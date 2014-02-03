@@ -9,11 +9,14 @@ import java.io.IOException;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import org.unix4j.convert.StringConverters;
+
 import jxl.Sheet;
 import jxl.Workbook;
 import jxl.WorkbookSettings;
 import jxl.read.biff.BiffException;
 
+import com.google.common.base.Charsets;
 import com.jgoodies.binding.adapter.AbstractTableAdapter;
 import com.jgoodies.binding.list.SelectionInList;
 
@@ -135,7 +138,9 @@ public class IdaKönyvtár
                 model.könyvek.getList().add(könyv);
             }
 
+            System.out.println();
             System.out.println(excelKönyvek.getCell("B2").getContents());
+
         }
         catch (BiffException e)
         {

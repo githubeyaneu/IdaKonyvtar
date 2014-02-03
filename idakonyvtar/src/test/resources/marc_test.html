@@ -1,0 +1,947 @@
+
+
+        
+        
+        
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<!-- ellenorzo:librivision:ok -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="hu-HU" lang="hu-HU">
+  <head>
+    <meta name="google-site-verification" content="cMqJM_BKUzMwRTPLx4M28fD1dbuJK9tI6Qfu8aXgvuU" />
+    <title>LibriVision</title>
+    <link rel="shortcut icon" href="http://nektar1.oszk.hu/LV/hu_hu_default/images/favicon16.ico" type="image/x-icon" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="Content-Script-Type" content="text/javascript; charset=UTF-8" />
+    
+    
+    
+      
+        <link rel="meta" type="application/rdf+xml" title="RDF Version" href="http://nektar.oszk.hu/data/manifestation/3487322" />
+
+      
+    
+    
+    <link href="http://nektar1.oszk.hu/LV/hu_hu_default/librivision.css" rel="StyleSheet" />    
+    
+    <!-- Nincs ilyen css 2010.10.13.
+	<link href="http://nektar1.oszk.hu/LV/hu_hu_default/scripts/jquery-treeview/jquery.treeview.css" rel="StyleSheet" />
+	//-->
+
+    <link href="http://nektar1.oszk.hu/LV/hu_hu_default/scripts/pirobox/css_pirobox/pirobox_b.css" media="screen" rel="StyleSheet" type="text/css"/>    
+     
+    <script src="http://nektar1.oszk.hu/LV/hu_hu_default/scripts/help_menu.js"></script>
+    <script src="http://nektar1.oszk.hu/LV/hu_hu_default/scripts/common.js"></script>
+    <script src="http://nektar1.oszk.hu/LV/hu_hu_default/scripts/overlib.js"></script>
+    <script src="http://nektar1.oszk.hu/LV/hu_hu_default/scripts/jquery-1.3.2.min.js"></script> 
+       <script type="text/javascript">
+           $(document).ready(function(){
+               $('a.mail').each(function(){
+                   e = this.rel.replace('/','@');
+                   this.href = 'mailto:' + e;
+                   $(this).text(e);
+               });
+           });
+       </script>      
+    <!-- Nincsenek ilyen js-ek 2010.10.13.
+	<script src="http://nektar1.oszk.hu/LV/hu_hu_default/scripts/jquery.cookie.js"></script>
+    <script src="http://nektar1.oszk.hu/LV/hu_hu_default/scripts/jquery-treeview/jquery.treeview.js"></script>
+    <script src="http://nektar1.oszk.hu/LV/hu_hu_default/scripts/jquery-treeview/jquery.treeview.async.js"></script>
+    <script src="http://nektar1.oszk.hu/LV/hu_hu_default/scripts/motionpack.js"></script>//-->
+    <script src="http://nektar1.oszk.hu/LV/hu_hu_default/scripts/pirobox/js/piroBox.js"></script>
+    
+    
+
+    <script type="text/javascript" language="JavaScript1.1">
+//////////////////////////////////////////////////////////////////////////////
+// Andrasi Aron: 2004-03-29
+// Index sugo torlese
+//
+    function sugo_torlese()
+      {
+        if (window.document.HELP_form.Help_Window_Status.value=="nyitva")
+        {
+         Help_Window.close();
+         window.document.HELP_form.Help_Window_Status.value="zarva";
+        }
+     }
+//////////////////////////////////////////////////////////////////////////////
+    </script>
+    
+  </head>
+
+  <body text="#666699" link="#666699" vlink="#666699" alink="#666699" onFocus="sugo_torlese();">
+
+<!-- Andrasi Aron: 2004-03-29: Adatmezo az index sugo torlesehez -->
+  <form name="HELP_form">
+   <input type='hidden' name='Help_Window_Status' value='zarva'>
+  </form>
+
+    <a name="top"></a>
+    <table width="98%" border="0" cellspacing="0" cellpadding="0" align="center" bgcolor="#666699" summary="This table holds the contents of the page.">
+      <tr>
+	<td align="left" valign="top" width="280" bgcolor="#FFFFFF" height="50">
+	  <table width="280" border="0" cellspacing="0" cellpadding="0">
+  		<tr>
+    		<td><img src="http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_left_end.png" width="20" height="60"></td>
+    	  	<td><a target="_blank" href="http://www.oszk.hu"><img src="http://nektar1.oszk.hu/LV/hu_hu_default/images/librivision.png" alt="Orsz&#225;gos Sz&#233;ch&#233;nyi K&#246;nyvt&#225;r" title="Orsz&#225;gos Sz&#233;ch&#233;nyi K&#246;nyvt&#225;r" width="260" height="60" border="0"></a></td>
+  		</tr>
+	</table>
+	</td>
+        <td align="right" valign="top" class="topmenu" width="100%" bgcolor="#FFFFFF">
+              <script type="text/javascript">
+    	function callhelp()
+	{
+		var NS4 = (document.layers) ? true : false;
+		if (NS4) {
+                	var myWindow = window.open("lv_help.html?SESSION_ID=1391233532_1350490027&lv_action=LV_Help#15", "LibriVision_help");
+		}
+		else {
+			 var myWindow = window.open("lv_help.html?SESSION_ID=1391233532_1350490027&lv_action=LV_Help#15", "LibriVision_help", "directories=no, height=500, width=600, hotkeys=no, location=no, menubar=no, resizable=yes, status=no, toolbar=no, scrollbars=yes");
+		}
+		myWindow.focus();
+        }
+
+     function gobackone ()
+      {
+        history.go(-1);
+      }
+
+    	function callkotelezo()
+	{
+		var NS4 = (document.layers) ? true : false;
+		if (NS4) {
+                	var myWindow = window.open("lv_kotelezo.html?SESSION_ID=1391233532_1350490027&lv_action=LV_Kotelezo", "LibriVision_Kotelezo");
+		}
+		else {
+		        var myWindow = window.open("lv_kotelezo.html?SESSION_ID=1391233532_1350490027&lv_action=LV_Kotelezo", "LibriVision_help", "directories=no, height=500, width=600, hotkeys=no, location=no, menubar=no, resizable=yes, status=no, toolbar=no, scrollbars=yes");
+		}
+		myWindow.focus();
+        }
+
+    </script>
+    
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" class="HelpMenu" align="center" summary="This table shows the navigational buttons.">
+      <tr valign="top">
+	<td width="100%" bgcolor="#FFFFFF" background="http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_border_bg.png"">
+         <img src="http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_border.png" border="0" align="middle" width="1" height="60" />
+	</td>
+	<td width="50" align="right" bgcolor="#FFFFFF">
+	  <a href="javascript:gobackone();" onmouseover="document.images.navback.src='http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_back_active.png'" onmouseout="document.images.navback.src='http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_back.png'" onfocus="document.images.navback.src='http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_back_active.png'" onblur="document.images.navback.src='http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_back.png'"><img src="http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_back.png" alt="Vissza az előző oldalra..." title="Vissza az előző oldalra..." border="0" align="middle" width="50" height="60" id="navback" /></a>
+	</td>
+	<td width="50" align="right" bgcolor="#FFFFFF">
+	  <a href="lv_menu.html?SESSION_ID=1391233532_1350490027&amp;lv_action=LV_Menu" onmouseover="document.images.navhome.src='http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_home_active.png'" onmouseout="document.images.navhome.src='http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_home.png'" onfocus="document.images.navhome.src='http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_home_active.png'" onblur="document.images.navhome.src='http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_home.png'"><img src="http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_home.png" alt="Főmenü..." title="Főmenü..." border="0" align="middle" width="50" height="60" id="navhome" /></a>
+	</td>
+	<td width="50" align="right" bgcolor="#FFFFFF">
+	  <a href="lv_database_menu.html?SESSION_ID=1391233532_1350490027&amp;lv_action=LV_Database_Menu" onmouseover="document.images.navselect_db.src='http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_select_db_active.png'" onmouseout="document.images.navselect_db.src='http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_select_db.png'" onfocus="document.images.navselect_db.src='http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_select_db_active.png'" onblur="document.images.navselect_db.src='http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_select_db.png'"><img src="http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_select_db.png" alt="Adatbázis választás..." title="Adatbázis választás..." border="0" align="middle" width="50" height="60" id="navselect_db" /></a>
+	</td>
+	<!-- Biro Szabolcs - 08.11.11 Csak egy bejelolt adatbazis eseteben jelenik meg a browse gomb. -->
+	
+	<td width="50" align="right" bgcolor="#FFFFFF">
+	  <a href="lv_search_form.html?SESSION_ID=1391233532_1350490027&amp;lv_action=LV_Search_Form&amp;HTML_SEARCH_TYPE=SIMPLE" onmouseover="document.images.navsearch.src='http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_search_active.png'" onmouseout="document.images.navsearch.src='http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_search.png'" onfocus="document.images.navsearch.src='http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_search_active.png'" onblur="document.images.navsearch.src='http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_search.png'"><img src="http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_search.png" alt="Új keresés..." title="Új keresés..." border="0" align="middle" width="50" height="60" id="navsearch" /></a>
+	</td>
+	<td width="50" align="right" bgcolor="#FFFFFF">
+	  <a href="lv_search.html?SESSION_ID=1391233532_1350490027&amp;lv_action=LV_Search" onmouseover="document.images.navlast_search.src='http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_last_search_active.png'" onmouseout="document.images.navlast_search.src='http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_last_search.png'" onfocus="document.images.navlast_search.src='http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_last_search_active.png'" onblur="document.images.navlast_search.src='http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_last_search.png'"><img src="http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_last_search.png" alt="Utolsó keresés..." title="Utolsó keresés..." border="0" align="middle" width="50" height="60" id="navlast_search" /></a>
+	</td>
+	<td width="50" align="right" bgcolor="#FFFFFF">
+	  <a href="lv_history.html?SESSION_ID=1391233532_1350490027&amp;lv_action=LV_History" onmouseover="document.images.navhistory.src='http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_history_active.png'" onmouseout="document.images.navhistory.src='http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_history.png'" onfocus="document.images.navhistory.src='http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_history_active.png'" onblur="document.images.navhistory.src='http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_history.png'"><img src="http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_history.png" alt="Történet..." title="Történet..." border="0" align="middle" width="50" height="60" id="navhistory" /></a>
+	</td>
+	<td width="50" align="right" bgcolor="#FFFFFF">
+	  <a onclick="callkotelezo();" onselect="callkotelezo();" href="#" onmouseover="document.images.compuls.src='http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_compulsory_active.png'" onmouseout="document.images.compuls.src='http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_compulsory.png'" onfocus="document.images.compuls.src='http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_compulsory_active.png'" onblur="document.images.compuls.src='http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_compulsory.png'" ><img src="http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_compulsory.png" alt="Tájékoztató a katalógusról..." title="Tájékoztató a katalógusról..." border="0" width="50" height="60" id="compuls" /></a>
+	</td>
+	<td width="50" align="right" bgcolor="#FFFFFF">
+	  <a onclick="callhelp();" onselect="callhelp();" href="#" onmouseover="document.images.navhelp.src='http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_help_active.png'" onmouseout="document.images.navhelp.src='http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_help.png'" onfocus="document.images.navhelp.src='http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_help_active.png'" onblur="document.images.navhelp.src='http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_help.png'"><img src="http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_help.png" alt="Súgó..." title="Súgó..." border="0" width="50" height="60" id="navhelp" /></a>
+	</td>
+	<td width="50" align="right" bgcolor="#FFFFFF">
+      <table width="70" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+	  <a href="lv_exit.html?SESSION_ID=1391233532_1350490027&amp;lv_action=LV_Exit" onmouseover="document.images.navexit.src='http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_exit_active.png'" onmouseout="document.images.navexit.src='http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_exit.png'" onfocus="document.images.navexit.src='http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_exit_active.png'" onblur="document.images.navexit.src='http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_exit.png'"><img src="http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_exit.png" alt="Kilépés a LibriVision-ből..." title="Kilépés a LibriVision-ből..." border="0" align="middle" width="50" height="60" id="navexit" /></a><img src="http://nektar1.oszk.hu/LV/hu_hu_default/images/menu_right_end.png" border="0" align="middle" width="20" height="60" /></td>
+          <td>&nbsp;</td>
+        </tr>
+      </table>
+
+    </td>
+      </tr>
+      <tr align="left">
+	<td align="left" valign="top" width="11" bgcolor="#FFFFFF">&nbsp;</td>
+	<td align="right" width="100%" bgcolor="#FFFFFF" colspan="9">
+          <div id="PageHeader">
+          &nbsp;
+          </div>
+	</td>
+      </tr>
+    </table>
+    
+
+
+        </td>
+      </tr>
+      <tr>
+	<td align="left" valign="top" width="100%" bgcolor="#FFFFFF" colspan="2">
+      <div valign="top"></div>
+	</td>
+      </tr>
+      <tr>
+	<td colspan="2" class="mainroom" bgcolor="#FFFFFF">
+          <table width="100%" cellspacing="0" cellpadding="0" border="0" summary="This table contains the main part of the screen." id="mainroom">
+            <tr height="5">
+              <td bgcolor="#FFFFFF">&nbsp;</td>
+              <td bgcolor="#FFFFFF">&nbsp;</td>
+              <td bgcolor="#FFFFFF">&nbsp;</td>
+            </tr>
+            <tr>
+              <td width="10" bgcolor="#FFFFFF">&nbsp;
+
+              </td>
+	      <td bgcolor="#FFFFFF">
+
+<script>SetDocumentTitle("Találatok megjelenítése");</script>
+<script src="http://nektar1.oszk.hu/LV/hu_hu_default/scripts/lv_view_records.js"></script>
+<script language="JavaScript">
+//////////////////////////////////////////////////////////////////////////////
+// Andrasi Aron: 2004-01-23
+// A weboldalon levo osszes checkbox kijelolese, illetve kijeloleseik torlese
+//
+
+
+
+function frbr(amicusid) {
+    if (jQuery.trim($("#"+amicusid).html())=="") {
+        $("#"+amicusid).treeview({
+        	url: "/frbr/?ID="+amicusid
+        });
+    }
+    return false;
+}
+
+function CheckAll() {
+  for ( var i = 0; i < document.view_record_form.elements.length; i++ ) {
+    var e = document.view_record_form.elements[i];
+    if ( e.type == 'checkbox' ) {
+        e.checked = true;
+    }
+  }
+}
+
+function CheckNone() {
+  for ( var i = 0; i < document.view_record_form.elements.length; i++ ) {
+    var e = document.view_record_form.elements[i];
+    if ( e.type == 'checkbox' ) {
+        e.checked = false;
+    }
+  }
+}
+var element_set_name = '';
+var amicus_azonosito = '';
+var db_id = '';
+var session_id = '';
+var return_url = '';
+var view = '';
+function show_kapcs() {
+/*    $.get("/kapcsolodo_rekordok/", { amicus_azonosito: amicus_azonosito, db_id: db_id, language: nyelv, session_id : session_id , return_url : return_url , view : view },
+      function(kapcs_data){
+        $("#kapcsolodo_rekordok_div").html(kapcs_data);
+      });*/
+    $.get("/kapcsrek_spring/kapcsrek.htm", { id: amicus_azonosito, db_id: db_id, language: nyelv, session_id : session_id , return_url : return_url , view : view },
+      function(kapcs_data){
+        $("#kapcsolodo_rekordok_div").html(kapcs_data);
+      });
+
+}
+$(document).ready(function() {
+  $("#loading").ajaxStart(function(){
+     $(this).show();
+  });
+  $("#loading").ajaxStop(function(){
+     $(this).hide();
+  }); 
+  if (element_set_name == 'F') {
+      show_cover();
+      show_kapcs();
+   }
+});
+
+
+//////////////////////////////////////////////////////////////////////////////
+</script>
+
+
+    <table border="0" cellspacing="0" cellpadding="0" align="center" summary="This table shows the title of the page.">
+      <tr>
+	<td>
+<!-- 2007.02.15 - Biro Szabolcs: A tablazat formazasa IE-hez.  -->
+	  <h2 style="font-size:14pt; margin:0px; color:#666699;">Találatok megjelenítése</h2>
+<!-- idaig  -->
+	</td>
+      </tr>
+    </table>
+    <br />
+
+	<!-- 2007.02.15 - Biro Szabolcs: A tablazat formazasa IE-hez.  -->
+    <table style="border:1px solid #666699;" cellspacing="0" cellpadding="0" width="100%" class="color"summary="This table contains a visual representation of the search query.">
+	<!-- idaig  -->
+      <tr>
+	<!-- 2007.02.14 - Biro Szabolcs: A felso sav formazasa IE-hez.  -->
+	<td class="rtlcolor" valign="middle">
+          <span style="font-size:13px;">&nbsp;Keresés:</span> <span style="color:#FF0000; font-weight:bold; font-size:13px;">BN 9789632273822</span>   <span style="font-size:13px;">OSZK Katalógus - Amicus</span>          
+        </td>
+	
+	
+	<td class="rtlcolor" valign="middle">
+	<!-- idaig  -->	
+	  
+	  
+	  
+	    <!-- 2007.08.01 - Biro Szabolcs: A formnak nincs margoja.  -->
+  <form style="margin:0px;" action="lv_view_records.html" method="post">
+  <!-- idaig -->
+    <input type="hidden" name="SESSION_ID" value="1391233532_1350490027"/>
+      <input type="hidden" name="lv_action" value="LV_Sort"/>
+	<input type="hidden" name="INPUT_RESULT_SET_NAME" value="set_1391233922_0"/>
+	  <input type="hidden" name="DB_ID" value="2"/>
+	  <input type="hidden" name="NR_RECORDS_TO_SHOW" value="10"/>
+	  <input type="hidden" name="GOTO_FIRST" value="TRUE"/>
+	  <input type="hidden" name="ELEMENT_SET_NAME" value="B"/>
+
+            
+      <!-- 2007.08.02 - Biro Szabolcs: Input Verdana stb.  -->            
+	    <input style="font-family: Verdana, Arial, Helvetica, sans-serif; color:#000000; height:22px; width:80px; border-top: 2px solid #ecebe7; border-left: 2px solid #ecebe7; border-right: 2px solid #404040; border-bottom: 2px solid #404040;" type="submit" value="Rendezés" title="Találatok rendezése."/>
+      <!-- idaig -->
+            
+	      
+	      
+              
+	      <select name="ATTRIBUTE[0]" id="KULCSSZAVAK">
+              
+		<option value="4">Cím</option>
+		<option value="1003">Szerző</option>
+		<option value="1018">Kiadó</option>
+		<option value="59">Kiadás helye</option>
+<!--		<option value="21">Tárgyszó</option> -->
+		<option value="54">Nyelv</option>
+		<option value="31">Kiadás dátuma</option>
+<!--		<option value="1001">Dokumentumtípus</option> -->
+<!--		<option value="2073">Bibliográfiai szint</option> -->
+	      </select>
+              
+	      <select name="RELATION[0]" id="RENDEZES">
+              
+		<option value="0">növekvő</option>
+		<option value="1">csökkenő</option>
+<!--
+		<option value="2">gyakoriság szerint növekvő</option>
+		<option value="3">gyakoriság szerint csökkenő</option>
+-->
+	      </select>
+	      
+	      
+  </form>
+
+	</td>
+	
+	<!-- 2007.02.14 - Biro Szabolcs: A felso sav formazasa IE-hez.  -->	
+        <td class="ltrcolor" valign="top">
+	  <form style="margin:0px;" action="lv_view_records.html" method="post">
+	    <span style="font-size:10pt;">Ugrás:<input type="text" size="3" name="GOTO_RECORD"></span>
+	<!-- idaig  -->	    
+	    <input type="hidden" name="SESSION_ID" value="1391233532_1350490027" />
+	    <input type="hidden" name="lv_action" value="LV_View_Records" />
+	    <input type="hidden" name="NR_RECORDS_TO_SHOW" value="1" />
+	    <input type="hidden" name="RESULT_SET_NAME" value="set_1391233922_0" />
+	    <input type="hidden" name="DISPLAY_RECORD_XSLT" value="marc_html" />
+	    <input type="hidden" name="ELEMENT_SET_NAME" value="F" />
+	  </form>
+        </td>
+      </tr>
+    </table>
+
+    <table cellspacing="0" cellpadding="0" border="0" width="100%" class="uncolor" summary="This table shows the navigation aids for the results.">
+      <tr>
+	<td class="rtluncolor">
+          <font size="1">Megjelenítve: <span class="ltruncolor" dir="ltr">1 - 1</span> /  <span class="ltruncolor" dir="ltr">1</span></font>
+	</td>
+	
+	<td class="ltruncolor">
+	  
+	  
+
+	  
+	  
+
+	  
+	  
+
+	  
+	  
+	</td>
+      </tr>
+    </table>
+    <table cellspacing="0" cellpadding="0" border="0" width="100%" class="uncolor" >
+	 <tr>
+	  <td>
+<!-- Andrasi Aron: 2004-02-18: Keresokerdes szerkesztese (Edit query) gomb -->
+    <input type="button" value="Keresőkérdés módosítása"
+                   alt="A keresőkérdés szerkesztése..." title="A keresőkérdés szerkesztése..." class="button" style="width:185px; height:22px;"
+                   onmouseover="this.style.color='#FFFFCC'"
+                   onmouseout="this.style.color='#FFFFFF'"
+                   onfocus="this.style.color='#FFFFCC'"
+                   onblur="this.style.color='#FFFFFF'"
+                   onclick="JavaScript:window.location='lv_search_edit_go_to.html?SESSION_ID=1391233532_1350490027&amp;lv_action=LV_Search'" />
+<!-- -->
+      </td>
+	  <!-- Goracz Monika sikertelen keresesnel info gomb -->
+      <td>
+	   <input type="button" value="Ha nem találta, amit keresett..."
+                   alt="Amennyiben nem találta, amit keresett, kérjük, ellenőrizze a cédulakatalógusokban is vagy kérje a tájékoztatók segítségét." title="Amennyiben nem találta, amit keresett, kérjük, ellenőrizze a cédulakatalógusokban is vagy kérje a tájékoztatók segítségét." class="button_grey" 
+                   onclick="JavaScript:var myWindow = window.open('http://nektar1.oszk.hu/LV/hu_hu_default/info.html', 'LibriVision_help', 'directories=no, screenX=0, screenY=0, left=0, top=0, height=650, width=600, hotkeys=no, location=no, menubar=no, resizable=yes, status=no, toolbar=no, scrollbars=yes'); myWindow.focus();"/>
+      </td>
+<!-- -->
+     </tr>
+	</table>  
+     <form action="http://nektar1.oszk.hu/LVbin/LibriVision/lv_stored_records.html" method="post" name="view_record_form">
+      <input type="hidden" name="SESSION_ID" value="1391233532_1350490027" />
+      <input type="hidden" name="lv_action" value="LV_Stored_Records" />
+      <input type="hidden" name="lv_option" value="ADD_RECORD" />
+      <input type="hidden" name="RESULT_VIEW" value="" />
+      <input type="hidden" name="NUMBER_OF_RECORDS" value="1" />
+
+    
+    
+    <div class="viewType"><span dir="ltr">1 / 1</span></div>
+    
+	 <!-- 2007.02.15 - Biro Szabolcs: A Teljes rekord megjelenites formazasa -->    
+    
+    
+    	<!-- 2007.02.15 - Biro Szabolcs: A Rovid rekord megjelenites formazasa -->     
+    	<div class="viewType"><div class="sortrekview"><a title="A rekord alap-adatainak megjelenítése." style="color:#ffffff; font-weight:normal; text-decoration:none;" onmouseover="this.style.color='#FFFFCC'" onmouseout="this.style.color='#FFFFFF'" onfocus="this.style.color='#FFFFCC'" onblur="this.style.color='#FFFFFF'" href="lv_view_records.html?SESSION_ID=1391233532_1350490027&lv_action=LV_View_Records&NR_RECORDS_TO_SHOW=10&GOTO_RECORD=1&RESULT_SET_NAME=set_1391233922_0&amp;DISPLAY_RECORD_XSLT=marc_html&amp;ELEMENT_SET_NAME=B">Rövid megjelenítés</a></div></div>
+		<!-- idaig  -->
+    
+       
+    
+    
+     
+      
+    
+    	
+  		<!-- 2007.02.14 - Biro Szabolcs: Cimkes megjelenites formazasa -->    	
+    	<div class="viewType"><div class="cimkesview"><a title="A rekord címkés formátumának megtekintése." style="color:#666699; font-weight:normal; text-decoration:none;" onmouseover="this.style.color='#000000'" onmouseout="this.style.color='#666699'" onfocus="this.style.color='#000000'" onblur="this.style.color='#666699'" href="lv_view_records.html?SESSION_ID=1391233532_1350490027&lv_action=LV_View_Records&NR_RECORDS_TO_SHOW=1&GOTO_RECORD=1&RESULT_SET_NAME=set_1391233922_0&amp;DISPLAY_RECORD_XSLT=html&amp;ELEMENT_SET_NAME=F">Cimkés formátum</a></div></div>
+		<!-- idaig  -->    	
+    	
+    	<!-- Kocsis Gergely: isbd megjelenítés -->
+    	
+		<!-- 2007.02.14 - Biro Szabolcs: ISBD megjelenites formazasa -->    	
+    	<div class="viewType"><div class="isbdview"><a title="A rekord cédula formátumának megtekintése." style="color:#666699; font-weight:normal; text-decoration:none;" onmouseover="this.style.color='#000000'" onmouseout="this.style.color='#666699'" onfocus="this.style.color='#000000'" onblur="this.style.color='#666699'" href="lv_view_records.html?SESSION_ID=1391233532_1350490027&lv_action=LV_View_Records&NR_RECORDS_TO_SHOW=1&GOTO_RECORD=1&RESULT_SET_NAME=set_1391233922_0&amp;DISPLAY_RECORD_XSLT=isbd_html&amp;ELEMENT_SET_NAME=F">Cédula formátum</a></div></div>
+		<!-- idaig  -->
+     	
+    
+    
+    <!-- Kocsis Gergely: isbd megjelenítés -->
+    
+    
+    <!-- Kocsis Gergely: isbd megjelenítés -->
+    
+ 	
+ 	<!-- 2007.02.14 - Biro Szabolcs: A Rekord tarolasa link esztetikusabba tetele.  -->    
+    
+    <div class="viewType" style="{ top:3px }"><div class="rektar"><a title="Rekord tárolása a jelölőnégyzet pipálásával." style="width:102px; height:16px;color:#ffffff; font-weight:normal; text-decoration:none;" onmouseover="this.style.color='#FFFFCC'" onmouseout="this.style.color='#FFFFFF'" onfocus="this.style.color='#FFFFCC'" onblur="this.style.color='#FFFFFF'" href="lv_stored_records.html?SESSION_ID=1391233532_1350490027&amp;lv_action=LV_Stored_Records&amp;lv_option=ADD_RECORD&amp;RECORD_ID=set_1391233922_0_F_1">Rekord tárolása</a>
+    <input type="hidden" name="RECORD_ID[0]" value="set_1391233922_0_F_1" />
+    <input class="rektarcheck" type="checkbox" name="SELECTED_RECORD_ID[0]" onclick="SelectRecord(this);" /></div></div>
+	<!-- idaig  -->
+
+    
+
+	<!-- Andrasi Aron: 2004-02-19: Nem ellenorizzuk, hogy DEFAULT_DB-rol van-e szo, mert nem 1 hanem 4 Amicusos adatbazisunk van -->
+    <!--?libriscript:LANG:IF:INIPAR:DEFAULT_DB_ID:=:DB_ID?-->
+     <!-- Do NOT display when record_type = authority record -->
+    
+      <!--  2=APW 1=BORROWER 0=LIBRIVISION CHANGE 5 INTO 0,1,2 IF YOU DO NOT WANT TO SHOW COPIES TO USERS -->
+    
+    
+	 <!-- 2007.02.14 - Biro Szabolcs: A Peldanyok megjelenitese link esztetikusabba tetele.  -->    
+      <!--  2010.04.08 - Goracz Monika - a Peldanyok gomb feleslegesse valt, a peldanyinformaciok link miatt
+        <div class="viewType"><div class="peldtar"><a title="Forgalmazható példányok megjelenítése." style="width:161px; height:16px; color:#ffffff; font-weight:normal; text-decoration:none;" onmouseover="this.style.color='#FFFFCC'" onmouseout="this.style.color='#FFFFFF'" onfocus="this.style.color='#FFFFCC'" onblur="this.style.color='#FFFFFF'" href="la_show_copies.html?SESSION_ID=1391233532_1350490027&lv_action=SR_LOAD_COPIES&BIB_NBR=3487322&ALL_COPIES=0">Példányok</a></div></div>
+      -->
+	 <!-- idaig  -->    
+    
+    
+    
+
+     <!-- Only display when we are in View marc record modus -->
+    
+    
+    
+    
+	 <!-- Andrasi Aron: 2004-02-19: Nem ellenorizzuk, hogy DEFAULT_DB-rol van-e szo, mert nem 1 hanem 4 Amicusos adatbazisunk van -->
+    <!--?libriscript:LANG:ENDIF?-->
+    <br />
+    <br />
+
+    <table class="records" dir="ltr" width="100%" border="0" summary="This table shows a record."><tr><td>
+<!-- Andrasi Aron: 2004-02-19: Raktari jelzet megjelenitese -->
+<!-- Ha Amicus adatbazisban kerestunk - 20-rol Reka keresere atirva 090420 -->
+ 
+
+
+<!-- -->
+
+      <table class="record">
+<colgroup>
+<col class="tag">
+<col class="indicators">
+<col class="subfieldcode">
+<col class="fieldValue">
+</colgroup>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">000</td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;"> </td>
+<td style="font-family: Tahoma, sans-serif;">01130nam a2200361 ir4500</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">001</td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;"> </td>
+<td style="font-family: Tahoma, sans-serif;">000003487322</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">005</td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;"> </td>
+<td style="font-family: Tahoma, sans-serif;">20130830101206.0</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">008</td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;"> </td>
+<td style="font-family: Tahoma, sans-serif;">130730s2013    hu            0000a hun e</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">020</td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;">a</td>
+<td style="font-family: Tahoma, sans-serif;">978-963-227-382-2</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">   </td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;">j</td>
+<td style="font-family: Tahoma, sans-serif;">kötött</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">   </td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;">c</td>
+<td style="font-family: Tahoma, sans-serif;">2990,- Ft</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">040</td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;">a</td>
+<td style="font-family: Tahoma, sans-serif;">OSZK</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">   </td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;">b</td>
+<td style="font-family: Tahoma, sans-serif;">hun</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">   </td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;">c</td>
+<td style="font-family: Tahoma, sans-serif;">OSZK</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">041</td>
+<td style="font-family: Tahoma, sans-serif;">0 </td>
+<td style="font-family: Tahoma, sans-serif;">a</td>
+<td style="font-family: Tahoma, sans-serif;">hun</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">080</td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;">a</td>
+<td style="font-family: Tahoma, sans-serif;">894.511-4</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">080</td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;">a</td>
+<td style="font-family: Tahoma, sans-serif;">943.9 (0:82-4)</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">080</td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;">a</td>
+<td style="font-family: Tahoma, sans-serif;">316.343.62 (0:82-4)</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">100</td>
+<td style="font-family: Tahoma, sans-serif;">10</td>
+<td style="font-family: Tahoma, sans-serif;">a</td>
+<td style="font-family: Tahoma, sans-serif;">Márai</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">   </td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;">j</td>
+<td style="font-family: Tahoma, sans-serif;">Sándor</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">   </td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;">d</td>
+<td style="font-family: Tahoma, sans-serif;">1900-1989</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">245</td>
+<td style="font-family: Tahoma, sans-serif;">10</td>
+<td style="font-family: Tahoma, sans-serif;">a</td>
+<td style="font-family: Tahoma, sans-serif;">Hallgatni akartam</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">   </td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;">c</td>
+<td style="font-family: Tahoma, sans-serif;">Márai Sándor</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">260</td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;">a</td>
+<td style="font-family: Tahoma, sans-serif;">[Budapest]</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">   </td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;">b</td>
+<td style="font-family: Tahoma, sans-serif;">Helikon</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">   </td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;">c</td>
+<td style="font-family: Tahoma, sans-serif;">2013</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">300</td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;">a</td>
+<td style="font-family: Tahoma, sans-serif;">183 p.</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">   </td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;">c</td>
+<td style="font-family: Tahoma, sans-serif;">19 cm</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">650</td>
+<td style="font-family: Tahoma, sans-serif;">17</td>
+<td style="font-family: Tahoma, sans-serif;">a</td>
+<td style="font-family: Tahoma, sans-serif;">magyar irodalom</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">   </td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;">2</td>
+<td style="font-family: Tahoma, sans-serif;">oszk</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">650</td>
+<td style="font-family: Tahoma, sans-serif;">17</td>
+<td style="font-family: Tahoma, sans-serif;">a</td>
+<td style="font-family: Tahoma, sans-serif;">magyar történelem</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">   </td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;">2</td>
+<td style="font-family: Tahoma, sans-serif;">oszk</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">650</td>
+<td style="font-family: Tahoma, sans-serif;">17</td>
+<td style="font-family: Tahoma, sans-serif;">a</td>
+<td style="font-family: Tahoma, sans-serif;">polgárság</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">   </td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;">2</td>
+<td style="font-family: Tahoma, sans-serif;">oszk</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">655</td>
+<td style="font-family: Tahoma, sans-serif;"> 7</td>
+<td style="font-family: Tahoma, sans-serif;">a</td>
+<td style="font-family: Tahoma, sans-serif;">esszé</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">   </td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;">2</td>
+<td style="font-family: Tahoma, sans-serif;">doktip</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">655</td>
+<td style="font-family: Tahoma, sans-serif;"> 7</td>
+<td style="font-family: Tahoma, sans-serif;">a</td>
+<td style="font-family: Tahoma, sans-serif;">memoár</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">   </td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;">2</td>
+<td style="font-family: Tahoma, sans-serif;">doktip</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">850</td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;">a</td>
+<td style="font-family: Tahoma, sans-serif;">B1</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">852</td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;">a</td>
+<td style="font-family: Tahoma, sans-serif;">B1</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">   </td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;">x</td>
+<td style="font-family: Tahoma, sans-serif;">Stack</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">   </td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;">m</td>
+<td style="font-family: Tahoma, sans-serif;">B 245.676</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">   </td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;">A</td>
+<td style="font-family: Tahoma, sans-serif;">@   17@6  </td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">   </td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;">B</td>
+<td style="font-family: Tahoma, sans-serif;">6072198</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">   </td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;">C</td>
+<td style="font-family: Tahoma, sans-serif;">OSZKTG</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">   </td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;">F</td>
+<td style="font-family: Tahoma, sans-serif;">              </td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">   </td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;">S</td>
+<td style="font-family: Tahoma, sans-serif;">B 245.676</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">852</td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;">a</td>
+<td style="font-family: Tahoma, sans-serif;">B1</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">   </td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;">x</td>
+<td style="font-family: Tahoma, sans-serif;">Stack</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">   </td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;">m</td>
+<td style="font-family: Tahoma, sans-serif;">MB 245.676</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">   </td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;">A</td>
+<td style="font-family: Tahoma, sans-serif;">@   A7@6  </td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">   </td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;">B</td>
+<td style="font-family: Tahoma, sans-serif;">6072199</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">   </td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;">C</td>
+<td style="font-family: Tahoma, sans-serif;">OSZKTG</td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">   </td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;">F</td>
+<td style="font-family: Tahoma, sans-serif;">              </td>
+</tr>
+<tr>
+<td style="font-family: Tahoma, sans-serif;">   </td>
+<td style="font-family: Tahoma, sans-serif;">  </td>
+<td style="font-family: Tahoma, sans-serif;">S</td>
+<td style="font-family: Tahoma, sans-serif;">MB 245.676</td>
+</tr>
+</table>
+     
+
+<!-- Andrasi Aron: 2004-02-19: Rekordkapcsolatok megjelenitese blabla-->
+<!-- Ha Amicus adatbazisban kerestunk - 20-rol Reka keresere atirva 090420 -->
+ 
+
+<!-- -->
+    </td></tr></table>
+    
+    
+
+    <table cellspacing="0" cellpadding="0" border="0" width="100%" class="uncolor" summary="This table shows the navigation aids for the results.">
+      <tr>
+	<td class="rtluncolor">
+          <font size="1">Megjelenítve: <span class="ltruncolor" dir="ltr">1 - 1</span> /  <span class="ltruncolor" dir="ltr">1</span></font>
+	</td>
+	<td class="ltruncolor">
+	  
+	  
+
+	  
+	  
+
+	  
+	  
+
+	  
+	  
+	</td>
+      </tr>
+    </table>
+
+<!-- Andrasi Aron: 2004-02-19: CheckAll, CheckNone -->
+    
+
+<!-- Biro Szabolcs - 2007.02.16 - Title kerult a gombhoz. -->    
+    <input type="button" value="Összes kijelölése"
+                   alt="A lapon található összes tétel kijelölése..." title="A lapon található összes tétel kijelölése..." class="button" style="width:128px; height:22px;"
+                   onmouseover="this.style.color='#FFFFCC'"
+                   onmouseout="this.style.color='#FFFFFF'"
+                   onfocus="this.style.color='#FFFFCC'"
+                   onblur="this.style.color='#FFFFFF'"
+                   onclick="JavaScript:CheckAll();" />
+<!-- idaig -->
+                   
+    
+
+    
+
+<!-- Biro Szabolcs - 2007.02.16 - Title kerult a gombhoz. -->    
+    <input type="button" value="Egyik se"
+                   alt="A lapon található összes kijelölés megszüntetése..." title="A lapon található összes kijelölés megszüntetése..." class="button"  style="width:76px; height:22px;"
+                   onmouseover="this.style.color='#FFFFCC'"
+                   onmouseout="this.style.color='#FFFFFF'"
+                   onfocus="this.style.color='#FFFFCC'"
+                   onblur="this.style.color='#FFFFFF'"
+                   onclick="JavaScript:CheckNone();" />
+<!-- idaig -->
+                   
+    
+
+
+    
+    
+<!-- Biro Szabolcs - 2007.02.16 - Title kerult a gombhoz. -->    
+    <input type="submit" value="Kijelölt rekordok tárolása"
+                   alt="Kijelölt rekordok tárolása." title="Kijelölt rekordok tárolása." class="button"  style="width:185px; height:22px;"
+                   onmouseover="this.style.color='#FFFFCC'"
+                   onmouseout="this.style.color='#FFFFFF'"
+                   onfocus="this.style.color='#FFFFCC'"
+                   onblur="this.style.color='#FFFFFF'"
+                   onclick="AddRecord();"
+                   onselect="AddRecord();"
+                   onkeypress="AddRecord();" />
+<!-- idaig -->                   
+                   
+    
+  </form>
+
+
+              </td>
+              <td width="10" bgcolor="#FFFFFF">
+                &nbsp;
+              </td>
+            </tr>
+            <tr height="5">
+              <td bgcolor="#FFFFFF">&nbsp;</td>
+              <td bgcolor="#FFFFFF">&nbsp;</td>
+              <td bgcolor="#FFFFFF">&nbsp;</td>
+            </tr>
+          </table>
+	</td>
+      </tr>
+      <tr>
+        <td colspan="2" align="center" valign="middle" class="mainroom" bgcolor="#FFFFFF">
+          &nbsp;
+        </td>
+      </tr>
+      <tr width="100%">
+        <td width="100%" colspan="2">
+          <table width="100%" cellspacing="0" cellpadding="0" border="0" summary="This table displays contact information and provides links.">
+            <tr>
+              <td width="10" bgcolor="#FFFFFF">
+                &nbsp;
+              </td>
+	      <td align="center" valign="middle" bgcolor="#666699" class="footerfirst">
+	        <font size="-2" color="#FFFFFF">
+                  
+                  <b><span onmouseover="overlib('Ha &lt;b&gt;kereséssel&lt;/b&gt;, a &lt;b&gt;keresőkérdések összeállításával&lt;/b&gt; vagy egyéb,&lt;br&gt; a &lt;b&gt;katalógussal kapcsolatos nem működésbeli problémája&lt;/b&gt; adódik, kérjük erre a címre írjon!')" onmouseout="nd();">Keresési problémák/hibák:</span> </b>
+  				        <a onmouseover="overlib('Ha &lt;b&gt;kereséssel&lt;/b&gt;, a &lt;b&gt;keresőkérdések összeállításával&lt;/b&gt; vagy egyéb,&lt;br&gt; a &lt;b&gt;katalógussal kapcsolatos nem működésbeli problémája&lt;/b&gt; adódik, kérjük erre a címre írjon!')" onmouseout="nd();" class="mail" style="color:white;" rel="inform/oszk.hu"></a>                
+                  <!--a href="<!--?libriscript:INIPAR:FEEDBACK_URL?--><!--"><font color="#FFFFFF"><!--?libriscript:INIPAR:FEEDBACK?--><!--/font></a-->
+                  <b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span onmouseover="overlib('Ha a &lt;b&gt;felülettel&lt;/b&gt;, &lt;b&gt;az egyes funkciók működésével&lt;/b&gt; vagy egyéb,&lt;br&gt; a &lt;b&gt;katalógussal kapcsolatos működésbeli problémája&lt;/b&gt; adódik, kérjük erre a címre írjon!')" onmouseout="nd();">Technikai problémák:</span> </b>
+                  <a onmouseover="overlib('Ha a &lt;b&gt;felülettel&lt;/b&gt;, &lt;b&gt;az egyes funkciók működésével&lt;/b&gt; vagy egyéb,&lt;br&gt; a &lt;b&gt;katalógussal kapcsolatos működésbeli problémája&lt;/b&gt; adódik, kérjük erre a címre írjon!')" onmouseout="nd();" class="mail" style="color:white;" rel="lvt/oszk.hu"></a>
+                  <b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Szolgáltató: </b>
+                  <a target="_blank" href="http://www.oszk.hu/"><font color="#FFFFFF">Országos Széchényi Könyvtár</font></a>                  
+                  <!--a href="<!--?libriscript:INIPAR:TECHNEUT_URL?--><!--"><!--font color="#FFFFFF"--><!--?libriscript:INIPAR:TECHNEUT?--><!--/font></a-->
+                </font><br />
+              </td>
+              <td width="10" bgcolor="#FFFFFF">
+                &nbsp;
+              </td>
+            </tr>
+            <tr>
+              <td width="10" bgcolor="#FFFFFF">
+                &nbsp;
+              </td>
+              <td align="center" valign="middle" bgcolor="#FFFFFF" class="footersecond">
+                <font size="-2" color="#666699">
+                  <b>Copyright: &copy;2003 </b>
+                  <a target="_blank" href="http://www.libricore.com/"><b>LibriCore</b></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <b>Utolsó frissítés: </b>2.1.0:  Aug 02, 2007
+                </font><br /><br />
+              </td>
+              <td width="10" bgcolor="#FFFFFF">
+                &nbsp;
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+    <span class="poweredby"><span style="{position: relative; bottom: 2px}">  </span><img src="http://nektar1.oszk.hu/LV/hu_hu_default/images/librivision_small.png" alt="LibriVision" height="14" /></span>
+    <br /><br />
+  </body>
+</html>
+

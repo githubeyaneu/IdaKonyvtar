@@ -1,6 +1,9 @@
 package eu.eyan.idakonyvtar.oszk;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.io.IOException;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -58,5 +61,64 @@ public class OszkKereso
         String group = matcher.group();
         String session_id = group.substring(regex_prefix.length(), group.length() - regexPost.length()).replaceAll("&amp;", "&");
         return session_id;
+    }
+
+    public static List<Marc> getMarcsToIsbn(String isbn)
+    {
+        List<Marc> marcs = newArrayList();
+        try
+        {
+            String source = isbnKeresOszkban(isbn);
+//			String source = FileUtils.readFileToString(new File(Resources.getResource("marc_test.html").getFile()));
+//			System.out.println(source);
+            source = source.replace("\r\n", "");
+
+            Matcher marcTableMatcher = Pattern.compile("<table class=\"record\">.*?</table>").matcher(source);
+            marcTableMatcher.find();
+            String marcTable = marcTableMatcher.group();
+//	        System.out.println(marcTable);
+
+            Matcher marcSorMatcher = Pattern.compile("<tr.*?</tr").matcher(marcTable);
+            String lastMarc1 = "", lastMarc2 = "", lastMarc3 = "";
+            while (marcSorMatcher.find())
+            {
+                String sor = marcSorMatcher.group();
+                String marc1 = sor.substring(50 - 1, 53 - 1).trim();
+                String marc2 = sor.substring(103 - 1, 105 - 1).trim();
+                String marc3 = sor.substring(155 - 1, 156 - 1).trim();
+                String érték = sor.substring(206 - 1, sor.length() - 9).trim();
+                if (!marc1.equals(lastMarc1) && !marc1.equals(""))
+                {
+                    lastMarc1 = marc1;
+                    lastMarc2 = marc2;
+                }
+                else if (!marc2.equals(lastMarc2) && !marc2.equals(""))
+                {
+                    lastMarc2 = marc2;
+                }
+                lastMarc3 = marc3;
+
+//				System.out.print(new StringBuilder()
+//				.append("-")
+//	        	.append(marc1)
+//	        	.append(" ")
+//	        	.append(marc2)
+//	        	.append(" ")
+//	        	.append(marc3)
+//	        	.append(" ")
+//	        	.append(érték)
+//	        	);
+//				System.out.println("+"+lastMarc1+" "+lastMarc2+" "+lastMarc3);
+                marcs.add(new Marc(lastMarc1, lastMarc2, lastMarc3, érték));
+            }
+
+        }
+        catch (IOException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        System.out.println("Siker");
+        return marcs;
     }
 }

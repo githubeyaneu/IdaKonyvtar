@@ -7,6 +7,24 @@
 	<name>idakonyvtar</name>
 	<description>Frey Károlyné, Ida könyvtára</description>
 
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<!-- project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding-->
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.0</version>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
 	<dependencies>
 		<dependency>
 			<groupId>jexcelapi</groupId>

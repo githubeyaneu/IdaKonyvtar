@@ -10,6 +10,8 @@ import java.net.URL;
 
 import org.apache.commons.io.FileUtils;
 
+import com.google.common.base.Charsets;
+
 public class HttpHelper
 {
 
@@ -31,8 +33,10 @@ public class HttpHelper
         System.out.println("\nSending 'POST' request to URL : " + request);
         System.out.println("Post parameters : " + urlParameters);
         System.out.println("Response Code : " + httpURLConnection.getResponseCode());
+        System.out.println("Connection Encoding : " + httpURLConnection.getContentEncoding());
+        
     
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream(), Charsets.UTF_8));
     
         StringBuffer ret = new StringBuffer();
         String inputLine;
