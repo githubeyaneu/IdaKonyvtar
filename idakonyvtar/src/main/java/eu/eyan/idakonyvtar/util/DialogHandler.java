@@ -19,9 +19,10 @@ public class DialogHandler
         dialog.setModal(true);
         dialog.add(controller.getView());
         dialog.setTitle(controller.getTitle());
-        dialog.setSize(controller.getSize());
+        dialog.setResizable(true);
         dialog.pack();
         dialog.setVisible(true);
+        dialog.setSize(controller.getSize());
     }
 
 }
