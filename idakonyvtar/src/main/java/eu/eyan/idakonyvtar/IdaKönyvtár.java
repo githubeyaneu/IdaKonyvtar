@@ -9,17 +9,15 @@ import java.io.IOException;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-import org.unix4j.convert.StringConverters;
-
 import jxl.Sheet;
 import jxl.Workbook;
 import jxl.WorkbookSettings;
 import jxl.read.biff.BiffException;
 
-import com.google.common.base.Charsets;
 import com.jgoodies.binding.adapter.AbstractTableAdapter;
 import com.jgoodies.binding.list.SelectionInList;
 
+import eu.eyan.idakonyvtar.menu.IdaKönyvtárMenü;
 import eu.eyan.idakonyvtar.model.IdaKönyvtárModel;
 import eu.eyan.idakonyvtar.model.Könyv;
 import eu.eyan.idakonyvtar.view.IdaKönyvtárView;
@@ -29,6 +27,7 @@ public class IdaKönyvtár
     private static final int DEFAULT_MAGASSÁG = 600;
     private static final int DEFAULT_SZÉLESSÉG = 1000;
 
+    // FIXME: refactor to IController
     public static void main(final String[] args)
     {
         JFrame frame = new JFrame();
@@ -40,6 +39,7 @@ public class IdaKönyvtár
         frame.setLocation((screenSize.width - DEFAULT_SZÉLESSÉG) / 2, (screenSize.height - DEFAULT_MAGASSÁG) / 2);
         frame.setJMenuBar(new IdaKönyvtárMenü(idaKönyvtár));
         frame.pack();
+        frame.setTitle("Ida könyvtára");
         frame.setVisible(true);
     }
 

@@ -5,13 +5,13 @@ import java.util.List;
 public class MarcHelper
 {
 
-    public static String findMarc(List<Marc> marcs, Marcs cim)
+    public static String findMarc(List<Marc> marcs, MarcCodes marcCode)
     {
         for (Marc marc : marcs)
         {
-            if (cim.getMarc1().equals(marc.getMarc1())
-                    && cim.getMarc2().equals(marc.getMarc2())
-                    && cim.getMarc2().equals(marc.getMarc2()))
+            if (marcCode.getMarc1().equals(marc.getMarc1())
+                    && marcCode.getMarc2().equals(marc.getMarc2())
+                    && marcCode.getMarc2().equals(marc.getMarc2()))
             {
                 return marc.getValue();
             }

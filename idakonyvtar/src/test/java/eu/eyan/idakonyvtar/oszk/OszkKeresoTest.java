@@ -29,16 +29,16 @@ public class OszkKeresoTest
     }
 
     @Test
-    public void mar_parse_muxik()
+    public void mar_parse_muxik() throws OszkKeresoException
     {
         List<Marc> abigel = OszkKereso.getMarcsToIsbn("9789631193701");
-        assertThat(MarcHelper.findMarc(abigel, Marcs.CIM)).isEqualTo("Abigél");
+        assertThat(MarcHelper.findMarc(abigel, MarcCodes.CIM)).isEqualTo("Abigél");
 
         List<Marc> marai = OszkKereso.getMarcsToIsbn("9789632273822");
-        assertThat(MarcHelper.findMarc(marai, Marcs.CIM)).isEqualTo("Hallgatni akartam");
+        assertThat(MarcHelper.findMarc(marai, MarcCodes.CIM)).isEqualTo("Hallgatni akartam");
     }
 
-    public static void main(String[] args)
+    public static void main(String[] args) throws OszkKeresoException
     {
         new OszkKeresoTest().mar_parse_muxik();
     }

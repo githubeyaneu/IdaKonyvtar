@@ -63,7 +63,7 @@ public class OszkKereso
         return session_id;
     }
 
-    public static List<Marc> getMarcsToIsbn(String isbn)
+    public static List<Marc> getMarcsToIsbn(String isbn) throws OszkKeresoException
     {
         List<Marc> marcs = newArrayList();
         try
@@ -113,10 +113,10 @@ public class OszkKereso
             }
 
         }
-        catch (IOException e)
+        catch (Throwable e)
         {
-            // TODO Auto-generated catch block
             e.printStackTrace();
+            throw new OszkKeresoException("Sikertelen.", e);
         }
         System.out.println("Siker");
         return marcs;

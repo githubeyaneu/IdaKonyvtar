@@ -1,6 +1,6 @@
 package eu.eyan.idakonyvtar.oszk;
 
-public enum Marcs
+public enum MarcCodes
 {
     CIM("245", "10", "a");
 
@@ -8,7 +8,7 @@ public enum Marcs
     private String marc2;
     private String marc3;
 
-    Marcs(String marc1, String marc2, String marc3)
+    MarcCodes(String marc1, String marc2, String marc3)
     {
         this.marc1 = marc1;
         this.marc2 = marc2;
