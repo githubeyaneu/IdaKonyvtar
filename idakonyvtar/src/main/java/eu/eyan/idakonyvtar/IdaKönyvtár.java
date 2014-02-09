@@ -3,6 +3,8 @@ package eu.eyan.idakonyvtar;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 
@@ -15,11 +17,15 @@ import jxl.WorkbookSettings;
 import jxl.read.biff.BiffException;
 
 import com.jgoodies.binding.adapter.AbstractTableAdapter;
+import com.jgoodies.binding.adapter.SingleListSelectionAdapter;
 import com.jgoodies.binding.list.SelectionInList;
 
+import eu.eyan.idakonyvtar.controller.KönyvController;
+import eu.eyan.idakonyvtar.controller.input.KönyvControllerInput;
 import eu.eyan.idakonyvtar.menu.IdaKönyvtárMenü;
 import eu.eyan.idakonyvtar.model.IdaKönyvtárModel;
 import eu.eyan.idakonyvtar.model.Könyv;
+import eu.eyan.idakonyvtar.util.DialogHandler;
 import eu.eyan.idakonyvtar.view.IdaKönyvtárView;
 
 public class IdaKönyvtár
@@ -49,15 +55,32 @@ public class IdaKönyvtár
     public IdaKönyvtár()
     {
         importExcel(new File("C:\\Users\\FA\\Desktop\\házikönyvtár.xls"));
-        KönyvtárListaTableModel dataModel = new KönyvtárListaTableModel(model.könyvek);
+        final KönyvtárListaTableModel dataModel = new KönyvtárListaTableModel(model.könyvek);
         view.könyvTábla.setModel(dataModel);
+        view.könyvTábla.setSelectionModel(new SingleListSelectionAdapter(model.könyvek.getSelectionIndexHolder()));
         view.könyvTábla.setEnabled(true);
+        view.könyvTábla.addMouseListener(new MouseAdapter()
+        {
+            @Override
+            public void mouseClicked(MouseEvent e)
+            {
+                if (e.getClickCount() == 2)
+                {
+                    DialogHandler.modalDialog(view.getComponent(), new KönyvController(), new KönyvControllerInput(dataModel.getSelectedKönyv(), model.könyvek.getList()));
+                }
+            }
+        });
     }
 
     public static class KönyvtárListaTableModel extends AbstractTableAdapter<Könyv>
     {
         private static final long serialVersionUID = 1L;
-        private final SelectionInList<Könyv> listModel;
+        private SelectionInList<Könyv> listModel;
+
+        public Könyv getSelectedKönyv()
+        {
+            return listModel.getSelection();
+        }
 
         public KönyvtárListaTableModel(final SelectionInList<Könyv> listModel)
         {
@@ -119,7 +142,7 @@ public class IdaKönyvtár
             WorkbookSettings ws = new WorkbookSettings();
             ws.setEncoding("Cp1252");
             Sheet excelKönyvek = Workbook.getWorkbook(file, ws).getSheet(0);
-            for (int aktuálisSor = 0; aktuálisSor < excelKönyvek.getRows(); aktuálisSor++)
+            for (int aktuálisSor = 1; aktuálisSor < excelKönyvek.getRows(); aktuálisSor++)
             {
                 Könyv könyv = new Könyv();
                 for (int aktuálisOszlop = 0; aktuálisOszlop < excelKönyvek.getColumns(); aktuálisOszlop++)

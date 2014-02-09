@@ -17,15 +17,9 @@ import eu.eyan.idakonyvtar.oszk.OszkKereso;
 import eu.eyan.idakonyvtar.oszk.OszkKeresoException;
 import eu.eyan.idakonyvtar.view.IsbnDialogView;
 
-public class IsbnDialogController implements IController, ActionListener
+public class IsbnController implements IController<Void>, ActionListener
 {
-    private IsbnDialogView view;
-
-    public IsbnDialogController()
-    {
-        view = new IsbnDialogView();
-        view.isbnText.addActionListener(this);
-    }
+    private IsbnDialogView view = new IsbnDialogView();
 
     public Component getView()
     {
@@ -79,8 +73,19 @@ public class IsbnDialogController implements IController, ActionListener
     }
 
     @Override
-    public Dimension getSize()
+    public Dimension getDefaultSize()
     {
         return new Dimension(300, 200);
+    }
+
+    @Override
+    public void initData(Void model)
+    {
+    }
+
+    @Override
+    public void initDataBindings()
+    {
+        view.isbnText.addActionListener(this);
     }
 }

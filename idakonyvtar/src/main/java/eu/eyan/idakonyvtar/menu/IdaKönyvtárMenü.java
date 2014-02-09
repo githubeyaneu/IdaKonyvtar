@@ -11,7 +11,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
 import eu.eyan.idakonyvtar.IdaKönyvtár;
-import eu.eyan.idakonyvtar.controller.IsbnDialogController;
+import eu.eyan.idakonyvtar.controller.IsbnController;
 import eu.eyan.idakonyvtar.util.DialogHandler;
 
 public class IdaKönyvtárMenü extends JMenuBar implements ActionListener
@@ -47,7 +47,7 @@ public class IdaKönyvtárMenü extends JMenuBar implements ActionListener
 
         if (e.getSource() == ISBN_KERES)
         {
-            DialogHandler.modalDialog(ISBN_KERES, new IsbnDialogController());
+            DialogHandler.modalDialog(ISBN_KERES, new IsbnController(), null);
         }
     }
 }

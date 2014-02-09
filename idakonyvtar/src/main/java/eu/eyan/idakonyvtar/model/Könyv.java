@@ -30,7 +30,7 @@ public class Könyv
         }
     }
 
-    String szerző, szerzőmegjegyzés, cím, kiadás, megjelenéshelye, kiadó, év, terjedelem, ár, sorozat, téma, megjegyzés, isbn;
+    String szerző, szerzőmegjegyzés, cim, kiadás, megjelenéshelye, kiadó, év, terjedelem, ár, sorozat, téma, megjegyzés, isbn;
 
     public String getSzerző()
     {
@@ -52,14 +52,14 @@ public class Könyv
         this.szerzőmegjegyzés = szerzőmegjegyzés;
     }
 
-    public String getCím()
+    public String getCim()
     {
-        return cím;
+        return cim;
     }
 
-    public void setCím(final String cím)
+    public void setCim(final String cim)
     {
-        this.cím = cím;
+        this.cim = cim;
     }
 
     public String getKiadás()
@@ -169,7 +169,7 @@ public class Könyv
             case SZERZŐ:
                 return getSzerző();
             case CÍM:
-                return getCím();
+                return getCim();
             case ISBN:
                 return getIsbn();
             case KIADÁS:
@@ -205,7 +205,7 @@ public class Könyv
                 setSzerző(szöveg);
                 break;
             case CÍM:
-                setCím(szöveg);
+                setCim(szöveg);
                 break;
             case ISBN:
                 setIsbn(szöveg);
