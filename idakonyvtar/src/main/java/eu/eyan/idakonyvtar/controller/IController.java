@@ -3,7 +3,7 @@ package eu.eyan.idakonyvtar.controller;
 import java.awt.Component;
 import java.awt.Dimension;
 
-public interface IController<MODEL>
+public interface IController<INPUT>
 {
     public Component getView();
 
@@ -11,7 +11,7 @@ public interface IController<MODEL>
 
     public Dimension getDefaultSize();
 
-    public void initData(MODEL model);
+    public void initData(INPUT input);
 
     public void initDataBindings();
 }

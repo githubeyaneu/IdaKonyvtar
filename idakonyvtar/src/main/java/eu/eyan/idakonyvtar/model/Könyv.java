@@ -89,7 +89,11 @@ public class Könyv
 
     public void setKiadó(final String kiadó)
     {
-        this.kiadó = kiadó;
+        // FIXME: AutoCompleteDecorator Problem: Disgusting Hack but works...
+        if (kiadó != null)
+        {
+            this.kiadó = kiadó;
+        }
     }
 
     public String getÉv()
