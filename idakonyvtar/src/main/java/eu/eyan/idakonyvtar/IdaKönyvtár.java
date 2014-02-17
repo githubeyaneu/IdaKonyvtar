@@ -10,6 +10,6 @@ public class IdaKönyvtár
 {
     public static void main(final String[] args)
     {
-        DialogHandler.runInFrame(new KönyvtárController(), new KönyvtárControllerInput(new File("C:\\Users\\FA\\Desktop\\házikönyvtár.xls")));
+        DialogHandler.runInFrame(new KönyvtárController(), new KönyvtárControllerInput(new File("házikönyvtár.xls")));
     }
 }

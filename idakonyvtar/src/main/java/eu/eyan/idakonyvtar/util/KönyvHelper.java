@@ -21,10 +21,11 @@ public class KönyvHelper
         Set<String> set = newHashSet("");
         for (Könyv könyv : könyvLista)
         {
-            if (könyv.getKiadó() != null)
-            {
-                set.add(könyv.getKiadó().trim());
-            }
+            // FIXME
+//            if (könyv.getKiadó() != null)
+//            {
+//                set.add(könyv.getKiadó().trim());
+//            }
         }
         List<String> list = newArrayList(set);
 

@@ -1,9 +1,14 @@
 package eu.eyan.idakonyvtar.view;
 
-import java.awt.Component;
+import static com.google.common.collect.Lists.newArrayList;
 
-import javax.swing.JComboBox;
+import java.awt.Component;
+import java.util.List;
+
 import javax.swing.JTextField;
+
+import lombok.Getter;
+import lombok.Setter;
 
 import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.factories.CC;
@@ -11,23 +16,29 @@ import com.jgoodies.forms.layout.FormLayout;
 
 public class KönyvView implements IView
 {
-    public JTextField cim = new JTextField();
-    public JTextField szerzo = new JTextField();
-    public JComboBox<String> valami = new JComboBox<String>();
+    @Setter
+    private List<String> oszlopok = newArrayList();
+    @Getter
+    private List<JTextField> szerkesztők = newArrayList();
 
     @Override
     public Component getComponent()
     {
-        PanelBuilder panelBuilder = new PanelBuilder(new FormLayout("pref, pref:grow", "pref, pref, pref"));
-        panelBuilder.addLabel("Cím", CC.xy(1, 1));
-        panelBuilder.addLabel("Szerző", CC.xy(1, 2));
-        panelBuilder.addLabel("Str...", CC.xy(1, 3));
-
-        panelBuilder.add(cim, CC.xy(2, 1));
-        panelBuilder.add(szerzo, CC.xy(2, 2));
-        panelBuilder.add(valami, CC.xy(2, 3));
-
+        String rowDef = "pref, 3dlu";
+        String rowSpec = rowDef;
+        for (int i = 1; i < oszlopok.size(); i++)
+        {
+            rowSpec += "," + rowDef;
+        }
+        PanelBuilder panelBuilder = new PanelBuilder(new FormLayout("pref, pref:grow", rowSpec));
+        for (int i = 0; i < oszlopok.size(); i++)
+        {
+            panelBuilder.addLabel(oszlopok.get(i), CC.xy(1, i * 2 + 1));
+            // public JComboBox<String> valami = new JComboBox<String>();
+            JTextField szerkesztő = new JTextField();
+            szerkesztők.add(szerkesztő);
+            panelBuilder.add(szerkesztő, CC.xy(2, i * 2 + 1));
+        }
         return panelBuilder.build();
     }
-
 }

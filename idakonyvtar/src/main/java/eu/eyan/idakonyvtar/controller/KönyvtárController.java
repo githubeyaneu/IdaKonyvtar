@@ -8,9 +8,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 
 import javax.swing.JFileChooser;
 import javax.swing.JMenuBar;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.jgoodies.binding.adapter.SingleListSelectionAdapter;
 
@@ -36,7 +38,7 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
     public Component getView()
     {
         view.getComponent();
-        dataModel = new KönyvtárListaTableModel(model.getKönyvek());
+        dataModel = new KönyvtárListaTableModel(model.getKönyvek(), model.getKönyvtár().getOszlopok());
         view.könyvTábla.setModel(dataModel);
         view.könyvTábla.setSelectionModel(new SingleListSelectionAdapter(model.getKönyvek().getSelectionIndexHolder()));
         view.könyvTábla.setEnabled(true);
@@ -58,15 +60,28 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
     @Override
     public void initData(KönyvtárControllerInput input)
     {
+        readKönyvtár(input.getFile());
+    }
+
+    private void readKönyvtár(File file)
+    {
+        model.setKönyvtár(ExcelKezelő.könyvtárBeolvasása(file));
         model.getKönyvek().getList().clear();
-        model.getKönyvek().getList().addAll(ExcelKezelő.könyvtárBeolvasása(input.getFile()));
+        // FIXME heee? 2x a modelben
+        model.getKönyvek().getList().addAll(model.getKönyvtár().getKönyvek());
+    }
+
+    private void saveKönyvtár(File file)
+    {
+        ExcelKezelő.könyvtárMentése(file, model.getKönyvtár());
     }
 
     @Override
     public void initDataBindings()
     {
-        menu.IMPORT_EXCEL.addActionListener(this);
+        menu.EXCEL_TÖLTÉS.addActionListener(this);
         menu.ISBN_KERES.addActionListener(this);
+        menu.EXCEL_MENTÉS.addActionListener(this);
 
         view.könyvTábla.addMouseListener(new MouseAdapter()
         {
@@ -75,7 +90,8 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
             {
                 if (e.getClickCount() == 2)
                 {
-                    DialogHandler.startModalDialog(view.getComponent(), new KönyvController(), new KönyvControllerInput(dataModel.getSelectedKönyv(), model.getKönyvek().getList()));
+                    DialogHandler.startModalDialog(view.getComponent(), new KönyvController(), new KönyvControllerInput(dataModel.getSelectedKönyv(), model.getKönyvek().getList(), model.getKönyvtár().getOszlopok()));
+//                    DialogHandler.runInModalerFrame(view.getComponent(), new KönyvController(), new KönyvControllerInput(dataModel.getSelectedKönyv(), model.getKönyvek().getList()));
                 }
             }
         });
@@ -90,13 +106,26 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
     @Override
     public void actionPerformed(final ActionEvent e)
     {
-        if (e.getSource() == menu.IMPORT_EXCEL)
+        if (e.getSource() == menu.EXCEL_TÖLTÉS)
         {
-            JFileChooser jFileChooser = new JFileChooser();
-            if (jFileChooser.showOpenDialog(menu.IMPORT_EXCEL) == APPROVE_OPTION)
+            JFileChooser jFileChooser = new JFileChooser(".");
+            jFileChooser.setApproveButtonText("Töltés");
+            jFileChooser.setFileFilter(new FileNameExtensionFilter("Excel97 fájlok", "xls"));
+            if (jFileChooser.showOpenDialog(menu.EXCEL_TÖLTÉS) == APPROVE_OPTION)
             {
-                model.getKönyvek().getList().clear();
-                model.getKönyvek().setList(ExcelKezelő.könyvtárBeolvasása(jFileChooser.getSelectedFile()));
+                readKönyvtár(jFileChooser.getSelectedFile());
+            }
+        }
+
+        if (e.getSource() == menu.EXCEL_MENTÉS)
+        {
+            JFileChooser jFileChooser = new JFileChooser(new File("."));
+            jFileChooser.setApproveButtonText("Mentés");
+            jFileChooser.setFileFilter(new FileNameExtensionFilter("Excel97 fájlok", "xls"));
+            if (jFileChooser.showOpenDialog(menu.EXCEL_MENTÉS) == APPROVE_OPTION)
+            {
+                System.out.println("Save " + jFileChooser.getSelectedFile());
+                saveKönyvtár(jFileChooser.getSelectedFile());
             }
         }
 

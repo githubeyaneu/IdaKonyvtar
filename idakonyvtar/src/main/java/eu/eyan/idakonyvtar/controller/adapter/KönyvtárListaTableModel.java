@@ -1,5 +1,7 @@
 package eu.eyan.idakonyvtar.controller.adapter;
 
+import java.util.List;
+
 import com.jgoodies.binding.adapter.AbstractTableAdapter;
 import com.jgoodies.binding.list.SelectionInList;
 
@@ -15,23 +17,9 @@ public class KönyvtárListaTableModel extends AbstractTableAdapter<Könyv>
         return listModel.getSelection();
     }
 
-    public KönyvtárListaTableModel(final SelectionInList<Könyv> listModel)
+    public KönyvtárListaTableModel(final SelectionInList<Könyv> listModel, List<String> oszlopok)
     {
-        super(listModel, new String[] {
-                "Szerző",
-                "Szerző megj.",
-                "Cím",
-                "Kiadás",
-                "Megjelenés helye",
-                "Kiadó",
-                "Év",
-                "Terjedelem",
-                "Ár",
-                "Sorozat",
-                "Téma",
-                "Megjegyzés",
-                "ISBN"
-        });
+        super(listModel, getOszlopNevek(oszlopok));
         this.listModel = listModel;
     }
 
@@ -54,10 +42,16 @@ public class KönyvtárListaTableModel extends AbstractTableAdapter<Könyv>
 //            }
 //        }
 
+    private static String[] getOszlopNevek(List<String> oszlopok)
+    {
+        String[] oszlopNevek = new String[oszlopok.size()];
+        return oszlopok.toArray(oszlopNevek);
+    }
+
     @Override
     public Object getValueAt(final int rowIndex, final int columnIndex)
     {
         Könyv könyv = getRow(rowIndex);
-        return könyv.getOszlop(columnIndex);
+        return könyv.getValue(columnIndex);
     }
 }

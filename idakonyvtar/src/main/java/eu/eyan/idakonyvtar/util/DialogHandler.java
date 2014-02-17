@@ -9,6 +9,7 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JMenuBar;
 import javax.swing.SwingUtilities;
 
 import eu.eyan.idakonyvtar.controller.IController;
@@ -46,6 +47,32 @@ public class DialogHandler
 
     public static <INPUT> JFrame runInFrame(IControllerMenüvel<INPUT> controller, INPUT input)
     {
+        return runInFrame(null, controller, input, controller.getMenuBar());
+    }
+
+    @Deprecated
+    public static <INPUT> JFrame runInModalerFrame(Component parent, IController<INPUT> controller, INPUT input)
+    {
+        final Window parentWindow = SwingUtilities.windowForComponent(parent);
+        if (parentWindow != null)
+        {
+            parentWindow.setEnabled(false);
+        }
+        JFrame frame = runInFrame(parent, controller, input, null);
+        frame.addWindowListener(new WindowAdapter()
+        {
+
+            @Override
+            public void windowClosing(WindowEvent e)
+            {
+                parentWindow.setEnabled(true);
+            }
+        });
+        return frame;
+    }
+
+    private static <INPUT> JFrame runInFrame(Component parent, IController<INPUT> controller, INPUT input, JMenuBar jMenuBar)
+    {
         controller.initData(input);
         JFrame frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -56,7 +83,7 @@ public class DialogHandler
         frame.setSize(szélesség, magasság);
         frame.setLocation((screenSize.width - szélesség) / 2, (screenSize.height - magasság) / 2);
         frame.setTitle(controller.getTitle());
-        frame.setJMenuBar(controller.getMenuBar());
+        frame.setJMenuBar(jMenuBar);
 
         controller.initDataBindings();
         frame.setVisible(true);

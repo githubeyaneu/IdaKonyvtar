@@ -1,18 +1,12 @@
 package eu.eyan.idakonyvtar.controller;
 
-import static eu.eyan.idakonyvtar.util.KönyvHelper.getMindenKiadó;
-
 import java.awt.Component;
 import java.awt.Dimension;
 
-import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
-
 import com.jgoodies.binding.adapter.Bindings;
-import com.jgoodies.binding.adapter.ComboBoxAdapter;
-import com.jgoodies.binding.beans.PropertyAdapter;
 
 import eu.eyan.idakonyvtar.controller.input.KönyvControllerInput;
-import eu.eyan.idakonyvtar.model.Könyv;
+import eu.eyan.idakonyvtar.model.KönyvMezőValueModel;
 import eu.eyan.idakonyvtar.view.KönyvView;
 
 public class KönyvController implements IController<KönyvControllerInput>
@@ -29,7 +23,7 @@ public class KönyvController implements IController<KönyvControllerInput>
     @Override
     public String getTitle()
     {
-        return "Könyv adatainak szerkesztése - " + model.könyv.getCim();
+        return "Könyv adatainak szerkesztése - " + model.getKönyv().getValue(model.getOszlopok().indexOf("Szerző"));
     }
 
     @Override
@@ -42,17 +36,23 @@ public class KönyvController implements IController<KönyvControllerInput>
     public void initData(KönyvControllerInput model)
     {
         this.model = model;
+        view.setOszlopok(model.getOszlopok());
     }
 
     @Override
     public void initDataBindings()
     {
-        Bindings.bind(view.cim, new PropertyAdapter<Könyv>(model.könyv, "cim"));
+        for (int i = 0; i < model.getOszlopok().size(); i++)
+        {
+            Bindings.bind(view.getSzerkesztők().get(i), new KönyvMezőValueModel(i, model.getKönyv()));
+        }
 
-        Bindings.bind(view.szerzo, new PropertyAdapter<Könyv>(model.könyv, "szerző"));
+//        Bindings.bind(view.cim, new PropertyAdapter<Könyv>(model.getKönyv(), "cim"));
 
-        view.valami.setEditable(true);
-        Bindings.bind(view.valami, new ComboBoxAdapter<String>(getMindenKiadó(model.könyvLista), new PropertyAdapter<Könyv>(model.könyv, "kiadó")));
-        AutoCompleteDecorator.decorate(view.valami);
+//        Bindings.bind(view.szerzo, new PropertyAdapter<Könyv>(model.getKönyv(), "szerző"));
+
+//        view.valami.setEditable(true);
+//        Bindings.bind(view.valami, new ComboBoxAdapter<String>(getMindenKiadó(model.getKönyvLista()), new PropertyAdapter<Könyv>(model.getKönyv(), "kiadó")));
+//        AutoCompleteDecorator.decorate(view.valami);
     }
 }
