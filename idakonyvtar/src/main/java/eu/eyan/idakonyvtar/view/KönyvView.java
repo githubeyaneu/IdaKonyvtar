@@ -30,7 +30,7 @@ public class KönyvView implements IView
         {
             rowSpec += "," + rowDef;
         }
-        PanelBuilder panelBuilder = new PanelBuilder(new FormLayout("pref, pref:grow", rowSpec));
+        PanelBuilder panelBuilder = new PanelBuilder(new FormLayout("pref, pref", rowSpec));
         for (int i = 0; i < oszlopok.size(); i++)
         {
             panelBuilder.addLabel(oszlopok.get(i), CC.xy(1, i * 2 + 1));

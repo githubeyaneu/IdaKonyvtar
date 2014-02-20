@@ -7,10 +7,16 @@ import java.awt.Window;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
+import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
+
+import com.jgoodies.forms.builder.PanelBuilder;
+import com.jgoodies.forms.factories.CC;
+import com.jgoodies.forms.layout.FormLayout;
 
 import eu.eyan.idakonyvtar.controller.IController;
 import eu.eyan.idakonyvtar.controller.IControllerMenüvel;
@@ -26,10 +32,12 @@ public class DialogHandler
         JDialog dialog = new JDialog(parentWindow);
         dialog.setLocationRelativeTo(parent);
         dialog.setModal(true);
-        dialog.add(controller.getView());
+        PanelBuilder panelBuilder = new PanelBuilder(new FormLayout("pref", "pref, 3dlu, pref"));
+        panelBuilder.add(controller.getView(), CC.xy(1, 1));
+        panelBuilder.add(getButtons(), CC.xy(1, 3));
+        dialog.add(new JScrollPane(panelBuilder.build()));
         dialog.setTitle(controller.getTitle());
         dialog.setResizable(true);
-        dialog.setSize(controller.getDefaultSize());
         dialog.addWindowListener(new WindowAdapter()
         {
             @Override
@@ -41,8 +49,19 @@ public class DialogHandler
         });
 
         controller.initDataBindings();
+        dialog.pack();
+
+        // blockiert:
         dialog.setVisible(true);
         parentWindow.invalidate();
+    }
+
+    private static Component getButtons()
+    {
+        // Ne így van már optionpane stb...
+        PanelBuilder panelBuilder = new PanelBuilder(new FormLayout("pref:grow,3dlu,pref", "pref"));
+        panelBuilder.add(new JButton("OK"), CC.xy(3, 1));
+        return panelBuilder.build();
     }
 
     public static <INPUT> JFrame runInFrame(IControllerMenüvel<INPUT> controller, INPUT input)
