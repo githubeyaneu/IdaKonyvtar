@@ -12,16 +12,16 @@ import com.jgoodies.forms.layout.FormLayout;
 public class IdaKönyvtárView
 {
     public final JTable könyvTábla = new JTable();
-    JScrollPane jScrollPane;
+    JScrollPane scrollPane;
 
     public Component getComponent()
     {
-        if (jScrollPane == null)
+        if (scrollPane == null)
         {
-            JPanel panel = new JPanel(new FormLayout("pref:grow", "pref:grow"));
-            jScrollPane = new JScrollPane(könyvTábla);
-            panel.add(jScrollPane, CC.xy(1, 1));
+            JPanel panel = new JPanel(new FormLayout("pref:grow", "pref, pref:grow"));
+            scrollPane = new JScrollPane(könyvTábla);
+            panel.add(scrollPane, CC.xy(1, 2));
         }
-        return jScrollPane;
+        return scrollPane;
     }
 }

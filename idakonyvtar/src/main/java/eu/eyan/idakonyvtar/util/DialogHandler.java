@@ -1,5 +1,6 @@
 package eu.eyan.idakonyvtar.util;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Toolkit;
@@ -14,6 +15,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JScrollPane;
+import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 
 import com.jgoodies.forms.builder.PanelBuilder;
@@ -80,10 +82,11 @@ public class DialogHandler
         return scrollPane;
     }
 
-    private static <INPUT> JFrame runInFrame(Component parent, IController<INPUT, ?> controller, INPUT input, JMenuBar jMenuBar)
+    private static <INPUT> JFrame runInFrame(Component parent, IController<INPUT, ?> controller, INPUT input, JMenuBar jMenuBar, JToolBar toolBar)
     {
         controller.initData(input);
         JFrame frame = new JFrame();
+        frame.add(toolBar, BorderLayout.NORTH);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.add(controller.getView());
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -130,7 +133,7 @@ public class DialogHandler
 
     public static <INPUT> JFrame runInFrame(IControllerMenüvel<INPUT, ?> controller, INPUT input)
     {
-        return runInFrame(null, controller, input, controller.getMenuBar());
+        return runInFrame(null, controller, input, controller.getMenuBar(), controller.getToolBar());
     }
 
     @Deprecated
@@ -141,7 +144,7 @@ public class DialogHandler
         {
             parentWindow.setEnabled(false);
         }
-        JFrame frame = runInFrame(parent, controller, input, null);
+        JFrame frame = runInFrame(parent, controller, input, null, null);
         frame.addWindowListener(new WindowAdapter()
         {
 

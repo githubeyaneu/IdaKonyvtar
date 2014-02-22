@@ -97,5 +97,10 @@
 			<artifactId>commons-compress</artifactId>
 			<version>1.7</version>
 		</dependency>
+		<dependency>
+			<groupId>com.seaglasslookandfeel</groupId>
+			<artifactId>seaglasslookandfeel</artifactId>
+			<version>0.2</version>
+		</dependency>
 	</dependencies>
 </project>

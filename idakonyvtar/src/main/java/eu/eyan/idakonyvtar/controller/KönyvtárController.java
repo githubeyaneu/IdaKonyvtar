@@ -10,10 +10,14 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JMenuBar;
+import javax.swing.JToolBar;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.google.common.io.Resources;
 import com.jgoodies.binding.adapter.SingleListSelectionAdapter;
 
 import eu.eyan.idakonyvtar.controller.adapter.KönyvtárListaTableModel;
@@ -144,5 +148,14 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
     public Void getOutput()
     {
         return null;
+    }
+
+    @Override
+    public JToolBar getToolBar()
+    {
+        JToolBar toolBar = new JToolBar("Toolbar");
+        toolBar.add(new JButton(new ImageIcon(Resources.getResource("icons/load.gif"))));
+        toolBar.add(new JButton(new ImageIcon(Resources.getResource("icons/save.gif"))));
+        return toolBar;
     }
 }
