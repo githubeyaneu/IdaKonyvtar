@@ -48,7 +48,7 @@ public class DialogHandler
         MyDialog dialog = new MyDialog(parentWindow);
         dialog.setLocationRelativeTo(parent);
         dialog.setModal(true);
-        PanelBuilder panelBuilder = new PanelBuilder(new FormLayout("pref", "pref, 3dlu, pref"));
+        PanelBuilder panelBuilder = new PanelBuilder(new FormLayout("pref:grow", "top:pref:grow, 3dlu, pref"));
         panelBuilder.add(controller.getView(), CC.xy(1, 1));
         panelBuilder.add(getButtons(dialog, controller), CC.xy(1, 3));
         dialog.add(addScrollableInBorders(panelBuilder.build()));
@@ -75,7 +75,7 @@ public class DialogHandler
 
     private static Component addScrollableInBorders(Component component)
     {
-        PanelBuilder panelBuilder = new PanelBuilder(new FormLayout("3dlu,pref,3dlu", "3dlu,pref,3dlu"));
+        PanelBuilder panelBuilder = new PanelBuilder(new FormLayout("3dlu,pref:grow,3dlu", "3dlu,pref:grow,3dlu"));
         panelBuilder.add(component, CC.xy(2, 2));
         JScrollPane scrollPane = new JScrollPane(panelBuilder.build());
         scrollPane.setBorder(null);

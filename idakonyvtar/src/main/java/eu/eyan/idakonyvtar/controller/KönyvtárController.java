@@ -10,21 +10,18 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JMenuBar;
 import javax.swing.JToolBar;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.google.common.io.Resources;
 import com.jgoodies.binding.adapter.SingleListSelectionAdapter;
 
 import eu.eyan.idakonyvtar.controller.adapter.KönyvtárListaTableModel;
 import eu.eyan.idakonyvtar.controller.input.KönyvControllerInput;
 import eu.eyan.idakonyvtar.controller.input.KönyvtárControllerInput;
 import eu.eyan.idakonyvtar.data.ExcelKezelő;
-import eu.eyan.idakonyvtar.menu.IdaKönyvtárMenü;
+import eu.eyan.idakonyvtar.menu.IdaKönyvtárMenüAndToolBar;
 import eu.eyan.idakonyvtar.model.IdaKönyvtárModel;
 import eu.eyan.idakonyvtar.model.Könyv;
 import eu.eyan.idakonyvtar.util.DialogHandler;
@@ -33,12 +30,13 @@ import eu.eyan.idakonyvtar.view.IdaKönyvtárView;
 public class KönyvtárController implements IControllerMenüvel<KönyvtárControllerInput, Void>, ActionListener
 {
 
-    private final IdaKönyvtárMenü menu = new IdaKönyvtárMenü();
+    private final IdaKönyvtárMenüAndToolBar menuAndToolBar = new IdaKönyvtárMenüAndToolBar();
     private final IdaKönyvtárView view = new IdaKönyvtárView();
     private final IdaKönyvtárModel model = new IdaKönyvtárModel();
-    // FIXME:
+    // FIXME: tényleg szükség van erre????
     private KönyvtárListaTableModel dataModel;
 
+    // FIXME: initview and getview are not the same!!
     @Override
     public Component getView()
     {
@@ -73,7 +71,7 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
         model.setKönyvtár(ExcelKezelő.könyvtárBeolvasása(file));
         model.getKönyvek().getList().clear();
         // FIXME heee? 2x a modelben
-        model.getKönyvek().getList().addAll(model.getKönyvtár().getKönyvek());
+        model.getKönyvek().setList(model.getKönyvtár().getKönyvek());
     }
 
     private void saveKönyvtár(File file)
@@ -84,9 +82,11 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
     @Override
     public void initDataBindings()
     {
-        menu.EXCEL_TÖLTÉS.addActionListener(this);
-        menu.ISBN_KERES.addActionListener(this);
-        menu.EXCEL_MENTÉS.addActionListener(this);
+        menuAndToolBar.EXCEL_TÖLTÉS.addActionListener(this);
+        menuAndToolBar.ISBN_KERES.addActionListener(this);
+        menuAndToolBar.EXCEL_MENTÉS.addActionListener(this);
+
+        menuAndToolBar.UJ_KONYV.addActionListener(this);
 
         view.könyvTábla.addMouseListener(new MouseAdapter()
         {
@@ -99,8 +99,9 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
                     if (DialogHandler.startModalDialog(view.getComponent(), könyvController, new KönyvControllerInput(new Könyv(dataModel.getSelectedKönyv()), model.getKönyvek().getList(), model.getKönyvtár().getOszlopok())))
                     {
                         model.getKönyvek().getList().set(model.getKönyvek().getSelectionIndex(), könyvController.getOutput());
+                        // TODO: ugly: use selectioninlist...
+                        model.getKönyvek().fireSelectedContentsChanged();
                     }
-//                    DialogHandler.runInModalerFrame(view.getComponent(), new KönyvController(), new KönyvControllerInput(dataModel.getSelectedKönyv(), model.getKönyvek().getList()));
                 }
             }
         });
@@ -109,38 +110,49 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
     @Override
     public JMenuBar getMenuBar()
     {
-        return menu;
+        return menuAndToolBar.getMenuBar();
     }
 
     @Override
     public void actionPerformed(final ActionEvent e)
     {
-        if (e.getSource() == menu.EXCEL_TÖLTÉS)
+        if (e.getSource() == menuAndToolBar.EXCEL_TÖLTÉS)
         {
             JFileChooser jFileChooser = new JFileChooser(".");
             jFileChooser.setApproveButtonText("Töltés");
             jFileChooser.setFileFilter(new FileNameExtensionFilter("Excel97 fájlok", "xls"));
-            if (jFileChooser.showOpenDialog(menu.EXCEL_TÖLTÉS) == APPROVE_OPTION)
+            if (jFileChooser.showOpenDialog(menuAndToolBar.EXCEL_TÖLTÉS) == APPROVE_OPTION)
             {
                 readKönyvtár(jFileChooser.getSelectedFile());
             }
         }
 
-        if (e.getSource() == menu.EXCEL_MENTÉS)
+        if (e.getSource() == menuAndToolBar.EXCEL_MENTÉS)
         {
             JFileChooser jFileChooser = new JFileChooser(new File("."));
             jFileChooser.setApproveButtonText("Mentés");
             jFileChooser.setFileFilter(new FileNameExtensionFilter("Excel97 fájlok", "xls"));
-            if (jFileChooser.showOpenDialog(menu.EXCEL_MENTÉS) == APPROVE_OPTION)
+            if (jFileChooser.showOpenDialog(menuAndToolBar.EXCEL_MENTÉS) == APPROVE_OPTION)
             {
                 System.out.println("Save " + jFileChooser.getSelectedFile());
                 saveKönyvtár(jFileChooser.getSelectedFile());
             }
         }
 
-        if (e.getSource() == menu.ISBN_KERES)
+        if (e.getSource() == menuAndToolBar.ISBN_KERES)
         {
-            DialogHandler.startModalDialog(menu.ISBN_KERES, new IsbnController(), null);
+            DialogHandler.startModalDialog(menuAndToolBar.ISBN_KERES, new IsbnController(), null);
+        }
+
+        if (e.getSource() == menuAndToolBar.UJ_KONYV)
+        {
+            KönyvController könyvController = new KönyvController();
+            if (DialogHandler.startModalDialog(view.getComponent(), könyvController, new KönyvControllerInput(new Könyv(model.getKönyvtár().getOszlopok().size()), model.getKönyvek().getList(), model.getKönyvtár().getOszlopok())))
+            {
+                model.getKönyvek().getList().add(0, könyvController.getOutput());
+                // TODO: ugly: use selectioninlist...
+                model.getKönyvek().fireIntervalAdded(0, 0);
+            }
         }
     }
 
@@ -153,9 +165,6 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
     @Override
     public JToolBar getToolBar()
     {
-        JToolBar toolBar = new JToolBar("Toolbar");
-        toolBar.add(new JButton(new ImageIcon(Resources.getResource("icons/load.gif"))));
-        toolBar.add(new JButton(new ImageIcon(Resources.getResource("icons/save.gif"))));
-        return toolBar;
+        return menuAndToolBar.getToolBar();
     }
 }

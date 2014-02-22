@@ -30,12 +30,12 @@ public class KönyvView implements IView
         {
             rowSpec += "," + rowDef;
         }
-        PanelBuilder panelBuilder = new PanelBuilder(new FormLayout("pref, pref", rowSpec));
+        PanelBuilder panelBuilder = new PanelBuilder(new FormLayout("pref, pref:grow", rowSpec));
         for (int i = 0; i < oszlopok.size(); i++)
         {
             panelBuilder.addLabel(oszlopok.get(i), CC.xy(1, i * 2 + 1));
             // public JComboBox<String> valami = new JComboBox<String>();
-            JTextField szerkesztő = new JTextField();
+            JTextField szerkesztő = new JTextField(20);
             szerkesztők.add(szerkesztő);
             panelBuilder.add(szerkesztő, CC.xy(2, i * 2 + 1));
         }
