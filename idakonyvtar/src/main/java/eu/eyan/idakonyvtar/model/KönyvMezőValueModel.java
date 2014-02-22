@@ -2,12 +2,13 @@ package eu.eyan.idakonyvtar.model;
 
 import static com.google.common.collect.Sets.newHashSet;
 
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Set;
 
 import com.jgoodies.binding.value.ValueModel;
 
-public class KönyvMezőValueModel implements ValueModel
+public class KönyvMezőValueModel implements ValueModel, PropertyChangeListener
 {
     private int oszlopIndex;
     private Könyv model;
@@ -17,6 +18,7 @@ public class KönyvMezőValueModel implements ValueModel
     {
         this.oszlopIndex = oszlopIndex;
         this.model = könyv;
+        model.addPropertyChangeListener(this);
     }
 
     @Override
@@ -29,11 +31,13 @@ public class KönyvMezőValueModel implements ValueModel
     public void setValue(Object newValue)
     {
         model.setValue(oszlopIndex, (String) newValue);
+
     }
 
     @Override
     public void addValueChangeListener(PropertyChangeListener listener)
     {
+        System.out.println(oszlopIndex + " addValueChangeListener");
         if (listeners == null)
         {
             listeners = newHashSet();
@@ -45,5 +49,22 @@ public class KönyvMezőValueModel implements ValueModel
     public void removeValueChangeListener(PropertyChangeListener listener)
     {
         listeners.remove(listener);
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt)
+    {
+        if (evt instanceof Könyv.KönyvPropertyChangeEvent)
+        {
+            Könyv.KönyvPropertyChangeEvent könyvEvent = (Könyv.KönyvPropertyChangeEvent) evt;
+            if (könyvEvent.getOszlopIndex() == this.oszlopIndex)
+            {
+                for (PropertyChangeListener listener : listeners)
+                {
+                    listener.propertyChange(evt);
+                }
+            }
+        }
+
     }
 }

@@ -162,7 +162,15 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
         if (e.getSource() == menuAndToolBar.MENÜPONT_ISBN_KERES || e.getSource() == menuAndToolBar.TOOLBAR_UJ_KONYV)
         {
             KönyvController könyvController = new KönyvController();
-            if (DialogHandler.startModalDialog(view.getComponent(), könyvController, new KönyvControllerInput(new Könyv(model.getKönyvtár().getOszlopok().size()), model.getKönyvek().getList(), model.getKönyvtár().getOszlopok(), ISBN_ENABLED)))
+            if (DialogHandler.startModalDialog(
+                    view.getComponent()
+                    , könyvController
+                    , new KönyvControllerInput(
+                            new Könyv(model.getKönyvtár().getOszlopok().size())
+                            , model.getKönyvek().getList()
+                            , model.getKönyvtár().getOszlopok()
+                            , ISBN_ENABLED
+                            , model.getKönyvtár().getKonfiguráció())))
             {
                 model.getKönyvek().getList().add(0, könyvController.getOutput());
                 // TODO: ugly: use selectioninlist...

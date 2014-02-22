@@ -1,20 +1,43 @@
 package eu.eyan.idakonyvtar.model;
 
+import static com.google.common.collect.Lists.newArrayList;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
+import eu.eyan.idakonyvtar.oszk.Marc;
 
 public class OszlopKonfiguráció
 {
+    public static enum OszlopKonfigurációk
+    {
+        MULTIMEZŐ("MultiMező"),
+        AUTOCOMPLETE("AutoComplete"),
+        MARCKÓD("MarcKód"),
+        MEGJELENÍTÉS_TÁBLÁZATBAN("Táblázatban");
+
+        @Getter
+        private String név;
+
+        OszlopKonfigurációk(String konfigurációNév)
+        {
+            this.név = konfigurációNév;
+        }
+
+    }
+
     @Getter
     @Setter
     private String[][] tábla;
 
-    public boolean isIgen(String oszlopNév, String konfigurációNév)
+    public boolean isIgen(String oszlopNév, OszlopKonfigurációk konfigurációNév)
     {
         return getÉrték(oszlopNév, konfigurációNév).equalsIgnoreCase("Igen");
     }
 
-    private String getÉrték(String oszlopNév, String konfigurációNév)
+    private String getÉrték(String oszlopNév, OszlopKonfigurációk konfigurációNév)
     {
         int oszlopIndex = getOszlopIndex(oszlopNév);
         int konfigurációIndex = getKonfigurációIndex(konfigurációNév);
@@ -40,15 +63,37 @@ public class OszlopKonfiguráció
         return -1;
     }
 
-    private int getKonfigurációIndex(String konfigurációNév)
+    private int getKonfigurációIndex(OszlopKonfigurációk konfigurációNév)
     {
         for (int oszlopIndex = 0; oszlopIndex < tábla.length; oszlopIndex++)
         {
-            if (tábla[oszlopIndex][0].equalsIgnoreCase(konfigurációNév))
+            if (tábla[oszlopIndex][0].equalsIgnoreCase(konfigurációNév.getNév()))
             {
                 return oszlopIndex;
             }
         }
         return -1;
+    }
+
+    public List<Marc> getMarcKódok(String oszlopNév) throws Exception
+    {
+        ArrayList<Marc> ret = newArrayList();
+        try
+        {
+            String[] marcKódSzövegek = getÉrték(oszlopNév, OszlopKonfigurációk.MARCKÓD).split(",");
+            for (String string : marcKódSzövegek)
+            {
+                String[] kódok = string.split("-");
+                if (kódok.length > 2)
+                {
+                    ret.add(new Marc(kódok[0], kódok[1], kódok[2], null));
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            throw new Exception("A Marc kódot nem lehet a konfigurációból beolvasni: " + oszlopNév);
+        }
+        return ret;
     }
 }
