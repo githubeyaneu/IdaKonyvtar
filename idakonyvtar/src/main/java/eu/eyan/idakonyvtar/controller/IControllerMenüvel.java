@@ -2,7 +2,7 @@ package eu.eyan.idakonyvtar.controller;
 
 import javax.swing.JMenuBar;
 
-public interface IControllerMenüvel<INPUT> extends IController<INPUT>
+public interface IControllerMenüvel<INPUT, OUTPUT> extends IController<INPUT, OUTPUT>
 {
     JMenuBar getMenuBar();
 }

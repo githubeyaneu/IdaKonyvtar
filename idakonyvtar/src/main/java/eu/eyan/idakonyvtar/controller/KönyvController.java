@@ -6,10 +6,11 @@ import java.awt.Dimension;
 import com.jgoodies.binding.adapter.Bindings;
 
 import eu.eyan.idakonyvtar.controller.input.KönyvControllerInput;
+import eu.eyan.idakonyvtar.model.Könyv;
 import eu.eyan.idakonyvtar.model.KönyvMezőValueModel;
 import eu.eyan.idakonyvtar.view.KönyvView;
 
-public class KönyvController implements IController<KönyvControllerInput>
+public class KönyvController implements IDialogController<KönyvControllerInput, Könyv>
 {
     private KönyvView view = new KönyvView();
     private KönyvControllerInput model;
@@ -54,5 +55,21 @@ public class KönyvController implements IController<KönyvControllerInput>
 //        view.valami.setEditable(true);
 //        Bindings.bind(view.valami, new ComboBoxAdapter<String>(getMindenKiadó(model.getKönyvLista()), new PropertyAdapter<Könyv>(model.getKönyv(), "kiadó")));
 //        AutoCompleteDecorator.decorate(view.valami);
+    }
+
+    @Override
+    public void onOk()
+    {
+    }
+
+    @Override
+    public void onCancel()
+    {
+    }
+
+    @Override
+    public Könyv getOutput()
+    {
+        return model.getKönyv();
     }
 }

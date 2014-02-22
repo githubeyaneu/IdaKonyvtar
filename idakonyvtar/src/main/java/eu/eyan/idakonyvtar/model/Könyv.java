@@ -2,9 +2,10 @@ package eu.eyan.idakonyvtar.model;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.Collections;
 import java.util.List;
 
-public class Könyv
+public class Könyv implements Cloneable
 {
     final List<String> values = newArrayList();
 
@@ -15,6 +16,12 @@ public class Könyv
         {
             values.add("");
         }
+    }
+
+    public Könyv(Könyv könyv)
+    {
+        this(könyv.values.size());
+        Collections.copy(this.values, könyv.values);
     }
 
     public void setValue(int index, final String value)
@@ -30,5 +37,4 @@ public class Könyv
     {
         return values.get(index);
     }
-
 }

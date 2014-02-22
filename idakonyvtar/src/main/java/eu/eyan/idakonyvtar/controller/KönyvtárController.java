@@ -22,10 +22,11 @@ import eu.eyan.idakonyvtar.controller.input.KönyvtárControllerInput;
 import eu.eyan.idakonyvtar.data.ExcelKezelő;
 import eu.eyan.idakonyvtar.menu.IdaKönyvtárMenü;
 import eu.eyan.idakonyvtar.model.IdaKönyvtárModel;
+import eu.eyan.idakonyvtar.model.Könyv;
 import eu.eyan.idakonyvtar.util.DialogHandler;
 import eu.eyan.idakonyvtar.view.IdaKönyvtárView;
 
-public class KönyvtárController implements IControllerMenüvel<KönyvtárControllerInput>, ActionListener
+public class KönyvtárController implements IControllerMenüvel<KönyvtárControllerInput, Void>, ActionListener
 {
 
     private final IdaKönyvtárMenü menu = new IdaKönyvtárMenü();
@@ -90,7 +91,11 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
             {
                 if (e.getClickCount() == 2)
                 {
-                    DialogHandler.startModalDialog(view.getComponent(), new KönyvController(), new KönyvControllerInput(dataModel.getSelectedKönyv(), model.getKönyvek().getList(), model.getKönyvtár().getOszlopok()));
+                    KönyvController könyvController = new KönyvController();
+                    if (DialogHandler.startModalDialog(view.getComponent(), könyvController, new KönyvControllerInput(new Könyv(dataModel.getSelectedKönyv()), model.getKönyvek().getList(), model.getKönyvtár().getOszlopok())))
+                    {
+                        model.getKönyvek().getList().set(model.getKönyvek().getSelectionIndex(), könyvController.getOutput());
+                    }
 //                    DialogHandler.runInModalerFrame(view.getComponent(), new KönyvController(), new KönyvControllerInput(dataModel.getSelectedKönyv(), model.getKönyvek().getList()));
                 }
             }
@@ -133,5 +138,11 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
         {
             DialogHandler.startModalDialog(menu.ISBN_KERES, new IsbnController(), null);
         }
+    }
+
+    @Override
+    public Void getOutput()
+    {
+        return null;
     }
 }
