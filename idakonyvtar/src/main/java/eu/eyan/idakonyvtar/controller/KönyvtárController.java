@@ -1,5 +1,6 @@
 package eu.eyan.idakonyvtar.controller;
 
+import static eu.eyan.idakonyvtar.controller.input.KönyvControllerInput.ISBN_ENABLED;
 import static javax.swing.JFileChooser.APPROVE_OPTION;
 
 import java.awt.Component;
@@ -108,16 +109,22 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
             {
                 if (e.getClickCount() == 2)
                 {
-                    KönyvController könyvController = new KönyvController();
-                    if (DialogHandler.startModalDialog(view.getComponent(), könyvController, new KönyvControllerInput(new Könyv(dataModel.getSelectedKönyv()), model.getKönyvek().getList(), model.getKönyvtár().getOszlopok())))
-                    {
-                        model.getKönyvek().getList().set(model.getKönyvek().getSelectionIndex(), könyvController.getOutput());
-                        // TODO: ugly: use selectioninlist...
-                        model.getKönyvek().fireSelectedContentsChanged();
-                    }
+                    könyvSzerkesztés();
                 }
             }
+
         });
+    }
+
+    private void könyvSzerkesztés()
+    {
+        KönyvController könyvController = new KönyvController();
+        if (DialogHandler.startModalDialog(view.getComponent(), könyvController, new KönyvControllerInput(new Könyv(dataModel.getSelectedKönyv()), model.getKönyvek().getList(), model.getKönyvtár().getOszlopok())))
+        {
+            model.getKönyvek().getList().set(model.getKönyvek().getSelectionIndex(), könyvController.getOutput());
+            // TODO: ugly: use selectioninlist...
+            model.getKönyvek().fireSelectedContentsChanged();
+        }
     }
 
     @Override
@@ -152,15 +159,10 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
             }
         }
 
-        if (e.getSource() == menuAndToolBar.MENÜPONT_ISBN_KERES)
-        {
-            DialogHandler.startModalDialog(menuAndToolBar.MENÜPONT_ISBN_KERES, new IsbnController(), null);
-        }
-
-        if (e.getSource() == menuAndToolBar.TOOLBAR_UJ_KONYV)
+        if (e.getSource() == menuAndToolBar.MENÜPONT_ISBN_KERES || e.getSource() == menuAndToolBar.TOOLBAR_UJ_KONYV)
         {
             KönyvController könyvController = new KönyvController();
-            if (DialogHandler.startModalDialog(view.getComponent(), könyvController, new KönyvControllerInput(new Könyv(model.getKönyvtár().getOszlopok().size()), model.getKönyvek().getList(), model.getKönyvtár().getOszlopok())))
+            if (DialogHandler.startModalDialog(view.getComponent(), könyvController, new KönyvControllerInput(new Könyv(model.getKönyvtár().getOszlopok().size()), model.getKönyvek().getList(), model.getKönyvtár().getOszlopok(), ISBN_ENABLED)))
             {
                 model.getKönyvek().getList().add(0, könyvController.getOutput());
                 // TODO: ugly: use selectioninlist...

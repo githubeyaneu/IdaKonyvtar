@@ -41,15 +41,15 @@ public class ExcelKezelő
         }
         catch (BiffException e)
         {
-            JOptionPane.showMessageDialog(null, "Biff Hiba a beolvasásnál");
+            JOptionPane.showMessageDialog(null, "Biff Hiba a beolvasásnál " + e.getLocalizedMessage());
         }
         catch (IOException e)
         {
-            JOptionPane.showMessageDialog(null, "Hiba a beolvasásnál");
+            JOptionPane.showMessageDialog(null, "Hiba a beolvasásnál " + e.getLocalizedMessage());
         }
         catch (Exception e)
         {
-            JOptionPane.showMessageDialog(null, e.getMessage());
+            JOptionPane.showMessageDialog(null, e.getLocalizedMessage());
             e.printStackTrace();
         }
         return könyvtár;

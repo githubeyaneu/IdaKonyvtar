@@ -6,7 +6,6 @@ import lombok.Getter;
 
 public class KönyvtárControllerInput
 {
-
     @Getter
     private File file;
 
@@ -14,5 +13,4 @@ public class KönyvtárControllerInput
     {
         this.file = file;
     }
-
 }

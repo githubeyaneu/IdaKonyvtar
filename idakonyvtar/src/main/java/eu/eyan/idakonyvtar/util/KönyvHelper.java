@@ -19,14 +19,14 @@ public class KönyvHelper
     public static List<String> getMindenKiadó(List<Könyv> könyvLista)
     {
         Set<String> set = newHashSet("");
-        for (Könyv könyv : könyvLista)
-        {
-            // FIXME
+//        for (Könyv könyv : könyvLista)
+//        {
+        // FIXME
 //            if (könyv.getKiadó() != null)
 //            {
 //                set.add(könyv.getKiadó().trim());
 //            }
-        }
+//        }
         List<String> list = newArrayList(set);
 
         collator.setStrength(Collator.SECONDARY);// a == A, a < Ä
