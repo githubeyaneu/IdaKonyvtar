@@ -12,7 +12,10 @@ import java.io.File;
 
 import javax.swing.JFileChooser;
 import javax.swing.JMenuBar;
+import javax.swing.JOptionPane;
 import javax.swing.JToolBar;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.jgoodies.binding.adapter.SingleListSelectionAdapter;
@@ -82,11 +85,21 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
     @Override
     public void initDataBindings()
     {
-        menuAndToolBar.EXCEL_TÖLTÉS.addActionListener(this);
-        menuAndToolBar.ISBN_KERES.addActionListener(this);
-        menuAndToolBar.EXCEL_MENTÉS.addActionListener(this);
+        menuAndToolBar.MENÜPONT_EXCEL_TÖLTÉS.addActionListener(this);
+        menuAndToolBar.MENÜPONT_ISBN_KERES.addActionListener(this);
+        menuAndToolBar.MENÜPONT_EXCEL_MENTÉS.addActionListener(this);
 
-        menuAndToolBar.UJ_KONYV.addActionListener(this);
+        menuAndToolBar.TOOLBAR_UJ_KONYV.addActionListener(this);
+        menuAndToolBar.TOOLBAR_KONYV_TOROL.addActionListener(this);
+
+        view.könyvTábla.getSelectionModel().addListSelectionListener(new ListSelectionListener()
+        {
+            @Override
+            public void valueChanged(ListSelectionEvent e)
+            {
+                menuAndToolBar.TOOLBAR_KONYV_TOROL.setEnabled(e.getFirstIndex() >= 0);
+            }
+        });
 
         view.könyvTábla.addMouseListener(new MouseAdapter()
         {
@@ -116,35 +129,35 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
     @Override
     public void actionPerformed(final ActionEvent e)
     {
-        if (e.getSource() == menuAndToolBar.EXCEL_TÖLTÉS)
+        if (e.getSource() == menuAndToolBar.MENÜPONT_EXCEL_TÖLTÉS)
         {
             JFileChooser jFileChooser = new JFileChooser(".");
             jFileChooser.setApproveButtonText("Töltés");
             jFileChooser.setFileFilter(new FileNameExtensionFilter("Excel97 fájlok", "xls"));
-            if (jFileChooser.showOpenDialog(menuAndToolBar.EXCEL_TÖLTÉS) == APPROVE_OPTION)
+            if (jFileChooser.showOpenDialog(menuAndToolBar.MENÜPONT_EXCEL_TÖLTÉS) == APPROVE_OPTION)
             {
                 readKönyvtár(jFileChooser.getSelectedFile());
             }
         }
 
-        if (e.getSource() == menuAndToolBar.EXCEL_MENTÉS)
+        if (e.getSource() == menuAndToolBar.MENÜPONT_EXCEL_MENTÉS)
         {
             JFileChooser jFileChooser = new JFileChooser(new File("."));
             jFileChooser.setApproveButtonText("Mentés");
             jFileChooser.setFileFilter(new FileNameExtensionFilter("Excel97 fájlok", "xls"));
-            if (jFileChooser.showOpenDialog(menuAndToolBar.EXCEL_MENTÉS) == APPROVE_OPTION)
+            if (jFileChooser.showOpenDialog(menuAndToolBar.MENÜPONT_EXCEL_MENTÉS) == APPROVE_OPTION)
             {
                 System.out.println("Save " + jFileChooser.getSelectedFile());
                 saveKönyvtár(jFileChooser.getSelectedFile());
             }
         }
 
-        if (e.getSource() == menuAndToolBar.ISBN_KERES)
+        if (e.getSource() == menuAndToolBar.MENÜPONT_ISBN_KERES)
         {
-            DialogHandler.startModalDialog(menuAndToolBar.ISBN_KERES, new IsbnController(), null);
+            DialogHandler.startModalDialog(menuAndToolBar.MENÜPONT_ISBN_KERES, new IsbnController(), null);
         }
 
-        if (e.getSource() == menuAndToolBar.UJ_KONYV)
+        if (e.getSource() == menuAndToolBar.TOOLBAR_UJ_KONYV)
         {
             KönyvController könyvController = new KönyvController();
             if (DialogHandler.startModalDialog(view.getComponent(), könyvController, new KönyvControllerInput(new Könyv(model.getKönyvtár().getOszlopok().size()), model.getKönyvek().getList(), model.getKönyvtár().getOszlopok())))
@@ -152,6 +165,17 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
                 model.getKönyvek().getList().add(0, könyvController.getOutput());
                 // TODO: ugly: use selectioninlist...
                 model.getKönyvek().fireIntervalAdded(0, 0);
+            }
+        }
+
+        if (e.getSource() == menuAndToolBar.TOOLBAR_KONYV_TOROL)
+        {
+            if (JOptionPane.showOptionDialog(menuAndToolBar.TOOLBAR_KONYV_TOROL, "Biztosan törölni akarod?", "Törlés megerősítése", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[] { "Igen", "Nem" }, "Nem") == JOptionPane.OK_OPTION)
+            {
+                int selectionIndex = model.getKönyvek().getSelectionIndex();
+                model.getKönyvek().getList().remove(selectionIndex);
+                // TODO: ugly: use selectioninlist...
+                model.getKönyvek().fireIntervalRemoved(selectionIndex, selectionIndex);
             }
         }
     }

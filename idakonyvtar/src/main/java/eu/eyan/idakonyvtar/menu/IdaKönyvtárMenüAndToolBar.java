@@ -13,11 +13,12 @@ import com.google.common.io.Resources;
 
 public class IdaKönyvtárMenüAndToolBar
 {
-    public final JMenuItem EXCEL_TÖLTÉS = new JMenuItem("Könyvtár betöltése Excelből (97)");
-    public final JMenuItem EXCEL_MENTÉS = new JMenuItem("Könyvtár mentése Excelbe (97)");
-    public final JMenuItem ISBN_KERES = new JMenuItem("ISBN keresés");
-    private final JMenu FÁJL_MENÜ = new JMenu("Fájl");
-    public final JButton UJ_KONYV = new JButton(new ImageIcon(Resources.getResource("icons/ujkonyv.gif")));
+    public final JMenuItem MENÜPONT_EXCEL_TÖLTÉS = new JMenuItem("Könyvtár betöltése Excelből (97)");
+    public final JMenuItem MENÜPONT_EXCEL_MENTÉS = new JMenuItem("Könyvtár mentése Excelbe (97)");
+    public final JMenuItem MENÜPONT_ISBN_KERES = new JMenuItem("ISBN keresés");
+    private final JMenu MENÜ_FÁJL = new JMenu("Fájl");
+    public final JButton TOOLBAR_UJ_KONYV = new JButton(new ImageIcon(Resources.getResource("icons/ujkonyv.gif")));
+    public final JButton TOOLBAR_KONYV_TOROL = new JButton(new ImageIcon(Resources.getResource("icons/töröl.gif")));
 
     @Getter
     private final JToolBar toolBar = new JToolBar("Alapfunkciók");
@@ -28,15 +29,16 @@ public class IdaKönyvtárMenüAndToolBar
     public IdaKönyvtárMenüAndToolBar()
     {
         super();
-        menuBar.add(FÁJL_MENÜ);
-        FÁJL_MENÜ.add(EXCEL_TÖLTÉS);
-        FÁJL_MENÜ.add(EXCEL_MENTÉS);
-        menuBar.add(ISBN_KERES);
+        menuBar.add(MENÜ_FÁJL);
+        MENÜ_FÁJL.add(MENÜPONT_EXCEL_TÖLTÉS);
+        MENÜ_FÁJL.add(MENÜPONT_EXCEL_MENTÉS);
+        menuBar.add(MENÜPONT_ISBN_KERES);
 
-        toolBar.add(UJ_KONYV);
-//        toolBar.add(new JButton(new ImageIcon(Resources.getResource("icons/load.gif"))));
-//        toolBar.add(new JButton(new ImageIcon(Resources.getResource("icons/save.gif"))));
-
+        toolBar.add(TOOLBAR_UJ_KONYV);
+        TOOLBAR_UJ_KONYV.setToolTipText("Új könyv hozzáadása");
+        toolBar.add(TOOLBAR_KONYV_TOROL);
+        TOOLBAR_KONYV_TOROL.setToolTipText("Könyv törlése");
+        TOOLBAR_KONYV_TOROL.setEnabled(false);
     }
 
 }
