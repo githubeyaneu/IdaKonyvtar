@@ -17,4 +17,7 @@ public class Könyvtár
     @Setter
     private List<String> oszlopok = newArrayList();
 
+    @Getter
+    @Setter
+    private OszlopKonfiguráció konfiguráció = new OszlopKonfiguráció();
 }

@@ -2,6 +2,7 @@ package eu.eyan.idakonyvtar.data;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -34,31 +35,9 @@ public class ExcelKezelő
         {
             WorkbookSettings ws = new WorkbookSettings();
             ws.setEncoding("Cp1252");
-            Sheet excelKönyvek = Workbook.getWorkbook(file, ws).getSheet(0);
-
-            for (int aktuálisOszlop = 0; aktuálisOszlop < excelKönyvek.getColumns(); aktuálisOszlop++)
-            {
-                könyvtár.getOszlopok().add(excelKönyvek.getCell(aktuálisOszlop, 0).getContents());
-            }
-
-            for (int aktuálisSor = 1; aktuálisSor < excelKönyvek.getRows(); aktuálisSor++)
-            {
-                Könyv könyv = new Könyv(excelKönyvek.getColumns() + 1);
-                for (int aktuálisOszlop = 0; aktuálisOszlop < excelKönyvek.getColumns(); aktuálisOszlop++)
-                {
-                    try
-                    {
-                        könyv.setValue(aktuálisOszlop, excelKönyvek.getCell(aktuálisOszlop, aktuálisSor).getContents());
-                    }
-                    catch (Exception e)
-                    {
-                        JOptionPane.showMessageDialog(null, e.getMessage());
-                        e.printStackTrace();
-                        return könyvtár;
-                    }
-                }
-                könyvtár.getKönyvek().add(könyv);
-            }
+            Workbook workbook = Workbook.getWorkbook(file, ws);
+            könyvekBeolvasása(könyvtár, workbook.getSheet(new String("Könyvek".getBytes(Charset.forName(ws.getEncoding())))));
+            oszlopKonfigurációBeolvasása(könyvtár, workbook.getSheet(new String("OszlopKonfiguráció".getBytes(Charset.forName(ws.getEncoding())))));
         }
         catch (BiffException e)
         {
@@ -68,7 +47,43 @@ public class ExcelKezelő
         {
             JOptionPane.showMessageDialog(null, "Hiba a beolvasásnál");
         }
+        catch (Exception e)
+        {
+            JOptionPane.showMessageDialog(null, e.getMessage());
+            e.printStackTrace();
+        }
         return könyvtár;
+    }
+
+    private static void oszlopKonfigurációBeolvasása(Könyvtár könyvtár, Sheet sheet)
+    {
+        String[][] tábla = new String[sheet.getColumns()][sheet.getRows()];
+        for (int aktuálisOszlop = 0; aktuálisOszlop < sheet.getColumns(); aktuálisOszlop++)
+        {
+            for (int aktuálisSor = 0; aktuálisSor < sheet.getRows(); aktuálisSor++)
+            {
+                tábla[aktuálisOszlop][aktuálisSor] = sheet.getCell(aktuálisOszlop, aktuálisSor).getContents();
+            }
+        }
+        könyvtár.getKonfiguráció().setTábla(tábla);
+    }
+
+    private static void könyvekBeolvasása(Könyvtár könyvtár, Sheet sheet)
+    {
+        for (int aktuálisOszlop = 0; aktuálisOszlop < sheet.getColumns(); aktuálisOszlop++)
+        {
+            könyvtár.getOszlopok().add(sheet.getCell(aktuálisOszlop, 0).getContents());
+        }
+
+        for (int aktuálisSor = 1; aktuálisSor < sheet.getRows(); aktuálisSor++)
+        {
+            Könyv könyv = new Könyv(sheet.getColumns() + 1);
+            for (int aktuálisOszlop = 0; aktuálisOszlop < sheet.getColumns(); aktuálisOszlop++)
+            {
+                könyv.setValue(aktuálisOszlop, sheet.getCell(aktuálisOszlop, aktuálisSor).getContents());
+            }
+            könyvtár.getKönyvek().add(könyv);
+        }
     }
 
     public static void könyvtárMentése(File célFile, Könyvtár könyvtár)
@@ -88,7 +103,6 @@ public class ExcelKezelő
             }
             catch (IOException e)
             {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
