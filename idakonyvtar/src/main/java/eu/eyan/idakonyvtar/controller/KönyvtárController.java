@@ -7,6 +7,8 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -28,7 +30,8 @@ import eu.eyan.idakonyvtar.data.ExcelKezelő;
 import eu.eyan.idakonyvtar.menu.IdaKönyvtárMenüAndToolBar;
 import eu.eyan.idakonyvtar.model.IdaKönyvtárModel;
 import eu.eyan.idakonyvtar.model.Könyv;
-import eu.eyan.idakonyvtar.util.DialogHandler;
+import eu.eyan.idakonyvtar.util.DialogHelper;
+import eu.eyan.idakonyvtar.util.MagyarRowFilter;
 import eu.eyan.idakonyvtar.view.IdaKönyvtárView;
 
 public class KönyvtárController implements IControllerMenüvel<KönyvtárControllerInput, Void>, ActionListener
@@ -86,7 +89,7 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
     }
 
     @Override
-    public void initDataBindings()
+    public void initBindings()
     {
         menuAndToolBar.MENÜPONT_EXCEL_TÖLTÉS.addActionListener(this);
         menuAndToolBar.MENÜPONT_ISBN_KERES.addActionListener(this);
@@ -116,14 +119,24 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
             }
 
         });
+
+        menuAndToolBar.TOOLBAR_KERES.addKeyListener(new KeyAdapter()
+        {
+            @Override
+            public void keyReleased(KeyEvent e)
+            {
+                view.könyvTábla.setRowFilter(new MagyarRowFilter(menuAndToolBar.TOOLBAR_KERES.getText()));
+            }
+        });
     }
 
     private void könyvSzerkesztés()
     {
         KönyvController könyvController = new KönyvController();
-        if (DialogHandler.startModalDialog(view.getComponent(), könyvController, new KönyvControllerInput(new Könyv(dataModel.getSelectedKönyv()), model.getKönyvek().getList(), model.getKönyvtár().getOszlopok())))
+        int selectedKönyvIndex = view.könyvTábla.convertRowIndexToModel(view.könyvTábla.getSelectedRow());
+        if (DialogHelper.startModalDialog(view.getComponent(), könyvController, new KönyvControllerInput(new Könyv(model.getKönyvek().getList().get(selectedKönyvIndex)), model.getKönyvek().getList(), model.getKönyvtár().getOszlopok())))
         {
-            model.getKönyvek().getList().set(model.getKönyvek().getSelectionIndex(), könyvController.getOutput());
+            model.getKönyvek().getList().set(selectedKönyvIndex, könyvController.getOutput());
             // TODO: ugly: use selectioninlist...
             model.getKönyvek().fireSelectedContentsChanged();
         }
@@ -164,7 +177,7 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
         if (e.getSource() == menuAndToolBar.MENÜPONT_ISBN_KERES || e.getSource() == menuAndToolBar.TOOLBAR_UJ_KONYV)
         {
             KönyvController könyvController = new KönyvController();
-            if (DialogHandler.startModalDialog(
+            if (DialogHelper.startModalDialog(
                     view.getComponent()
                     , könyvController
                     , new KönyvControllerInput(

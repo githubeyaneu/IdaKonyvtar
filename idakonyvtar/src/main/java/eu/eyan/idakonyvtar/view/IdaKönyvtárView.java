@@ -4,14 +4,15 @@ import java.awt.Component;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
+
+import org.jdesktop.swingx.JXTable;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 
 public class IdaKönyvtárView
 {
-    public final JTable könyvTábla = new JTable();
+    public final JXTable könyvTábla = new JXTable();
     JScrollPane scrollPane;
 
     public Component getComponent()

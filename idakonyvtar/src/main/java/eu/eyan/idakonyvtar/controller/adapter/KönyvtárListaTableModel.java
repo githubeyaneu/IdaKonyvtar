@@ -12,7 +12,7 @@ public class KönyvtárListaTableModel extends AbstractTableAdapter<Könyv>
     private static final long serialVersionUID = 1L;
     private SelectionInList<Könyv> listModel;
 
-    public Könyv getSelectedKönyv()
+    public Könyv getSelectedKönyv(int selectedKönyvIndex)
     {
         return listModel.getSelection();
     }

@@ -26,7 +26,7 @@ import eu.eyan.idakonyvtar.controller.IController;
 import eu.eyan.idakonyvtar.controller.IControllerMenüvel;
 import eu.eyan.idakonyvtar.controller.IDialogController;
 
-public class DialogHandler
+public class DialogHelper
 {
 
     private static class MyDialog extends JDialog
@@ -64,7 +64,7 @@ public class DialogHandler
             }
         });
 
-        controller.initDataBindings();
+        controller.initBindings();
         dialog.pack();
 
         // blockiert:
@@ -82,7 +82,7 @@ public class DialogHandler
         return scrollPane;
     }
 
-    private static <INPUT> JFrame runInFrame(Component parent, IController<INPUT, ?> controller, INPUT input, JMenuBar jMenuBar, JToolBar toolBar)
+    private static <INPUT> JFrame runInFrame(Component parent, IController<INPUT, ?> controller, INPUT input, JMenuBar jMenuBar, JToolBar toolBar, boolean fullScreen)
     {
         controller.initData(input);
         JFrame frame = new JFrame();
@@ -94,10 +94,14 @@ public class DialogHandler
         int magasság = controller.getDefaultSize().height;
         frame.setSize(szélesség, magasság);
         frame.setLocation((screenSize.width - szélesség) / 2, (screenSize.height - magasság) / 2);
+        if (fullScreen)
+        {
+            frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        }
         frame.setTitle(controller.getTitle());
         frame.setJMenuBar(jMenuBar);
 
-        controller.initDataBindings();
+        controller.initBindings();
         frame.setVisible(true);
         return frame;
     }
@@ -133,7 +137,12 @@ public class DialogHandler
 
     public static <INPUT> JFrame runInFrame(IControllerMenüvel<INPUT, ?> controller, INPUT input)
     {
-        return runInFrame(null, controller, input, controller.getMenuBar(), controller.getToolBar());
+        return runInFrame(null, controller, input, controller.getMenuBar(), controller.getToolBar(), false);
+    }
+
+    public static <INPUT> JFrame runInFrameFullScreen(IControllerMenüvel<INPUT, ?> controller, INPUT input)
+    {
+        return runInFrame(null, controller, input, controller.getMenuBar(), controller.getToolBar(), true);
     }
 
     @Deprecated
@@ -144,7 +153,7 @@ public class DialogHandler
         {
             parentWindow.setEnabled(false);
         }
-        JFrame frame = runInFrame(parent, controller, input, null, null);
+        JFrame frame = runInFrame(parent, controller, input, null, null, false);
         frame.addWindowListener(new WindowAdapter()
         {
 

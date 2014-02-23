@@ -13,7 +13,7 @@ public interface IController<INPUT, OUTPUT>
 
     public void initData(INPUT input);
 
-    public void initDataBindings();
+    public void initBindings();
 
     public OUTPUT getOutput();
 }

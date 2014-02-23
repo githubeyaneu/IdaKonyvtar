@@ -53,7 +53,7 @@ public class KönyvController implements IDialogController<KönyvControllerInput
     }
 
     @Override
-    public void initDataBindings()
+    public void initBindings()
     {
         for (int i = 0; i < model.getOszlopok().size(); i++)
         {
