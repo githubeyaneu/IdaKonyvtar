@@ -2,7 +2,7 @@ package eu.eyan.idakonyvtar;
 
 import org.junit.Test;
 
-public class IdaKönyvtárTest
+public class IdaKonyvtarTest
 {
     @Test
     public void testImportExcel() throws Exception

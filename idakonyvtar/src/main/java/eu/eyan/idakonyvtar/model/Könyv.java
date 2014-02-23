@@ -34,7 +34,7 @@ public class Könyv extends Model implements Cloneable
     {
         String oldValue = this.values.get(index);
         // FIXME: AutoCompleteDecorator Problem: Disgusting Hack but works...
-        if (value != null)
+        if (value != null && !value.equals(""))
         {
             this.values.set(index, value);
             firePropertyChange(new KönyvPropertyChangeEvent(this, "PROP", oldValue, value, index));
