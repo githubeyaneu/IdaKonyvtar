@@ -3,13 +3,12 @@ package eu.eyan.idakonyvtar.util;
 import java.awt.Component;
 import java.util.regex.Matcher;
 
-import javax.swing.JLabel;
 import javax.swing.JTable;
-import javax.swing.table.TableCellRenderer;
+import javax.swing.table.DefaultTableCellRenderer;
 
-public class KiemelőRenderer implements TableCellRenderer
+public class KiemelőRenderer extends DefaultTableCellRenderer
 {
-    private JLabel jLabel = new JLabel();
+    private static final long serialVersionUID = 1L;
 
     private String kiemelendőSzövegÉkezetekNélkül = "";
 
@@ -18,6 +17,7 @@ public class KiemelőRenderer implements TableCellRenderer
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)
     {
+        super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         String szöveg = (String) value;
         String szövegÉkezetekNélkül = MagyarÉkezetHelper.ékezetNélkül(szöveg).toLowerCase();
         if (!kiemelendőSzövegÉkezetekNélkül.equals("") && szövegÉkezetekNélkül.contains(kiemelendőSzövegÉkezetekNélkül))
@@ -36,13 +36,13 @@ public class KiemelőRenderer implements TableCellRenderer
             }
             html.append(szöveg.substring(start, szöveg.length()));
             html.append("</html>");
-            jLabel.setText(html.toString());
+            setText(html.toString());
         }
         else
         {
-            jLabel.setText(szöveg);
+            setText(szöveg);
         }
-        return jLabel;
+        return this;
     }
 
     public void setKiemelendőSzöveg(String kiemelendőSzöveg)

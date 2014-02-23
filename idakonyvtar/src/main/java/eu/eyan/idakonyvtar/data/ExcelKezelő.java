@@ -37,8 +37,8 @@ public class ExcelKezelő
             WorkbookSettings ws = new WorkbookSettings();
             ws.setEncoding("Cp1252");
             Workbook workbook = Workbook.getWorkbook(file, ws);
-            könyvekBeolvasása(könyvtár, workbook.getSheet(new String("Könyvek".getBytes(Charset.forName(ws.getEncoding())))));
-            oszlopKonfigurációBeolvasása(könyvtár, workbook.getSheet(new String("OszlopKonfiguráció".getBytes(Charset.forName(ws.getEncoding())))));
+            könyvekBeolvasása(könyvtár, getSheet(ws, workbook, "Könyvek"));
+            oszlopKonfigurációBeolvasása(könyvtár, getSheet(ws, workbook, "OszlopKonfiguráció"));
         }
         catch (BiffException e)
         {
@@ -54,6 +54,16 @@ public class ExcelKezelő
             e.printStackTrace();
         }
         return könyvtár;
+    }
+
+    private static Sheet getSheet(WorkbookSettings ws, Workbook workbook, String string)
+    {
+        Sheet sheet = workbook.getSheet(new String(string.getBytes(Charset.forName(ws.getEncoding()))));
+        if (sheet == null)
+        {
+            sheet = workbook.getSheet(string);
+        }
+        return sheet;
     }
 
     private static void oszlopKonfigurációBeolvasása(Könyvtár könyvtár, Sheet sheet)
@@ -110,8 +120,10 @@ public class ExcelKezelő
 
         try
         {
-            WritableWorkbook workbook = Workbook.createWorkbook(célFile);
-            WritableSheet writablesheet1 = workbook.createSheet("Könyvek", 0);
+            WorkbookSettings ws = new WorkbookSettings();
+            ws.setEncoding("Cp1252");
+            WritableWorkbook workbook = Workbook.createWorkbook(célFile, ws);
+            WritableSheet writablesheet1 = workbook.createSheet(new String("Könyvek"), 0);
             for (int oszlopIndex = 0; oszlopIndex < könyvtár.getOszlopok().size(); oszlopIndex++)
             {
                 writablesheet1.addCell(new Label(oszlopIndex, 0, könyvtár.getOszlopok().get(oszlopIndex)));
@@ -122,6 +134,16 @@ public class ExcelKezelő
                     writablesheet1.addCell(new Label(oszlopIndex, könyvIndex + 1, könyvtár.getKönyvek().get(könyvIndex).getValue(oszlopIndex), cellFormat));
                 }
             }
+            WritableSheet writablesheet2 = workbook.createSheet("OszlopKonfiguráció", 1);
+            String[][] tábla = könyvtár.getKonfiguráció().getTábla();
+            for (int oszlop = 0; oszlop < tábla.length; oszlop++)
+            {
+                for (int sor = 0; sor < tábla[0].length; sor++)
+                {
+                    writablesheet2.addCell(new Label(oszlop, sor, tábla[oszlop][sor]));
+                }
+            }
+            // FIXME: konfig mentése
             workbook.write();
             workbook.close();
         }

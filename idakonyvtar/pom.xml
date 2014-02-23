@@ -36,6 +36,12 @@
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
+					<archive>
+						<manifest>
+							<mainClass>eu.eyan.idakonyvtar.IdaKonyvtar</mainClass>
+							<addClasspath>true</addClasspath>
+						</manifest>
+					</archive>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -46,6 +52,7 @@
 					<archive>
 						<manifest>
 							<mainClass>eu.eyan.idakonyvtar.IdaKonyvtar</mainClass>
+							<addClasspath>true</addClasspath>
 						</manifest>
 					</archive>
 				</configuration>

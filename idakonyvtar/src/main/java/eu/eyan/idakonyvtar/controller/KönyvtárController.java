@@ -17,6 +17,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JToolBar;
+import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -51,11 +52,12 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
     public Component getView()
     {
         view.getComponent();
-        dataModel = new KönyvtárListaTableModel(model.getKönyvek(), model.getKönyvtár().getOszlopok());
+        dataModel = new KönyvtárListaTableModel(model.getKönyvek(), model.getKönyvtár().getOszlopok(), model.getKönyvtár().getKonfiguráció());
         view.könyvTábla.setModel(dataModel);
         view.könyvTábla.setSelectionModel(new SingleListSelectionAdapter(model.getKönyvek().getSelectionIndexHolder()));
         view.könyvTábla.setEnabled(true);
         view.könyvTábla.setDefaultRenderer(Object.class, kiemelőRenderer);
+        view.könyvTábla.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         return view.getComponent();
     }
 
