@@ -103,6 +103,11 @@ public class DialogHelper
 
         controller.initBindings();
         frame.setVisible(true);
+        Component initFocusComponent = controller.getComponentForFocus();
+        if (initFocusComponent != null)
+        {
+            initFocusComponent.requestFocusInWindow();
+        }
         return frame;
     }
 

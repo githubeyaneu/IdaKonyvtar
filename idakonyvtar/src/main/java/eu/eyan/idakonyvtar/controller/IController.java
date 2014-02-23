@@ -16,4 +16,6 @@ public interface IController<INPUT, OUTPUT>
     public void initBindings();
 
     public OUTPUT getOutput();
+
+    public Component getComponentForFocus();
 }

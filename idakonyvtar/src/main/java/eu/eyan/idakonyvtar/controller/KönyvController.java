@@ -169,4 +169,10 @@ public class KönyvController implements IDialogController<KönyvControllerInput
     {
         return model.getKönyv();
     }
+
+    @Override
+    public Component getComponentForFocus()
+    {
+        return view.getIsbnText();
+    }
 }

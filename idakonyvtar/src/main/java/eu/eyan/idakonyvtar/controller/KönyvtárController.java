@@ -31,6 +31,7 @@ import eu.eyan.idakonyvtar.menu.IdaKönyvtárMenüAndToolBar;
 import eu.eyan.idakonyvtar.model.IdaKönyvtárModel;
 import eu.eyan.idakonyvtar.model.Könyv;
 import eu.eyan.idakonyvtar.util.DialogHelper;
+import eu.eyan.idakonyvtar.util.KiemelőRenderer;
 import eu.eyan.idakonyvtar.util.MagyarRowFilter;
 import eu.eyan.idakonyvtar.view.IdaKönyvtárView;
 
@@ -43,6 +44,7 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
     // FIXME: tényleg szükség van erre????
     private KönyvtárListaTableModel dataModel;
     private Könyv emlékKönyv;
+    KiemelőRenderer kiemelőRenderer = new KiemelőRenderer();
 
     // FIXME: initview and getview are not the same!!
     @Override
@@ -53,6 +55,7 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
         view.könyvTábla.setModel(dataModel);
         view.könyvTábla.setSelectionModel(new SingleListSelectionAdapter(model.getKönyvek().getSelectionIndexHolder()));
         view.könyvTábla.setEnabled(true);
+        view.könyvTábla.setDefaultRenderer(Object.class, kiemelőRenderer);
         return view.getComponent();
     }
 
@@ -126,6 +129,7 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
             public void keyReleased(KeyEvent e)
             {
                 view.könyvTábla.setRowFilter(new MagyarRowFilter(menuAndToolBar.TOOLBAR_KERES.getText()));
+                kiemelőRenderer.setKiemelendőSzöveg(menuAndToolBar.TOOLBAR_KERES.getText());
             }
         });
     }
@@ -237,5 +241,11 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
     public JToolBar getToolBar()
     {
         return menuAndToolBar.getToolBar();
+    }
+
+    @Override
+    public Component getComponentForFocus()
+    {
+        return menuAndToolBar.TOOLBAR_KERES;
     }
 }
