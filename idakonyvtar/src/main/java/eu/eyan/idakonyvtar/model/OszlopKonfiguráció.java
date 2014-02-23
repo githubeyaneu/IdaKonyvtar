@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 import eu.eyan.idakonyvtar.oszk.Marc;
 
+//FIXME: Refactor, mert ez így érthetelen állandó fájdalom
 public class OszlopKonfiguráció
 {
     public static enum OszlopKonfigurációk
@@ -16,6 +17,7 @@ public class OszlopKonfiguráció
         MULTIMEZŐ("MultiMező"),
         AUTOCOMPLETE("AutoComplete"),
         MARCKÓD("MarcKód"),
+        EMLÉKEZŐ("Emlékező"),
         MEGJELENÍTÉS_TÁBLÁZATBAN("Táblázatban");
 
         @Getter
@@ -95,5 +97,18 @@ public class OszlopKonfiguráció
             throw new Exception("A Marc kódot nem lehet a konfigurációból beolvasni: " + oszlopNév);
         }
         return ret;
+    }
+
+    public List<String> getEmlékezőOszlopok()
+    {
+        List<String> emlékezőOszlopok = newArrayList();
+        for (int oszlopIndex = 1; oszlopIndex < tábla[0].length; oszlopIndex++)
+        {
+            if (isIgen(tábla[0][oszlopIndex], OszlopKonfigurációk.EMLÉKEZŐ))
+            {
+                emlékezőOszlopok.add(tábla[0][oszlopIndex]);
+            }
+        }
+        return emlékezőOszlopok;
     }
 }

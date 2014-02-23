@@ -39,6 +39,7 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
     private final IdaKönyvtárModel model = new IdaKönyvtárModel();
     // FIXME: tényleg szükség van erre????
     private KönyvtárListaTableModel dataModel;
+    private Könyv emlékKönyv;
 
     // FIXME: initview and getview are not the same!!
     @Override
@@ -68,6 +69,7 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
     public void initData(KönyvtárControllerInput input)
     {
         readKönyvtár(input.getFile());
+        emlékKönyv = new Könyv(model.getKönyvtár().getOszlopok().size());
     }
 
     private void readKönyvtár(File file)
@@ -166,13 +168,14 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
                     view.getComponent()
                     , könyvController
                     , new KönyvControllerInput(
-                            new Könyv(model.getKönyvtár().getOszlopok().size())
+                            újKönyvEmlékekkel(model.getKönyvtár().getOszlopok().size())
                             , model.getKönyvek().getList()
                             , model.getKönyvtár().getOszlopok()
                             , ISBN_ENABLED
                             , model.getKönyvtár().getKonfiguráció())))
             {
                 model.getKönyvek().getList().add(0, könyvController.getOutput());
+                emlékekMentése(könyvController.getOutput());
                 // TODO: ugly: use selectioninlist...
                 model.getKönyvek().fireIntervalAdded(0, 0);
             }
@@ -188,6 +191,27 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
                 model.getKönyvek().fireIntervalRemoved(selectionIndex, selectionIndex);
             }
         }
+    }
+
+    private void emlékekMentése(Könyv könyv)
+    {
+        emlékKönyv = new Könyv(model.getKönyvtár().getOszlopok().size());
+        for (String emlékezőOszlop : model.getKönyvtár().getKonfiguráció().getEmlékezőOszlopok())
+        {
+            int oszlopIndex = model.getKönyvtár().getOszlopok().indexOf(emlékezőOszlop);
+            emlékKönyv.setValue(oszlopIndex, könyv.getValue(oszlopIndex));
+        }
+    }
+
+    private Könyv újKönyvEmlékekkel(int size)
+    {
+        Könyv újKönyv = new Könyv(size);
+        for (String emlékezőOszlop : model.getKönyvtár().getKonfiguráció().getEmlékezőOszlopok())
+        {
+            int oszlopIndex = model.getKönyvtár().getOszlopok().indexOf(emlékezőOszlop);
+            újKönyv.setValue(oszlopIndex, emlékKönyv.getValue(oszlopIndex));
+        }
+        return újKönyv;
     }
 
     @Override

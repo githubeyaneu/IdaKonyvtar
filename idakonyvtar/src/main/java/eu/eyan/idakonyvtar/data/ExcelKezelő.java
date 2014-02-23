@@ -20,6 +20,7 @@ import jxl.write.WriteException;
 import jxl.write.biff.RowsExceededException;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 
 import eu.eyan.idakonyvtar.model.Könyv;
 import eu.eyan.idakonyvtar.model.Könyvtár;
@@ -140,6 +141,11 @@ public class ExcelKezelő
 
     private static void backup(File mentendőFile)
     {
-        BackupHelper.zipFile(mentendőFile, new File(mentendőFile.getAbsolutePath() + "_backup_" + new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date()) + ".zip"));
+        String forrásKönyvtár = FilenameUtils.getFullPath(mentendőFile.getAbsolutePath());
+        String forrásFileNév = FilenameUtils.getName(mentendőFile.getAbsolutePath());
+        File backupKönyvtár = new File(forrásKönyvtár + "backup");
+        backupKönyvtár.mkdirs();
+        File backupFile = new File(backupKönyvtár.getAbsoluteFile() + File.separator + forrásFileNév + "_backup_" + new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date()) + ".zip");
+        BackupHelper.zipFile(mentendőFile, backupFile);
     }
 }

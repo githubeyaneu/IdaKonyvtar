@@ -37,7 +37,6 @@ public class KönyvMezőValueModel implements ValueModel, PropertyChangeListener
     @Override
     public void addValueChangeListener(PropertyChangeListener listener)
     {
-        System.out.println(oszlopIndex + " addValueChangeListener");
         if (listeners == null)
         {
             listeners = newHashSet();
