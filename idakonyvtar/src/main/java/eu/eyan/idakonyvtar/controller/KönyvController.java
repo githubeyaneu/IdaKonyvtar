@@ -2,6 +2,7 @@ package eu.eyan.idakonyvtar.controller;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -174,5 +175,12 @@ public class KönyvController implements IDialogController<KönyvControllerInput
     public Component getComponentForFocus()
     {
         return view.getIsbnText();
+    }
+
+    @Override
+    public void addResizeListener(Window window)
+    {
+        // TODO Auto-generated method stub
+
     }
 }

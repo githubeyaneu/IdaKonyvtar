@@ -18,6 +18,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 
+import org.jdesktop.swingx.JXFrame;
+
 import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
@@ -66,11 +68,22 @@ public class DialogHelper
 
         controller.initBindings();
         dialog.pack();
+        középretesz(dialog);
+        controller.addResizeListener(dialog);
 
         // blockiert:
         dialog.setVisible(true);
         parentWindow.invalidate();
         return dialog.ok;
+    }
+
+    private static void középretesz(Component component)
+    {
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int szélesség = component.getSize().width;
+        int magasság = component.getSize().height;
+        component.setSize(szélesség, magasság);
+        component.setLocation((screenSize.width - szélesség) / 2, (screenSize.height - magasság) / 2);
     }
 
     private static Component addScrollableInBorders(Component component)
@@ -85,23 +98,19 @@ public class DialogHelper
     private static <INPUT> JFrame runInFrame(Component parent, IController<INPUT, ?> controller, INPUT input, JMenuBar jMenuBar, JToolBar toolBar, boolean fullScreen)
     {
         controller.initData(input);
-        JFrame frame = new JFrame();
+        JXFrame frame = new JXFrame();
         frame.add(toolBar, BorderLayout.NORTH);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.add(controller.getView());
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        int szélesség = controller.getDefaultSize().width;
-        int magasság = controller.getDefaultSize().height;
-        frame.setSize(szélesség, magasság);
-        frame.setLocation((screenSize.width - szélesség) / 2, (screenSize.height - magasság) / 2);
+        frame.setTitle(controller.getTitle());
+        frame.setJMenuBar(jMenuBar);
+        controller.initBindings();
+        frame.pack();
+        középretesz(frame);
         if (fullScreen)
         {
             frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         }
-        frame.setTitle(controller.getTitle());
-        frame.setJMenuBar(jMenuBar);
-
-        controller.initBindings();
         frame.setVisible(true);
         Component initFocusComponent = controller.getComponentForFocus();
         if (initFocusComponent != null)
