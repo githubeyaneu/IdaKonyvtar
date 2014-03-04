@@ -155,34 +155,8 @@ public class DialogHelper
         return panelBuilder.build();
     }
 
-    public static <INPUT> JFrame runInFrame(IControllerMenüvel<INPUT, ?> controller, INPUT input)
-    {
-        return runInFrame(null, controller, input, controller.getMenuBar(), controller.getToolBar(), false);
-    }
-
     public static <INPUT> JFrame runInFrameFullScreen(IControllerMenüvel<INPUT, ?> controller, INPUT input)
     {
         return runInFrame(null, controller, input, controller.getMenuBar(), controller.getToolBar(), true);
-    }
-
-    @Deprecated
-    public static <INPUT> JFrame runInModalerFrame(Component parent, IController<INPUT, ?> controller, INPUT input)
-    {
-        final Window parentWindow = SwingUtilities.windowForComponent(parent);
-        if (parentWindow != null)
-        {
-            parentWindow.setEnabled(false);
-        }
-        JFrame frame = runInFrame(parent, controller, input, null, null, false);
-        frame.addWindowListener(new WindowAdapter()
-        {
-
-            @Override
-            public void windowClosing(WindowEvent e)
-            {
-                parentWindow.setEnabled(true);
-            }
-        });
-        return frame;
     }
 }
