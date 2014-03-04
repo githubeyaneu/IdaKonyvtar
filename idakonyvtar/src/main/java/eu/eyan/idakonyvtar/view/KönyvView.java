@@ -17,8 +17,13 @@ import com.jgoodies.forms.layout.FormLayout;
 
 public class KönyvView implements IView
 {
+    public static final String ISBN_TEXT = "isbnText";
+
+    public static final String ISBN_LABEL = "isbnLabel";
+
     @Setter
     private List<String> oszlopok = newArrayList();
+
     @Setter
     private boolean isbnEnabled = false;
 
@@ -52,16 +57,20 @@ public class KönyvView implements IView
             panelBuilder.addSeparator("Isbn", CC.xyw(1, row, 3));
             row = row + 2;
             panelBuilder.add(isbnKeresőLabel, CC.xyw(1, row, 1));
+            isbnKeresőLabel.setName(ISBN_LABEL);
             panelBuilder.add(isbnText, CC.xyw(3, row, 1));
+            isbnText.setName(ISBN_TEXT);
             row = row + 2;
         }
         panelBuilder.addSeparator("Adatok", CC.xyw(1, row, 3));
         for (int i = 0; i < oszlopok.size(); i++)
         {
             row = row + 2;
-            panelBuilder.addLabel(oszlopok.get(i), CC.xy(1, row));
+            String oszlopNév = oszlopok.get(i);
+            panelBuilder.addLabel(oszlopNév, CC.xy(1, row));
             // public JComboBox<String> valami = new JComboBox<String>();
             JTextField szerkesztő = new JTextField(20);
+            szerkesztő.setName(oszlopNév);
             szerkesztők.add(szerkesztő);
             panelBuilder.add(szerkesztő, CC.xy(3, row));
         }

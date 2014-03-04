@@ -1,4 +1,4 @@
-package eu.eyan.idakonyvtar.data;
+package eu.eyan.idakonyvtar.util;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,36 +24,45 @@ import org.apache.commons.io.FilenameUtils;
 
 import eu.eyan.idakonyvtar.model.Könyv;
 import eu.eyan.idakonyvtar.model.Könyvtár;
-import eu.eyan.idakonyvtar.util.BackupHelper;
 
 public class ExcelKezelő
 {
+    public static final String OSZLOP_KONFIGURÁCIÓ = "OszlopKonfiguráció";
+    public static final String KÖNYVEK = "Könyvek";
+
     public static Könyvtár könyvtárBeolvasása(final File file)
     {
         backup(file);
         Könyvtár könyvtár = new Könyvtár();
         try
         {
-            WorkbookSettings ws = new WorkbookSettings();
-            ws.setEncoding("Cp1252");
-            Workbook workbook = Workbook.getWorkbook(file, ws);
-            könyvekBeolvasása(könyvtár, getSheet(ws, workbook, "Könyvek"));
-            oszlopKonfigurációBeolvasása(könyvtár, getSheet(ws, workbook, "OszlopKonfiguráció"));
+            Workbook workbook = Workbook.getWorkbook(file, getWorkbookSettings());
+            könyvekBeolvasása(könyvtár, getSheet(getWorkbookSettings(), workbook, KÖNYVEK));
+            oszlopKonfigurációBeolvasása(könyvtár, getSheet(getWorkbookSettings(), workbook, OSZLOP_KONFIGURÁCIÓ));
         }
         catch (BiffException e)
         {
+            e.printStackTrace();
             JOptionPane.showMessageDialog(null, "Biff Hiba a beolvasásnál " + e.getLocalizedMessage());
         }
         catch (IOException e)
         {
+            e.printStackTrace();
             JOptionPane.showMessageDialog(null, "Hiba a beolvasásnál " + e.getLocalizedMessage());
         }
         catch (Exception e)
         {
-            JOptionPane.showMessageDialog(null, e.getLocalizedMessage());
             e.printStackTrace();
+            JOptionPane.showMessageDialog(null, e.getLocalizedMessage());
         }
         return könyvtár;
+    }
+
+    public static WorkbookSettings getWorkbookSettings()
+    {
+        WorkbookSettings ws = new WorkbookSettings();
+        ws.setEncoding("Cp1252");
+        return ws;
     }
 
     private static Sheet getSheet(WorkbookSettings ws, Workbook workbook, String string)
@@ -120,10 +129,8 @@ public class ExcelKezelő
 
         try
         {
-            WorkbookSettings ws = new WorkbookSettings();
-            ws.setEncoding("Cp1252");
-            WritableWorkbook workbook = Workbook.createWorkbook(célFile, ws);
-            WritableSheet writablesheet1 = workbook.createSheet(new String("Könyvek"), 0);
+            WritableWorkbook workbook = Workbook.createWorkbook(célFile, getWorkbookSettings());
+            WritableSheet writablesheet1 = workbook.createSheet(new String(KÖNYVEK), 0);
             for (int oszlopIndex = 0; oszlopIndex < könyvtár.getOszlopok().size(); oszlopIndex++)
             {
                 writablesheet1.addCell(new Label(oszlopIndex, 0, könyvtár.getOszlopok().get(oszlopIndex)));
@@ -134,7 +141,7 @@ public class ExcelKezelő
                     writablesheet1.addCell(new Label(oszlopIndex, könyvIndex + 1, könyvtár.getKönyvek().get(könyvIndex).getValue(oszlopIndex), cellFormat));
                 }
             }
-            WritableSheet writablesheet2 = workbook.createSheet("OszlopKonfiguráció", 1);
+            WritableSheet writablesheet2 = workbook.createSheet(OSZLOP_KONFIGURÁCIÓ, 1);
             String[][] tábla = könyvtár.getKonfiguráció().getTábla();
             for (int oszlop = 0; oszlop < tábla.length; oszlop++)
             {

@@ -57,64 +57,21 @@
 					</archive>
 				</configuration>
 			</plugin>
-			<!-- <plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.4</version>
-				<configuration>
-					<archive>
-						<manifest>
-							<mainClass>eu.eyan.idakonyvtar.IdaKonyvtar</mainClass>
-							<addClasspath>true</addClasspath>
-							<classpathPrefix>lib/</classpathPrefix>
-						</manifest>
-					</archive>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.eclipse.m2e</groupId>
-				<artifactId>lifecycle-mapping</artifactId>
-				<version>1.0.0</version>
-				<configuration>
-					<lifecycleMappingMetadata>
-						<pluginExecutions>
-							copy-dependency plugin
-							<pluginExecution>
-								<pluginExecutionFilter>
-									<groupId>org.apache.maven.plugins</groupId>
-									<artifactId>maven-dependency-plugin</artifactId>
-									<versionRange>[1.0.0,)</versionRange>
-									<goals>
-										<goal>copy-dependencies</goal>
-									</goals>
-								</pluginExecutionFilter>
-								<action>
-									<ignore />
-								</action>
-							</pluginExecution>
-						</pluginExecutions>
-					</lifecycleMappingMetadata>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.5.1</version>
-				<executions>
-					<execution>
-						<id>copy-dependencies</id>
-						<phase>package</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>
-								${project.build.directory}/lib/
-							</outputDirectory>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin> -->
+			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-jar-plugin</artifactId> 
+				<version>2.4</version> <configuration> <archive> <manifest> <mainClass>eu.eyan.idakonyvtar.IdaKonyvtar</mainClass> 
+				<addClasspath>true</addClasspath> <classpathPrefix>lib/</classpathPrefix> 
+				</manifest> </archive> </configuration> </plugin> <plugin> <groupId>org.eclipse.m2e</groupId> 
+				<artifactId>lifecycle-mapping</artifactId> <version>1.0.0</version> <configuration> 
+				<lifecycleMappingMetadata> <pluginExecutions> copy-dependency plugin <pluginExecution> 
+				<pluginExecutionFilter> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-dependency-plugin</artifactId> 
+				<versionRange>[1.0.0,)</versionRange> <goals> <goal>copy-dependencies</goal> 
+				</goals> </pluginExecutionFilter> <action> <ignore /> </action> </pluginExecution> 
+				</pluginExecutions> </lifecycleMappingMetadata> </configuration> </plugin> 
+				<plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-dependency-plugin</artifactId> 
+				<version>2.5.1</version> <executions> <execution> <id>copy-dependencies</id> 
+				<phase>package</phase> <goals> <goal>copy-dependencies</goal> </goals> <configuration> 
+				<outputDirectory> ${project.build.directory}/lib/ </outputDirectory> </configuration> 
+				</execution> </executions> </plugin> -->
 		</plugins>
 	</build>
 
@@ -144,11 +101,11 @@
 			<artifactId>junit</artifactId>
 			<version>4.11</version>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.easytesting</groupId>
 			<artifactId>fest-assert</artifactId>
 			<version>1.4</version>
-		</dependency>
+		</dependency> -->
 		<dependency>
 			<groupId>org.easytesting</groupId>
 			<artifactId>fest-swing</artifactId>
@@ -195,5 +152,11 @@
 			<artifactId>seaglasslookandfeel</artifactId>
 			<version>0.2</version>
 		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.8.4</version>
+		</dependency>
+
 	</dependencies>
 </project>

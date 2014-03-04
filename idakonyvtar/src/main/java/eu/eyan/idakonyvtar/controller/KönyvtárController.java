@@ -27,23 +27,24 @@ import com.jgoodies.binding.adapter.SingleListSelectionAdapter;
 import eu.eyan.idakonyvtar.controller.adapter.KönyvtárListaTableModel;
 import eu.eyan.idakonyvtar.controller.input.KönyvControllerInput;
 import eu.eyan.idakonyvtar.controller.input.KönyvtárControllerInput;
-import eu.eyan.idakonyvtar.data.ExcelKezelő;
-import eu.eyan.idakonyvtar.menu.IdaKönyvtárMenüAndToolBar;
-import eu.eyan.idakonyvtar.model.IdaKönyvtárModel;
+import eu.eyan.idakonyvtar.model.KönyvtárModel;
 import eu.eyan.idakonyvtar.model.Könyv;
 import eu.eyan.idakonyvtar.util.DialogHelper;
+import eu.eyan.idakonyvtar.util.ExcelKezelő;
 import eu.eyan.idakonyvtar.util.KiemelőRenderer;
 import eu.eyan.idakonyvtar.util.MagyarRowFilter;
-import eu.eyan.idakonyvtar.view.IdaKönyvtárView;
+import eu.eyan.idakonyvtar.view.KönyvtárMenüAndToolBar;
+import eu.eyan.idakonyvtar.view.KönyvtárView;
 
 public class KönyvtárController implements IControllerMenüvel<KönyvtárControllerInput, Void>, ActionListener
 {
 
-    private final IdaKönyvtárMenüAndToolBar menuAndToolBar = new IdaKönyvtárMenüAndToolBar();
-    private final IdaKönyvtárView view = new IdaKönyvtárView();
-    private final IdaKönyvtárModel model = new IdaKönyvtárModel();
-    // FIXME: tényleg szükség van erre????
-    private KönyvtárListaTableModel dataModel;
+    public static final String MEGERŐSÍTÉS_NEM = "Nem";
+    public static final String MEGERŐSÍTÉS_IGEN = "Igen";
+    public static final String TITLE = "Ida könyvtára";
+    private final KönyvtárMenüAndToolBar menuAndToolBar = new KönyvtárMenüAndToolBar();
+    private final KönyvtárView view = new KönyvtárView();
+    private final KönyvtárModel model = new KönyvtárModel();
     private Könyv emlékKönyv;
     KiemelőRenderer kiemelőRenderer = new KiemelőRenderer();
 
@@ -52,8 +53,7 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
     public Component getView()
     {
         view.getComponent();
-        dataModel = new KönyvtárListaTableModel(model.getKönyvek(), model.getKönyvtár().getOszlopok(), model.getKönyvtár().getKonfiguráció());
-        view.könyvTábla.setModel(dataModel);
+        resetTableModel();
         view.könyvTábla.setSelectionModel(new SingleListSelectionAdapter(model.getKönyvek().getSelectionIndexHolder()));
         view.könyvTábla.setEnabled(true);
         view.könyvTábla.setDefaultRenderer(Object.class, kiemelőRenderer);
@@ -61,10 +61,17 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
         return view.getComponent();
     }
 
+    private void resetTableModel()
+    {
+        // FIXME: tényleg szükség van erre????
+        KönyvtárListaTableModel dataModel = new KönyvtárListaTableModel(model.getKönyvek(), model.getKönyvtár().getOszlopok(), model.getKönyvtár().getKonfiguráció());
+        view.könyvTábla.setModel(dataModel);
+    }
+
     @Override
     public String getTitle()
     {
-        return "Ida könyvtára";
+        return TITLE;
     }
 
     @Override
@@ -82,10 +89,12 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
 
     private void readKönyvtár(File file)
     {
+        System.out.println("Fájl betöltése: " + file);
         model.setKönyvtár(ExcelKezelő.könyvtárBeolvasása(file));
         model.getKönyvek().getList().clear();
         // FIXME heee? 2x a modelben
         model.getKönyvek().setList(model.getKönyvtár().getKönyvek());
+        resetTableModel();
     }
 
     private void saveKönyvtár(File file)
@@ -108,7 +117,7 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
             @Override
             public void valueChanged(ListSelectionEvent e)
             {
-                menuAndToolBar.TOOLBAR_KONYV_TOROL.setEnabled(e.getFirstIndex() >= 0);
+                menuAndToolBar.TOOLBAR_KONYV_TOROL.setEnabled(view.könyvTábla.getSelectedRow() >= 0);
             }
         });
 
@@ -202,7 +211,7 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
 
         if (e.getSource() == menuAndToolBar.TOOLBAR_KONYV_TOROL)
         {
-            if (JOptionPane.showOptionDialog(menuAndToolBar.TOOLBAR_KONYV_TOROL, "Biztosan törölni akarod?", "Törlés megerősítése", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[] { "Igen", "Nem" }, "Nem") == JOptionPane.OK_OPTION)
+            if (JOptionPane.showOptionDialog(menuAndToolBar.TOOLBAR_KONYV_TOROL, "Biztosan törölni akarod?", "Törlés megerősítése", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[] { MEGERŐSÍTÉS_IGEN, MEGERŐSÍTÉS_NEM }, MEGERŐSÍTÉS_NEM) == JOptionPane.OK_OPTION)
             {
                 int selectionIndex = model.getKönyvek().getSelectionIndex();
                 model.getKönyvek().getList().remove(selectionIndex);

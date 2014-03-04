@@ -66,7 +66,12 @@ public class KönyvtárListaTableModel extends AbstractTableAdapter<Könyv>
         {
             megjelenítettOszlopIndexek[i] = megjelenítendőOszlopokIndexei.get(i);
         }
-        return megjelenítendőOszlopok.toArray(new String[megjelenítendőOszlopok.size()]);
+        String[] megjelenítendőOszlopokTömb = megjelenítendőOszlopok.toArray(new String[megjelenítendőOszlopok.size()]);
+        if (megjelenítendőOszlopokTömb.length < 1)
+        {
+            throw new IllegalArgumentException("Legalább 1 oszlopot meg kell jeleníteni! Oszlopkonfigurációban helyesen kell konfigurálni.");
+        }
+        return megjelenítendőOszlopokTömb;
     }
 
     @Override

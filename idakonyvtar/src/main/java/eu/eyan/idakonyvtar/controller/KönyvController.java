@@ -1,5 +1,7 @@
 package eu.eyan.idakonyvtar.controller;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Window;
@@ -26,6 +28,7 @@ public class KönyvController implements IDialogController<KönyvControllerInput
 {
     private KönyvView view = new KönyvView();
     private KönyvControllerInput model;
+    private List<Window> resizeListeners = newArrayList();
 
     @Override
     public Component getView()
@@ -98,10 +101,11 @@ public class KönyvController implements IDialogController<KönyvControllerInput
                                 view.getIsbnKeresőLabel().setText("Nincs találat");
                                 view.getIsbnKeresőLabel().setIcon(new ImageIcon(Resources.getResource("icons/hiba.gif")));
                             }
+                            fireResizeEvent();
                         }
 
                     });
-
+                    fireResizeEvent();
                 }
 
             }
@@ -131,6 +135,7 @@ public class KönyvController implements IDialogController<KönyvControllerInput
             }
             catch (Exception e)
             {
+                e.printStackTrace();
                 JOptionPane.showMessageDialog(null, e.getLocalizedMessage());
             }
         }
@@ -180,7 +185,14 @@ public class KönyvController implements IDialogController<KönyvControllerInput
     @Override
     public void addResizeListener(Window window)
     {
-        // TODO Auto-generated method stub
+        this.resizeListeners.add(window);
+    }
 
+    private void fireResizeEvent()
+    {
+        for (Window window : resizeListeners)
+        {
+            window.pack();
+        }
     }
 }

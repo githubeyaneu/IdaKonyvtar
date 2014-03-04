@@ -8,6 +8,11 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 public class KiemelőRenderer extends DefaultTableCellRenderer
 {
+    public static final String KIEMELÉS_END_TAG = "</span>";
+    public static final String KIEMELÉS_START_TAG = "<span style=\"background-color:#F2F5A9;\">";
+    public static final String HTML_END_TAG = "</html>";
+    public static final String HTML_START_TAG = "<html>";
+
     private static final long serialVersionUID = 1L;
 
     private String kiemelendőSzövegÉkezetekNélkül = "";
@@ -24,18 +29,18 @@ public class KiemelőRenderer extends DefaultTableCellRenderer
         {
             matcher.reset(szövegÉkezetekNélkül);
             StringBuilder html = new StringBuilder();
-            html.append("<html>");
+            html.append(HTML_START_TAG);
             int start = 0;
             while (matcher.find())
             {
                 html.append(szöveg.substring(start, matcher.start()));
-                html.append("<span style=\"background-color:#F2F5A9;\">");
+                html.append(KIEMELÉS_START_TAG);
                 html.append(szöveg.substring(matcher.start(), matcher.end()));
-                html.append("</span>");
+                html.append(KIEMELÉS_END_TAG);
                 start = matcher.end();
             }
             html.append(szöveg.substring(start, szöveg.length()));
-            html.append("</html>");
+            html.append(HTML_END_TAG);
             setText(html.toString());
         }
         else

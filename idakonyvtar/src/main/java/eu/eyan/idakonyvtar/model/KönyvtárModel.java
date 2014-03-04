@@ -5,7 +5,7 @@ import lombok.Setter;
 
 import com.jgoodies.binding.list.SelectionInList;
 
-public class IdaKönyvtárModel
+public class KönyvtárModel
 {
     @Getter
     private SelectionInList<Könyv> könyvek = new SelectionInList<Könyv>();

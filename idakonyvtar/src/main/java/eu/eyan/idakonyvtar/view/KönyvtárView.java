@@ -10,7 +10,7 @@ import org.jdesktop.swingx.JXTable;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 
-public class IdaKönyvtárView
+public class KönyvtárView
 {
     public final JXTable könyvTábla = new JXTable();
     JScrollPane scrollPane;

@@ -31,6 +31,9 @@ import eu.eyan.idakonyvtar.controller.IDialogController;
 public class DialogHelper
 {
 
+    public static final String MÉGSEM = "Mégsem";
+    public static final String MENTÉS = "Mentés";
+
     private static class MyDialog extends JDialog
     {
         public MyDialog(Window owner)
@@ -103,6 +106,7 @@ public class DialogHelper
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.add(controller.getView());
         frame.setTitle(controller.getTitle());
+        frame.setName(controller.getTitle());
         frame.setJMenuBar(jMenuBar);
         controller.initBindings();
         frame.pack();
@@ -123,8 +127,10 @@ public class DialogHelper
     private static Component getButtons(final MyDialog dialog, final IDialogController<?, ?> dialogController)
     {
         PanelBuilder panelBuilder = new PanelBuilder(new FormLayout("pref:grow,3dlu,pref,3dlu,pref", "pref"));
-        JButton okButton = new JButton("OK");
-        JButton cancelButton = new JButton("Mégsem");
+        JButton okButton = new JButton(MENTÉS);
+        okButton.setName(MENTÉS);
+        JButton cancelButton = new JButton(MÉGSEM);
+        cancelButton.setName(MÉGSEM);
         panelBuilder.add(okButton, CC.xy(3, 1));
         panelBuilder.add(cancelButton, CC.xy(5, 1));
         okButton.addActionListener(new ActionListener()
