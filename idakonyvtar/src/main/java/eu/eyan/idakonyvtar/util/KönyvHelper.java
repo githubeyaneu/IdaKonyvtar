@@ -16,17 +16,18 @@ public class KönyvHelper
 {
     final static Collator collator = Collator.getInstance(new Locale("hu"));
 
-    public static List<String> getMindenKiadó(List<Könyv> könyvLista)
+    public static List<String> getOszlopLista(List<Könyv> könyvLista, int oszlopIndex)
     {
         Set<String> set = newHashSet("");
-//        for (Könyv könyv : könyvLista)
-//        {
-        // FIXME
-//            if (könyv.getKiadó() != null)
-//            {
-//                set.add(könyv.getKiadó().trim());
-//            }
-//        }
+        for (Könyv könyv : könyvLista)
+        {
+            if (könyv.getValue(oszlopIndex) != null)
+            {
+                List<String> values = newArrayList(könyv.getValue(oszlopIndex).split(" + "));
+                values.forEach((String s) -> s.trim());
+                set.addAll(values);
+            }
+        }
         List<String> list = newArrayList(set);
 
         collator.setStrength(Collator.SECONDARY);// a == A, a < Ä
@@ -40,5 +41,4 @@ public class KönyvHelper
         });
         return list;
     }
-
 }

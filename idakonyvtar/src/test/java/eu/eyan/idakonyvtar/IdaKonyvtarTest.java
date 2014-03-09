@@ -2,7 +2,6 @@ package eu.eyan.idakonyvtar;
 
 import java.io.File;
 
-import org.fest.swing.core.EmergencyAbortListener;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,19 +9,19 @@ import org.junit.Test;
 import eu.eyan.idakonyvtar.controller.KönyvtárController;
 import eu.eyan.idakonyvtar.model.OszlopKonfiguráció.OszlopKonfigurációk;
 import eu.eyan.idakonyvtar.testhelper.ExcelAssert;
+import eu.eyan.idakonyvtar.testhelper.IdaKönyvtárTestHelper;
 import eu.eyan.idakonyvtar.testhelper.KönyvtárFileBuilder;
 import eu.eyan.idakonyvtar.util.ExcelKezelő;
 import eu.eyan.idakonyvtar.util.KiemelőRenderer;
 import eu.eyan.idakonyvtar.view.KönyvtárMenüAndToolBar;
 
-public class IdaKonyvtarTest
+public class IdaKonyvtarTest extends AbstractUiTest
 {
     private static IdaKönyvtárTestHelper könyvtár = new IdaKönyvtárTestHelper();
 
     @Before
     public void setUp()
     {
-        EmergencyAbortListener.registerInToolkit();
         könyvtár.start(null);
     }
 
@@ -86,7 +85,7 @@ public class IdaKonyvtarTest
         könyvtár.assertTáblázatCella(2, 1, "A napok hordaléka");
         könyvtár.clickÚjGomb();
         könyvtár.szerkesztő().requireIsbnPresent();
-        könyvtár.szerkesztő().setText("Cím", "Cím1");
+        könyvtár.szerkesztő().setNormalText("Cím", "Cím1");
         könyvtár.szerkesztő().clickMentés();
         könyvtár.assertTáblázatCella(2, 1, "Cím1");
         könyvtár.assertTáblázatCella(2, 2, "A napok hordaléka");
@@ -97,7 +96,7 @@ public class IdaKonyvtarTest
     {
         könyvtár.assertTáblázatCella(2, 1, "A napok hordaléka");
         könyvtár.clickÚjGomb();
-        könyvtár.szerkesztő().setText("Cím", "Cím1");
+        könyvtár.szerkesztő().setNormalText("Cím", "Cím1");
         könyvtár.szerkesztő().clickMégsem();
         könyvtár.assertTáblázatCella(2, 1, "A napok hordaléka");
     }
@@ -159,7 +158,7 @@ public class IdaKonyvtarTest
         könyvtár.assertTáblázatCella(2, 1, "A napok hordaléka");
         könyvtár.duplaKlick(1);
         könyvtár.szerkesztő().requireIsbnNotPresent();
-        könyvtár.szerkesztő().setText("Cím", "Cím1");
+        könyvtár.szerkesztő().setNormalText("Cím", "Cím1");
         könyvtár.szerkesztő().clickMentés();
         könyvtár.assertTáblázatCella(2, 1, "Cím1");
     }
@@ -169,7 +168,7 @@ public class IdaKonyvtarTest
     {
         könyvtár.assertTáblázatCella(2, 1, "A napok hordaléka");
         könyvtár.duplaKlick(1);
-        könyvtár.szerkesztő().setText("Cím", "Cím1");
+        könyvtár.szerkesztő().setNormalText("Cím", "Cím1");
         könyvtár.szerkesztő().clickMégsem();
         könyvtár.assertTáblázatCella(2, 1, "A napok hordaléka");
     }

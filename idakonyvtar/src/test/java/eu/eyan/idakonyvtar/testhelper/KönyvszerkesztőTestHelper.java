@@ -1,6 +1,12 @@
-package eu.eyan.idakonyvtar;
+package eu.eyan.idakonyvtar.testhelper;
+
+import static org.fest.swing.finder.WindowFinder.findDialog;
+
+import javax.swing.JDialog;
 
 import org.fest.assertions.Fail;
+import org.fest.swing.core.GenericTypeMatcher;
+import org.fest.swing.core.Robot;
 import org.fest.swing.fixture.ContainerFixture;
 import org.fest.swing.fixture.DialogFixture;
 
@@ -10,11 +16,20 @@ import eu.eyan.idakonyvtar.view.KönyvView;
 public class KönyvszerkesztőTestHelper
 {
 
+    public static final GenericTypeMatcher<JDialog> VISIBLE_DIALOG_FINDER = new GenericTypeMatcher<JDialog>(JDialog.class)
+    {
+        @Override
+        protected boolean isMatching(JDialog jDialog)
+        {
+            return jDialog.isVisible();
+        }
+    };
+
     private DialogFixture dialog;
 
-    public KönyvszerkesztőTestHelper(DialogFixture dialog)
+    public KönyvszerkesztőTestHelper(Robot robot)
     {
-        this.dialog = dialog;
+        dialog = findDialog(VISIBLE_DIALOG_FINDER).withTimeout(1000).using(robot);
     }
 
     public void requireIsbnNotPresent()
@@ -55,7 +70,7 @@ public class KönyvszerkesztőTestHelper
         dialog.textBox(KönyvView.ISBN_TEXT).requireVisible();
     }
 
-    public void setText(String textBoxNév, String szöveg)
+    public void setNormalText(String textBoxNév, String szöveg)
     {
         dialog.textBox(textBoxNév).setText(szöveg);
     }
@@ -70,4 +85,13 @@ public class KönyvszerkesztőTestHelper
         dialog.button(DialogHelper.MÉGSEM).click();
     }
 
+    public void cleanUp()
+    {
+        dialog.cleanUp();
+    }
+
+    public void setComboBoxText(String comboBoxName, String value)
+    {
+        dialog.comboBox(comboBoxName).enterText(value);
+    }
 }

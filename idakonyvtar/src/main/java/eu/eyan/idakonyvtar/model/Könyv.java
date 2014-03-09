@@ -30,14 +30,14 @@ public class Könyv extends Model implements Cloneable
         Collections.copy(this.values, könyv.values);
     }
 
-    public void setValue(int index, final String value)
+    public void setValue(int oszlopIndex, final String value)
     {
-        String oldValue = this.values.get(index);
+        String oldValue = this.values.get(oszlopIndex);
         // FIXME: AutoCompleteDecorator Problem: Disgusting Hack but works...
-        if (value != null && !value.equals(""))
+        if (value != null /* && !value.equals("") */)
         {
-            this.values.set(index, value);
-            firePropertyChange(new KönyvPropertyChangeEvent(this, "PROP", oldValue, value, index));
+            this.values.set(oszlopIndex, value);
+            firePropertyChange(new KönyvPropertyChangeEvent(this, "PROP", oldValue, value, oszlopIndex));
         }
     }
 
@@ -59,4 +59,27 @@ public class Könyv extends Model implements Cloneable
         }
 
     }
+
+    public static class Builder
+    {
+        private Könyv könyv;
+
+        public Builder(int oszlopSzám)
+        {
+            this.könyv = new Könyv(oszlopSzám);
+        }
+
+        public Builder withÉrték(int oszlopIndex, String value)
+        {
+            this.könyv.setValue(oszlopIndex, value);
+            return this;
+        }
+
+        public Könyv build()
+        {
+            return this.könyv;
+        }
+
+    }
+
 }

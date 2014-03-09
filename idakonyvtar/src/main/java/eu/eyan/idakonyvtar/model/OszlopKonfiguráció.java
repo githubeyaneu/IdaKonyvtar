@@ -34,15 +34,15 @@ public class OszlopKonfiguráció
     @Setter
     private String[][] tábla;
 
-    public boolean isIgen(String oszlopNév, OszlopKonfigurációk konfigurációNév)
+    public boolean isIgen(String oszlopNév, OszlopKonfigurációk oszlopKonfiguráció)
     {
-        return getÉrték(oszlopNév, konfigurációNév).equalsIgnoreCase("Igen");
+        return getÉrték(oszlopNév, oszlopKonfiguráció).equalsIgnoreCase("Igen");
     }
 
-    private String getÉrték(String oszlopNév, OszlopKonfigurációk konfigurációNév)
+    private String getÉrték(String oszlopNév, OszlopKonfigurációk oszlopKonfiguráció)
     {
         int oszlopIndex = getOszlopIndex(oszlopNév);
-        int konfigurációIndex = getKonfigurációIndex(konfigurációNév);
+        int konfigurációIndex = getKonfigurációIndex(oszlopKonfiguráció);
         if (oszlopIndex > 0 && konfigurációIndex > 0)
         {
             return tábla[konfigurációIndex][oszlopIndex];
@@ -110,5 +110,33 @@ public class OszlopKonfiguráció
             }
         }
         return emlékezőOszlopok;
+    }
+
+    public static class Builder
+    {
+        public Builder(int columns, int rows)
+        {
+            this.oszlopKonfiguráció.setTábla(new String[columns][rows]);
+            this.actualRow = 0;
+        }
+
+        private int actualRow;
+        private OszlopKonfiguráció oszlopKonfiguráció = new OszlopKonfiguráció();
+
+        // FIXME phüjj...
+        public Builder withRow(String... values)
+        {
+            for (int i = 0; i < values.length; i++)
+            {
+                this.oszlopKonfiguráció.getTábla()[i][actualRow] = values[i];
+            }
+            actualRow++;
+            return this;
+        }
+
+        public OszlopKonfiguráció build()
+        {
+            return this.oszlopKonfiguráció;
+        }
     }
 }

@@ -27,12 +27,13 @@ import com.jgoodies.binding.adapter.SingleListSelectionAdapter;
 import eu.eyan.idakonyvtar.controller.adapter.KönyvtárListaTableModel;
 import eu.eyan.idakonyvtar.controller.input.KönyvControllerInput;
 import eu.eyan.idakonyvtar.controller.input.KönyvtárControllerInput;
-import eu.eyan.idakonyvtar.model.KönyvtárModel;
 import eu.eyan.idakonyvtar.model.Könyv;
+import eu.eyan.idakonyvtar.model.KönyvtárModel;
 import eu.eyan.idakonyvtar.util.DialogHelper;
 import eu.eyan.idakonyvtar.util.ExcelKezelő;
 import eu.eyan.idakonyvtar.util.KiemelőRenderer;
 import eu.eyan.idakonyvtar.util.MagyarRowFilter;
+import eu.eyan.idakonyvtar.util.OkCancelDialog;
 import eu.eyan.idakonyvtar.view.KönyvtárMenüAndToolBar;
 import eu.eyan.idakonyvtar.view.KönyvtárView;
 
@@ -149,7 +150,16 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
     {
         KönyvController könyvController = new KönyvController();
         int selectedKönyvIndex = view.könyvTábla.convertRowIndexToModel(view.könyvTábla.getSelectedRow());
-        if (DialogHelper.startModalDialog(view.getComponent(), könyvController, new KönyvControllerInput(new Könyv(model.getKönyvek().getList().get(selectedKönyvIndex)), model.getKönyvek().getList(), model.getKönyvtár().getOszlopok())))
+        OkCancelDialog szerkesztőDialog = DialogHelper.startModalDialog(
+                view.getComponent(),
+                könyvController,
+                new KönyvControllerInput.Builder()
+                        .withKönyv(new Könyv(model.getKönyvek().getList().get(selectedKönyvIndex)))
+                        .withOszlopok(model.getKönyvtár().getOszlopok())
+                        .withOszlopKonfiguráció(model.getKönyvtár().getKonfiguráció())
+                        .withKönyvLista(model.getKönyvtár().getKönyvek())
+                        .build());
+        if (szerkesztőDialog.isOk())
         {
             model.getKönyvek().getList().set(selectedKönyvIndex, könyvController.getOutput());
             // TODO: ugly: use selectioninlist...
@@ -192,15 +202,18 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
         if (e.getSource() == menuAndToolBar.MENÜPONT_ISBN_KERES || e.getSource() == menuAndToolBar.TOOLBAR_UJ_KONYV)
         {
             KönyvController könyvController = new KönyvController();
-            if (DialogHelper.startModalDialog(
+
+            OkCancelDialog szerkesztőDialog = DialogHelper.startModalDialog(
                     view.getComponent()
                     , könyvController
-                    , new KönyvControllerInput(
-                            újKönyvEmlékekkel(model.getKönyvtár().getOszlopok().size())
-                            , model.getKönyvek().getList()
-                            , model.getKönyvtár().getOszlopok()
-                            , ISBN_ENABLED
-                            , model.getKönyvtár().getKonfiguráció())))
+                    , new KönyvControllerInput.Builder()
+                            .withKönyv(újKönyvEmlékekkel(model.getKönyvtár().getOszlopok().size()))
+                            .withKönyvLista(model.getKönyvek().getList())
+                            .withOszlopok(model.getKönyvtár().getOszlopok())
+                            .withIsbnEnabled(ISBN_ENABLED)
+                            .withOszlopKonfiguráció(model.getKönyvtár().getKonfiguráció())
+                            .build());
+            if (szerkesztőDialog.isOk())
             {
                 model.getKönyvek().getList().add(0, könyvController.getOutput());
                 emlékekMentése(könyvController.getOutput());

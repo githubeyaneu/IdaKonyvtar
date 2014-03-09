@@ -1,4 +1,4 @@
-package eu.eyan.idakonyvtar;
+package eu.eyan.idakonyvtar.testhelper;
 
 import static org.fest.assertions.Assertions.assertThat;
 
@@ -9,6 +9,7 @@ import org.fest.swing.core.MouseButton;
 import org.fest.swing.core.matcher.JButtonMatcher;
 import org.fest.swing.fixture.FrameFixture;
 
+import eu.eyan.idakonyvtar.IdaKonyvtar;
 import eu.eyan.idakonyvtar.controller.KönyvtárController;
 import eu.eyan.idakonyvtar.view.KönyvtárMenüAndToolBar;
 
@@ -69,7 +70,7 @@ public class IdaKönyvtárTestHelper
 
     public KönyvszerkesztőTestHelper szerkesztő()
     {
-        return new KönyvszerkesztőTestHelper(frame.dialog());
+        return new KönyvszerkesztőTestHelper(frame.robot);
     }
 
     public void requireTörlésDisabled()

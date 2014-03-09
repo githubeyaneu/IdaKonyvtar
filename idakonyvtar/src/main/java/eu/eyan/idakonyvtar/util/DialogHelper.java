@@ -11,7 +11,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JScrollPane;
@@ -34,23 +33,20 @@ public class DialogHelper
     public static final String MÉGSEM = "Mégsem";
     public static final String MENTÉS = "Mentés";
 
-    private static class MyDialog extends JDialog
-    {
-        public MyDialog(Window owner)
-        {
-            super(owner);
-        }
-
-        private static final long serialVersionUID = 1L;
-        private boolean ok = false;
-    }
-
-    public static <INPUT, OUTPUT> boolean startModalDialog(Component parent, IDialogController<INPUT, OUTPUT> controller, INPUT input)
+    /**
+     * Blockiert!!!
+     * 
+     * @param parent
+     * @param controller
+     * @param input
+     * @return
+     */
+    public static <INPUT, OUTPUT> OkCancelDialog startModalDialog(Component parent, IDialogController<INPUT, OUTPUT> controller, INPUT input)
     {
         controller.initData(input);
 
-        Window parentWindow = SwingUtilities.windowForComponent(parent);
-        MyDialog dialog = new MyDialog(parentWindow);
+        Window parentWindow = parent == null ? null : SwingUtilities.windowForComponent(parent);
+        OkCancelDialog dialog = new OkCancelDialog(parentWindow);
         dialog.setLocationRelativeTo(parent);
         dialog.setModal(true);
         PanelBuilder panelBuilder = new PanelBuilder(new FormLayout("pref:grow", "top:pref:grow, 3dlu, pref"));
@@ -64,7 +60,6 @@ public class DialogHelper
             @Override
             public void windowClosing(WindowEvent e)
             {
-                System.out.println("Closing");
                 super.windowClosed(e);
             }
         });
@@ -76,8 +71,11 @@ public class DialogHelper
 
         // blockiert:
         dialog.setVisible(true);
-        parentWindow.invalidate();
-        return dialog.ok;
+        if (parentWindow != null)
+        {
+            parentWindow.invalidate();
+        }
+        return dialog;
     }
 
     private static void középretesz(Component component)
@@ -124,7 +122,7 @@ public class DialogHelper
         return frame;
     }
 
-    private static Component getButtons(final MyDialog dialog, final IDialogController<?, ?> dialogController)
+    private static Component getButtons(final OkCancelDialog dialog, final IDialogController<?, ?> dialogController)
     {
         PanelBuilder panelBuilder = new PanelBuilder(new FormLayout("pref:grow,3dlu,pref,3dlu,pref", "pref"));
         JButton okButton = new JButton(MENTÉS);

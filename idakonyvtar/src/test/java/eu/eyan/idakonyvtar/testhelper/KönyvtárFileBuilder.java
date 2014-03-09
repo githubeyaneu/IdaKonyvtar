@@ -10,8 +10,6 @@ import jxl.Workbook;
 import jxl.write.Label;
 import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
-import jxl.write.WriteException;
-import jxl.write.biff.RowsExceededException;
 import eu.eyan.idakonyvtar.util.ExcelKezelő;
 
 public class KönyvtárFileBuilder
@@ -41,11 +39,7 @@ public class KönyvtárFileBuilder
             {
                 aktuálisSheet.addCell(new Label(i, 0, oszlopok[i]));
             }
-            catch (RowsExceededException e)
-            {
-                e.printStackTrace();
-            }
-            catch (WriteException e)
+            catch (Exception e)
             {
                 e.printStackTrace();
             }
@@ -62,11 +56,7 @@ public class KönyvtárFileBuilder
             {
                 aktuálisSheet.addCell(new Label(i, sorok.size(), sor[i]));
             }
-            catch (RowsExceededException e)
-            {
-                e.printStackTrace();
-            }
-            catch (WriteException e)
+            catch (Exception e)
             {
                 e.printStackTrace();
             }
@@ -81,11 +71,7 @@ public class KönyvtárFileBuilder
             workbook.write();
             workbook.close();
         }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        catch (WriteException e)
+        catch (Exception e)
         {
             e.printStackTrace();
         }

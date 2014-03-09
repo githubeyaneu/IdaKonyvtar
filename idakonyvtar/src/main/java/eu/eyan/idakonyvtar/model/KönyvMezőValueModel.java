@@ -12,7 +12,7 @@ public class KönyvMezőValueModel implements ValueModel, PropertyChangeListener
 {
     private int oszlopIndex;
     private Könyv model;
-    private Set<PropertyChangeListener> listeners;
+    private Set<PropertyChangeListener> listeners = newHashSet();
 
     public KönyvMezőValueModel(int oszlopIndex, Könyv könyv)
     {
@@ -31,7 +31,6 @@ public class KönyvMezőValueModel implements ValueModel, PropertyChangeListener
     public void setValue(Object newValue)
     {
         model.setValue(oszlopIndex, (String) newValue);
-
     }
 
     @Override

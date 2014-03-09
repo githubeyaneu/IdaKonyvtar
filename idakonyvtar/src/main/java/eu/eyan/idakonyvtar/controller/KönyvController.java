@@ -10,18 +10,25 @@ import java.awt.event.ActionListener;
 import java.util.List;
 
 import javax.swing.ImageIcon;
+import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+
+import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
 import com.google.common.io.Resources;
 import com.jgoodies.binding.adapter.Bindings;
+import com.jgoodies.binding.adapter.ComboBoxAdapter;
 
 import eu.eyan.idakonyvtar.controller.input.KönyvControllerInput;
 import eu.eyan.idakonyvtar.model.Könyv;
 import eu.eyan.idakonyvtar.model.KönyvMezőValueModel;
+import eu.eyan.idakonyvtar.model.OszlopKonfiguráció.OszlopKonfigurációk;
 import eu.eyan.idakonyvtar.oszk.Marc;
 import eu.eyan.idakonyvtar.oszk.OszkKereso;
 import eu.eyan.idakonyvtar.oszk.OszkKeresoException;
+import eu.eyan.idakonyvtar.util.KönyvHelper;
 import eu.eyan.idakonyvtar.view.KönyvView;
 
 public class KönyvController implements IDialogController<KönyvControllerInput, Könyv>
@@ -39,7 +46,12 @@ public class KönyvController implements IDialogController<KönyvControllerInput
     @Override
     public String getTitle()
     {
-        return "Könyv adatainak szerkesztése - " + model.getKönyv().getValue(model.getOszlopok().indexOf("Szerző"));
+        if (model.getOszlopok().indexOf("Szerző") >= 0)
+        {
+            return "Könyv adatainak szerkesztése - " + model.getKönyv().getValue(model.getOszlopok().indexOf("Szerző"));
+        }
+        else
+            return "Könyv adatainak szerkesztése";
     }
 
     @Override
@@ -54,18 +66,28 @@ public class KönyvController implements IDialogController<KönyvControllerInput
         this.model = model;
         view.setOszlopok(model.getOszlopok());
         view.setIsbnEnabled(model.isIsbnEnabled());
+        view.setOszlopKonfiguráció(model.getOszlopKonfiguráció());
     }
 
     @Override
     public void initBindings()
     {
-        for (int i = 0; i < model.getOszlopok().size(); i++)
+        for (int oszlopIndex = 0; oszlopIndex < model.getOszlopok().size(); oszlopIndex++)
         {
-            Bindings.bind(view.getSzerkesztők().get(i), new KönyvMezőValueModel(i, model.getKönyv()));
+            String oszlopNév = model.getOszlopok().get(oszlopIndex);
+            boolean autoComplete = model.getOszlopKonfiguráció().isIgen(oszlopNév, OszlopKonfigurációk.AUTOCOMPLETE);
+            System.out.println(oszlopNév + " " + autoComplete);
+            if (autoComplete)
+            {
+                JComboBox<String> comboBox = (JComboBox<String>) view.getSzerkesztők().get(oszlopIndex);
+                Bindings.bind(comboBox, new ComboBoxAdapter<String>(KönyvHelper.getOszlopLista(model.getKönyvLista(), oszlopIndex), new KönyvMezőValueModel(oszlopIndex, model.getKönyv())));
+                AutoCompleteDecorator.decorate(comboBox);
+            }
+            else
+            {
+                Bindings.bind((JTextField) view.getSzerkesztők().get(oszlopIndex), new KönyvMezőValueModel(oszlopIndex, model.getKönyv()));
+            }
         }
-
-//        Bindings.bind(view.valami, new ComboBoxAdapter<String>(getMindenKiadó(model.getKönyvLista()), new PropertyAdapter<Könyv>(model.getKönyv(), "kiadó")));
-//        AutoCompleteDecorator.decorate(view.valami);
         view.getIsbnText().addActionListener(isbnKeresés());
     }
 

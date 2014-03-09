@@ -25,6 +25,7 @@ public class BackupHelperTest
     @Theory
     public void test(Charset charset1, Charset charset2)
     {
+        // FIXME
 //        String filename = "házikönyvtár.xls";
 //        System.out.println(cnt + " " + charset1 + " " + charset2);
 //        String to = new String(filename.getBytes(charset1));

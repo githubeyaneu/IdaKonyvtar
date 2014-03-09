@@ -6,11 +6,16 @@ import java.io.IOException;
 import java.util.List;
 
 import org.fest.assertions.Fail;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.Timeout;
 
 public class OszkKeresoTest
 {
     final static String ABIGEL_ISBN = "9789631193701";
+
+    @Rule
+    public Timeout globalTimeout = new Timeout(15000);
 
     @Test
     public void isbnKeresOszkban_muxik()
@@ -29,17 +34,12 @@ public class OszkKeresoTest
     }
 
     @Test
-    public void mar_parse_muxik() throws OszkKeresoException
+    public void marc_parse_muxik() throws OszkKeresoException
     {
         List<Marc> abigel = OszkKereso.getMarcsToIsbn("9789631193701");
         assertThat(MarcHelper.findMarc(abigel, MarcCodes.CIM)).isEqualTo("Abigél");
 
         List<Marc> marai = OszkKereso.getMarcsToIsbn("9789632273822");
         assertThat(MarcHelper.findMarc(marai, MarcCodes.CIM)).isEqualTo("Hallgatni akartam");
-    }
-
-    public static void main(String[] args) throws OszkKeresoException
-    {
-        new OszkKeresoTest().mar_parse_muxik();
     }
 }

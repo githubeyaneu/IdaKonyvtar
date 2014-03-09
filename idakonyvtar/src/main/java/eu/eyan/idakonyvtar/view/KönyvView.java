@@ -5,6 +5,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.awt.Component;
 import java.util.List;
 
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
@@ -14,6 +15,9 @@ import lombok.Setter;
 import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
+
+import eu.eyan.idakonyvtar.model.OszlopKonfiguráció;
+import eu.eyan.idakonyvtar.model.OszlopKonfiguráció.OszlopKonfigurációk;
 
 public class KönyvView implements IView
 {
@@ -28,13 +32,16 @@ public class KönyvView implements IView
     private boolean isbnEnabled = false;
 
     @Getter
-    private List<JTextField> szerkesztők = newArrayList();
+    private List<Component> szerkesztők = newArrayList();
 
     @Getter
     private JLabel isbnKeresőLabel = new JLabel();
 
     @Getter
     private JTextField isbnText = new JTextField();
+
+    @Setter
+    private OszlopKonfiguráció oszlopKonfiguráció;
 
     @Override
     public Component getComponent()
@@ -68,12 +75,23 @@ public class KönyvView implements IView
             row = row + 2;
             String oszlopNév = oszlopok.get(i);
             panelBuilder.addLabel(oszlopNév, CC.xy(1, row));
-            // public JComboBox<String> valami = new JComboBox<String>();
-            JTextField szerkesztő = new JTextField(20);
+
+            Component szerkesztő;
+            if (oszlopKonfiguráció.isIgen(oszlopNév, OszlopKonfigurációk.AUTOCOMPLETE))
+            {
+                JComboBox<String> jComboBox = new JComboBox<String>();
+                jComboBox.setEditable(true);
+                szerkesztő = jComboBox;
+            }
+            else
+            {
+                szerkesztő = new JTextField(20);
+            }
             szerkesztő.setName(oszlopNév);
             szerkesztők.add(szerkesztő);
             panelBuilder.add(szerkesztő, CC.xy(3, row));
         }
         return panelBuilder.build();
     }
+
 }
