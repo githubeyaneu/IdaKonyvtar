@@ -14,6 +14,9 @@ import eu.eyan.idakonyvtar.model.Könyv;
 
 public class KönyvHelper
 {
+    public static final String LISTA_SEPARATOR = " + ";
+    public static final String LISTA_SEPARATOR_REGEX = LISTA_SEPARATOR.replace("+", "\\+");
+
     final static Collator collator = Collator.getInstance(new Locale("hu"));
 
     public static List<String> getOszlopLista(List<Könyv> könyvLista, int oszlopIndex)
@@ -23,7 +26,7 @@ public class KönyvHelper
         {
             if (könyv.getValue(oszlopIndex) != null)
             {
-                List<String> values = newArrayList(könyv.getValue(oszlopIndex).split(" + "));
+                List<String> values = newArrayList(könyv.getValue(oszlopIndex).split(LISTA_SEPARATOR_REGEX));
                 values.forEach((String s) -> s.trim());
                 set.addAll(values);
             }

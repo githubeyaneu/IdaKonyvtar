@@ -7,7 +7,9 @@ import java.awt.Dimension;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
@@ -15,8 +17,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
+import org.fest.util.Objects;
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
+import com.google.common.base.Joiner;
 import com.google.common.io.Resources;
 import com.jgoodies.binding.adapter.Bindings;
 import com.jgoodies.binding.adapter.ComboBoxAdapter;
@@ -30,6 +34,9 @@ import eu.eyan.idakonyvtar.oszk.OszkKereso;
 import eu.eyan.idakonyvtar.oszk.OszkKeresoException;
 import eu.eyan.idakonyvtar.util.KönyvHelper;
 import eu.eyan.idakonyvtar.view.KönyvView;
+import eu.eyan.idakonyvtar.view.MultiMező;
+import eu.eyan.idakonyvtar.view.MultiMezőJComboBox;
+import eu.eyan.idakonyvtar.view.MultiMezőJTextField;
 
 public class KönyvController implements IDialogController<KönyvControllerInput, Könyv>
 {
@@ -51,7 +58,9 @@ public class KönyvController implements IDialogController<KönyvControllerInput
             return "Könyv adatainak szerkesztése - " + model.getKönyv().getValue(model.getOszlopok().indexOf("Szerző"));
         }
         else
+        {
             return "Könyv adatainak szerkesztése";
+        }
     }
 
     @Override
@@ -76,19 +85,61 @@ public class KönyvController implements IDialogController<KönyvControllerInput
         {
             String oszlopNév = model.getOszlopok().get(oszlopIndex);
             boolean autoComplete = model.getOszlopKonfiguráció().isIgen(oszlopNév, OszlopKonfigurációk.AUTOCOMPLETE);
-            System.out.println(oszlopNév + " " + autoComplete);
+            boolean multi = model.getOszlopKonfiguráció().isIgen(oszlopNév, OszlopKonfigurációk.MULTIMEZŐ);
             if (autoComplete)
             {
-                JComboBox<String> comboBox = (JComboBox<String>) view.getSzerkesztők().get(oszlopIndex);
-                Bindings.bind(comboBox, new ComboBoxAdapter<String>(KönyvHelper.getOszlopLista(model.getKönyvLista(), oszlopIndex), new KönyvMezőValueModel(oszlopIndex, model.getKönyv())));
-                AutoCompleteDecorator.decorate(comboBox);
+                List<String> oszlopLista = KönyvHelper.getOszlopLista(model.getKönyvLista(), oszlopIndex);
+                if (multi)
+                {
+                    MultiMezőJComboBox mmcombo = (MultiMezőJComboBox) view.getSzerkesztők().get(oszlopIndex);
+                    mmcombo.setAutoCompleteLista(oszlopLista);
+                    bind(mmcombo, new KönyvMezőValueModel(oszlopIndex, model.getKönyv()));
+                }
+                else
+                {
+                    JComboBox<?> comboBox = (JComboBox<?>) view.getSzerkesztők().get(oszlopIndex);
+                    Bindings.bind(comboBox, new ComboBoxAdapter<String>(oszlopLista, new KönyvMezőValueModel(oszlopIndex, model.getKönyv())));
+                    AutoCompleteDecorator.decorate(comboBox);
+                }
             }
             else
             {
-                Bindings.bind((JTextField) view.getSzerkesztők().get(oszlopIndex), new KönyvMezőValueModel(oszlopIndex, model.getKönyv()));
+                if (multi)
+                {
+                    MultiMezőJTextField mmc = (MultiMezőJTextField) view.getSzerkesztők().get(oszlopIndex);
+                    bind(mmc, new KönyvMezőValueModel(oszlopIndex, model.getKönyv()));
+                }
+                else
+                {
+                    Bindings.bind((JTextField) view.getSzerkesztők().get(oszlopIndex), new KönyvMezőValueModel(oszlopIndex, model.getKönyv()));
+                }
             }
         }
         view.getIsbnText().addActionListener(isbnKeresés());
+    }
+
+    private void bind(final MultiMező<String, ?> mmc, final KönyvMezőValueModel könyvMezőValueModel)
+    {
+        könyvMezőValueModel.addValueChangeListener((PropertyChangeEvent propertyChangeEvent) -> {
+            if (!Objects.areEqual(propertyChangeEvent.getNewValue(), propertyChangeEvent.getOldValue()))
+            {
+                mmc.setValues(getMultiMezőLista((String) propertyChangeEvent.getNewValue()));
+            }
+        });
+        mmc.setValues(getMultiMezőLista((String) könyvMezőValueModel.getValue()));
+
+        mmc.addPropertyChangeListener((PropertyChangeEvent propertyChangeEvent) -> {
+            könyvMezőValueModel.setValue(Joiner.on(KönyvHelper.LISTA_SEPARATOR).skipNulls().join(mmc.getValues()));
+        });
+    }
+
+    private static List<String> getMultiMezőLista(String value)
+    {
+        String[] strings = (value).split(KönyvHelper.LISTA_SEPARATOR_REGEX);
+        List<String> lista = newArrayList(strings).stream().filter((String s) -> {
+            return !s.isEmpty();
+        }).collect(Collectors.toList());
+        return lista;
     }
 
     private ActionListener isbnKeresés()

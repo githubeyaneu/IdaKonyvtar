@@ -77,15 +77,30 @@ public class KönyvView implements IView
             panelBuilder.addLabel(oszlopNév, CC.xy(1, row));
 
             Component szerkesztő;
+            boolean multi = oszlopKonfiguráció.isIgen(oszlopNév, OszlopKonfigurációk.MULTIMEZŐ);
             if (oszlopKonfiguráció.isIgen(oszlopNév, OszlopKonfigurációk.AUTOCOMPLETE))
             {
-                JComboBox<String> jComboBox = new JComboBox<String>();
-                jComboBox.setEditable(true);
-                szerkesztő = jComboBox;
+                if (multi)
+                {
+                    szerkesztő = new MultiMezőJComboBox();
+                }
+                else
+                {
+                    JComboBox<String> jComboBox = new JComboBox<String>();
+                    jComboBox.setEditable(true);
+                    szerkesztő = jComboBox;
+                }
             }
             else
             {
-                szerkesztő = new JTextField(20);
+                if (multi)
+                {
+                    szerkesztő = new MultiMezőJTextField();
+                }
+                else
+                {
+                    szerkesztő = new JTextField(20);
+                }
             }
             szerkesztő.setName(oszlopNév);
             szerkesztők.add(szerkesztő);
@@ -93,5 +108,4 @@ public class KönyvView implements IView
         }
         return panelBuilder.build();
     }
-
 }
