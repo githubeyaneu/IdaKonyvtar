@@ -7,6 +7,11 @@ import javax.swing.JTextField;
 
 public class MultiMezőJTextField extends MultiMező<String, JTextField>
 {
+    public MultiMezőJTextField(String oszlopNév)
+    {
+        super(oszlopNév);
+    }
+
     private static final long serialVersionUID = 1L;
 
     @Override

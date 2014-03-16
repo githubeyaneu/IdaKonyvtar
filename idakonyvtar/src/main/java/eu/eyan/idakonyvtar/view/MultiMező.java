@@ -21,6 +21,8 @@ public abstract class MultiMező<INPUT, EDITOR extends Component> extends JPanel
 {
     private static final long serialVersionUID = 1L;
     private final List<Mező<EDITOR>> mezők = newArrayList();
+    private String oszlopNév;
+    private int számláló = 1;
 
     private static class Mező<EDITOR>
     {
@@ -39,8 +41,9 @@ public abstract class MultiMező<INPUT, EDITOR extends Component> extends JPanel
         }
     }
 
-    public MultiMező()
+    public MultiMező(String oszlopNév)
     {
+        this.oszlopNév = oszlopNév;
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
     }
 
@@ -60,30 +63,36 @@ public abstract class MultiMező<INPUT, EDITOR extends Component> extends JPanel
     {
         EDITOR editor = getEditor();
         addMezőEditListener(editor, this);
-        JButton button = new JButton("x");
+        JButton törlésGomb = new JButton("x");
 
         PanelBuilder panelBuilder = new PanelBuilder(new FormLayout("f:p:g, 3dlu, 30dlu", "f:p:g, 3dlu"));
         panelBuilder.add(editor, CC.xy(1, 1));
-        panelBuilder.add(button, CC.xy(3, 1));
+        panelBuilder.add(törlésGomb, CC.xy(3, 1));
         JPanel mezőPanel = panelBuilder.build();
 
         if (utolsó)
         {
-            button.setEnabled(false);
+            törlésGomb.setEnabled(false);
         }
         else
         {
             setValueInEditor(editor, input);
         }
 
-        final Mező<EDITOR> mező = new Mező<EDITOR>(editor, button, mezőPanel);
-        button.addActionListener((ActionEvent actionEvent) -> {
+        final Mező<EDITOR> mező = new Mező<EDITOR>(editor, törlésGomb, mezőPanel);
+        törlésGomb.addActionListener((ActionEvent actionEvent) -> {
             mezők.remove(mező);
             remove(mező.getPanel());
             revalidate();
         });
         mezők.add(mező);
         add(mezőPanel);
+
+        mezőPanel.setName(oszlopNév + ".panel." + számláló);
+        editor.setName(oszlopNév + számláló);
+        törlésGomb.setName(oszlopNév + ".delete." + számláló);
+        számláló++;
+
         revalidate();
 //        SwingUtilities.getWindowAncestor(this).pack();
     }

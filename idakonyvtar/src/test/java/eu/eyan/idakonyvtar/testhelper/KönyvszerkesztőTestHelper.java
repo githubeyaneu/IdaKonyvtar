@@ -2,6 +2,8 @@ package eu.eyan.idakonyvtar.testhelper;
 
 import static org.fest.swing.finder.WindowFinder.findDialog;
 
+import java.awt.event.KeyEvent;
+
 import javax.swing.JDialog;
 
 import org.fest.assertions.Fail;
@@ -93,5 +95,34 @@ public class KönyvszerkesztőTestHelper
     public void setComboBoxText(String comboBoxName, String value)
     {
         dialog.comboBox(comboBoxName).enterText(value);
+    }
+
+    public void keyboard(int keyCode)
+    {
+        dialog.robot.pressKey(keyCode);
+    }
+
+    public void enterNormalText(String textBoxNév, String szöveg)
+    {
+        dialog.textBox(textBoxNév).click();
+        dialog.textBox(textBoxNév).robot.enterText(szöveg);
+    }
+
+    public void multimezőTöröl(String oszlopnév, int számláló)
+    {
+        dialog.button(oszlopnév + ".delete." + számláló).click();
+    }
+
+    public void requireTörölDisabled(String oszlopnév, int számláló)
+    {
+        dialog.button(oszlopnév + ".delete." + számláló).requireDisabled();
+
+    }
+
+    public void enterComboBoxText(String comboBoxName, String szöveg)
+    {
+        dialog.comboBox(comboBoxName).click();
+        dialog.comboBox(comboBoxName).robot.enterText(szöveg);
+        dialog.comboBox(comboBoxName).robot.pressKey(KeyEvent.VK_ESCAPE);
     }
 }

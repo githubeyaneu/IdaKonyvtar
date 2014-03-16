@@ -17,6 +17,11 @@ public class MultiMezőJComboBox extends MultiMező<String, JComboBox<String>>
     private static final long serialVersionUID = 1L;
     private List<String> oszlopLista = newArrayList();
 
+    public MultiMezőJComboBox(String oszlopNév)
+    {
+        super(oszlopNév);
+    }
+
     @Override
     protected void addMezőEditListener(JComboBox<String> editor, MezőEditListener<JComboBox<String>> listener)
     {
@@ -31,12 +36,14 @@ public class MultiMezőJComboBox extends MultiMező<String, JComboBox<String>>
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected JComboBox<String> getEditor()
     {
         JComboBox<String> jComboBox = new JComboBox<String>();
-        AutoCompleteDecorator.decorate(jComboBox);
         jComboBox.setModel(new ListComboBoxModel<String>(oszlopLista));
+        // Fontos először seteditable aztán autocomplete mert ez az AC egy FOS
         jComboBox.setEditable(true);
+        AutoCompleteDecorator.decorate(jComboBox);
         return jComboBox;
     }
 

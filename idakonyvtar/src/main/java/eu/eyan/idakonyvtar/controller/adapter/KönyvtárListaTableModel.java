@@ -15,7 +15,6 @@ public class KönyvtárListaTableModel extends AbstractTableAdapter<Könyv>
 {
     private static final long serialVersionUID = 1L;
     private SelectionInList<Könyv> listModel;
-    private List<String> összesOszlop;
     private static int[] megjelenítettOszlopIndexek;
 
     public Könyv getSelectedKönyv(int selectedKönyvIndex)
@@ -27,7 +26,6 @@ public class KönyvtárListaTableModel extends AbstractTableAdapter<Könyv>
     {
         super(listModel, megjelenítendőOszlopok(oszlopok, oszlopKonfiguráció));
         this.listModel = listModel;
-        this.összesOszlop = oszlopok;
     }
 
 //        @Override

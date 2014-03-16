@@ -82,7 +82,7 @@ public class KönyvView implements IView
             {
                 if (multi)
                 {
-                    szerkesztő = new MultiMezőJComboBox();
+                    szerkesztő = new MultiMezőJComboBox(oszlopNév);
                 }
                 else
                 {
@@ -95,7 +95,7 @@ public class KönyvView implements IView
             {
                 if (multi)
                 {
-                    szerkesztő = new MultiMezőJTextField();
+                    szerkesztő = new MultiMezőJTextField(oszlopNév);
                 }
                 else
                 {
