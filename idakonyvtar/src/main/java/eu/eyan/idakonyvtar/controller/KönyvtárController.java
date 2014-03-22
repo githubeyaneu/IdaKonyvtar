@@ -11,13 +11,17 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -55,18 +59,26 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
     {
         view.getComponent();
         resetTableModel();
-        view.könyvTábla.setSelectionModel(new SingleListSelectionAdapter(model.getKönyvek().getSelectionIndexHolder()));
-        view.könyvTábla.setEnabled(true);
-        view.könyvTábla.setDefaultRenderer(Object.class, kiemelőRenderer);
-        view.könyvTábla.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        view.getKönyvTábla().setSelectionModel(new SingleListSelectionAdapter(model.getKönyvek().getSelectionIndexHolder()));
+        view.getKönyvTábla().setEnabled(true);
+        view.getKönyvTábla().setDefaultRenderer(Object.class, kiemelőRenderer);
+        view.getKönyvTábla().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         return view.getComponent();
     }
 
     private void resetTableModel()
     {
         // FIXME: tényleg szükség van erre????
+        if (model.getKönyvek().getSize() > 0)
+        {
+            view.getKönyvTábla().setÜresSzöveg("Ilyen szűrőfeltételekkel nem található könyv.");
+        }
+        else
+        {
+            view.getKönyvTábla().setÜresSzöveg("Nincs könyv a listában.");
+        }
         KönyvtárListaTableModel dataModel = new KönyvtárListaTableModel(model.getKönyvek(), model.getKönyvtár().getOszlopok(), model.getKönyvtár().getKonfiguráció());
-        view.könyvTábla.setModel(dataModel);
+        view.getKönyvTábla().setModel(dataModel);
     }
 
     @Override
@@ -113,16 +125,16 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
         menuAndToolBar.TOOLBAR_UJ_KONYV.addActionListener(this);
         menuAndToolBar.TOOLBAR_KONYV_TOROL.addActionListener(this);
 
-        view.könyvTábla.getSelectionModel().addListSelectionListener(new ListSelectionListener()
+        view.getKönyvTábla().getSelectionModel().addListSelectionListener(new ListSelectionListener()
         {
             @Override
             public void valueChanged(ListSelectionEvent e)
             {
-                menuAndToolBar.TOOLBAR_KONYV_TOROL.setEnabled(view.könyvTábla.getSelectedRow() >= 0);
+                menuAndToolBar.TOOLBAR_KONYV_TOROL.setEnabled(view.getKönyvTábla().getSelectedRow() >= 0);
             }
         });
 
-        view.könyvTábla.addMouseListener(new MouseAdapter()
+        view.getKönyvTábla().addMouseListener(new MouseAdapter()
         {
             @Override
             public void mouseClicked(MouseEvent e)
@@ -140,8 +152,22 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
             @Override
             public void keyReleased(KeyEvent e)
             {
-                view.könyvTábla.setRowFilter(new MagyarRowFilter(menuAndToolBar.TOOLBAR_KERES.getText()));
+                view.getKönyvTábla().setRowFilter(new MagyarRowFilter(menuAndToolBar.TOOLBAR_KERES.getText()));
                 kiemelőRenderer.setKiemelendőSzöveg(menuAndToolBar.TOOLBAR_KERES.getText());
+            }
+        });
+
+        JFrame frame = (JFrame) SwingUtilities.getRoot(view.getComponent());
+        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        frame.addWindowListener(new WindowAdapter()
+        {
+            @Override
+            public void windowClosing(WindowEvent e)
+            {
+                if (DialogHelper.igenNem(frame, "Biztos ki akar lépni?", "Megerősítés"))
+                {
+                    frame.dispose();
+                }
             }
         });
     }
@@ -149,7 +175,7 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
     private void könyvSzerkesztés()
     {
         KönyvController könyvController = new KönyvController();
-        int selectedKönyvIndex = view.könyvTábla.convertRowIndexToModel(view.könyvTábla.getSelectedRow());
+        int selectedKönyvIndex = view.getKönyvTábla().convertRowIndexToModel(view.getKönyvTábla().getSelectedRow());
         OkCancelDialog szerkesztőDialog = DialogHelper.startModalDialog(
                 view.getComponent(),
                 könyvController,

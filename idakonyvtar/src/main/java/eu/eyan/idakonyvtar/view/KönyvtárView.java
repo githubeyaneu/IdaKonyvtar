@@ -5,15 +5,17 @@ import java.awt.Component;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import org.jdesktop.swingx.JXTable;
+import lombok.Getter;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 
 public class KönyvtárView
 {
-    public final JXTable könyvTábla = new JXTable();
-    JScrollPane scrollPane;
+    @Getter
+    private final KönyvTábla könyvTábla = new KönyvTábla();
+
+    private JScrollPane scrollPane;
 
     public Component getComponent()
     {

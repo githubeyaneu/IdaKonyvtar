@@ -55,7 +55,7 @@ public class KönyvController implements IDialogController<KönyvControllerInput
     {
         if (model.getOszlopok().indexOf("Szerző") >= 0)
         {
-            return "Könyv adatainak szerkesztése - " + model.getKönyv().getValue(model.getOszlopok().indexOf("Szerző"));
+            return "KKönyv adatainak szerkesztése - " + model.getKönyv().getValue(model.getOszlopok().indexOf("Szerző"));
         }
         else
         {

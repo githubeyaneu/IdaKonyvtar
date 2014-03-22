@@ -13,6 +13,7 @@ import java.awt.event.WindowEvent;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
@@ -156,5 +157,17 @@ public class DialogHelper
     public static <INPUT> JFrame runInFrameFullScreen(IControllerMenüvel<INPUT, ?> controller, INPUT input)
     {
         return runInFrame(null, controller, input, controller.getMenuBar(), controller.getToolBar(), true);
+    }
+
+    public static boolean igenNem(Component parent, String kérdés, String dialogCím)
+    {
+        return JOptionPane.showOptionDialog(parent,
+                kérdés,
+                dialogCím,
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                new Object[] { "Igen", "Mégsem" },
+                "Mégsem") == JOptionPane.OK_OPTION;
     }
 }
