@@ -3,7 +3,6 @@ package eu.eyan.idakonyvtar.controller;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -55,18 +54,12 @@ public class KönyvController implements IDialogController<KönyvControllerInput
     {
         if (model.getOszlopok().indexOf("Szerző") >= 0)
         {
-            return "KKönyv adatainak szerkesztése - " + model.getKönyv().getValue(model.getOszlopok().indexOf("Szerző"));
+            return "Könyv adatainak szerkesztése - " + model.getKönyv().getValue(model.getOszlopok().indexOf("Szerző"));
         }
         else
         {
             return "Könyv adatainak szerkesztése";
         }
-    }
-
-    @Override
-    public Dimension getDefaultSize()
-    {
-        return new Dimension(400, 600);
     }
 
     @Override
@@ -81,6 +74,12 @@ public class KönyvController implements IDialogController<KönyvControllerInput
     @Override
     public void initBindings()
     {
+        mezőkAkcióinakCsatolása();
+        view.getIsbnText().addActionListener(isbnKeresés());
+    }
+
+    private void mezőkAkcióinakCsatolása()
+    {
         for (int oszlopIndex = 0; oszlopIndex < model.getOszlopok().size(); oszlopIndex++)
         {
             String oszlopNév = model.getOszlopok().get(oszlopIndex);
@@ -93,7 +92,7 @@ public class KönyvController implements IDialogController<KönyvControllerInput
                 {
                     MultiMezőJComboBox mmcombo = (MultiMezőJComboBox) view.getSzerkesztők().get(oszlopIndex);
                     mmcombo.setAutoCompleteLista(oszlopLista);
-                    bind(mmcombo, new KönyvMezőValueModel(oszlopIndex, model.getKönyv()));
+                    multimezőBind(mmcombo, new KönyvMezőValueModel(oszlopIndex, model.getKönyv()));
                 }
                 else
                 {
@@ -107,7 +106,7 @@ public class KönyvController implements IDialogController<KönyvControllerInput
                 if (multi)
                 {
                     MultiMezőJTextField mmc = (MultiMezőJTextField) view.getSzerkesztők().get(oszlopIndex);
-                    bind(mmc, new KönyvMezőValueModel(oszlopIndex, model.getKönyv()));
+                    multimezőBind(mmc, new KönyvMezőValueModel(oszlopIndex, model.getKönyv()));
                 }
                 else
                 {
@@ -115,10 +114,9 @@ public class KönyvController implements IDialogController<KönyvControllerInput
                 }
             }
         }
-        view.getIsbnText().addActionListener(isbnKeresés());
     }
 
-    private void bind(final MultiMező<String, ?> mmc, final KönyvMezőValueModel könyvMezőValueModel)
+    private void multimezőBind(final MultiMező<String, ?> mmc, final KönyvMezőValueModel könyvMezőValueModel)
     {
         könyvMezőValueModel.addValueChangeListener((PropertyChangeEvent propertyChangeEvent) -> {
             if (!Objects.areEqual(propertyChangeEvent.getNewValue(), propertyChangeEvent.getOldValue()))
@@ -146,7 +144,6 @@ public class KönyvController implements IDialogController<KönyvControllerInput
     {
         return new ActionListener()
         {
-
             @Override
             public void actionPerformed(ActionEvent e)
             {
@@ -156,6 +153,7 @@ public class KönyvController implements IDialogController<KönyvControllerInput
                     view.getIsbnText().selectAll();
                     view.getIsbnKeresőLabel().setText("Keresés");
                     view.getIsbnKeresőLabel().setIcon(new ImageIcon(Resources.getResource("icons/keresés.gif")));
+                    view.getSzerkesztők().forEach(component -> component.setEnabled(false));
                     // TODO Asynchron
                     SwingUtilities.invokeLater(new Runnable()
                     {
@@ -174,13 +172,15 @@ public class KönyvController implements IDialogController<KönyvControllerInput
                                 view.getIsbnKeresőLabel().setText("Nincs találat");
                                 view.getIsbnKeresőLabel().setIcon(new ImageIcon(Resources.getResource("icons/hiba.gif")));
                             }
-                            fireResizeEvent();
+                            finally
+                            {
+                                view.getSzerkesztők().forEach(component -> component.setEnabled(true));
+                                fireResizeEvent();
+                            }
                         }
-
                     });
                     fireResizeEvent();
                 }
-
             }
         };
     }

@@ -108,13 +108,13 @@ public class DialogHelper
         frame.setName(controller.getTitle());
         frame.setJMenuBar(jMenuBar);
         controller.initBindings();
+        frame.setVisible(true);
         frame.pack();
         középretesz(frame);
         if (fullScreen)
         {
             frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         }
-        frame.setVisible(true);
         Component initFocusComponent = controller.getComponentForFocus();
         if (initFocusComponent != null)
         {

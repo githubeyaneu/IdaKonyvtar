@@ -25,7 +25,6 @@ public class KönyvtárMenüAndToolBar
 
     public final JMenuItem MENÜPONT_EXCEL_TÖLTÉS = new JMenuItem(KÖNYVTÁR_BETÖLTÉSE);
     public final JMenuItem MENÜPONT_EXCEL_MENTÉS = new JMenuItem(KÖNYVTÁR_MENTÉSE);
-    public final JMenuItem MENÜPONT_ISBN_KERES = new JMenuItem(ISBN_KERESÉS);
     private final JMenu MENÜ_FÁJL = new JMenu(FILE);
     public final JButton TOOLBAR_UJ_KONYV = new JButton("Új könyv", new ImageIcon(Resources.getResource("icons/ujkonyv.gif")));
     public final JButton TOOLBAR_KONYV_TOROL = new JButton("Törlés", new ImageIcon(Resources.getResource("icons/töröl.gif")));
@@ -49,9 +48,6 @@ public class KönyvtárMenüAndToolBar
 
         MENÜ_FÁJL.add(MENÜPONT_EXCEL_MENTÉS);
         MENÜPONT_EXCEL_MENTÉS.setName(KÖNYVTÁR_MENTÉSE);
-
-        menuBar.add(MENÜPONT_ISBN_KERES);
-        MENÜPONT_ISBN_KERES.setName(ISBN_KERESÉS);
 
         toolBar.add(TOOLBAR_UJ_KONYV);
         TOOLBAR_UJ_KONYV.setName(ÚJ_KÖNYV_HOZZÁADÁSA);

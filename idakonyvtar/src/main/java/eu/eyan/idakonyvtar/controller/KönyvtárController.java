@@ -4,7 +4,6 @@ import static eu.eyan.idakonyvtar.controller.input.KönyvControllerInput.ISBN_EN
 import static javax.swing.JFileChooser.APPROVE_OPTION;
 
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -88,12 +87,6 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
     }
 
     @Override
-    public Dimension getDefaultSize()
-    {
-        return new Dimension(1000, 600);
-    }
-
-    @Override
     public void initData(KönyvtárControllerInput input)
     {
         readKönyvtár(input.getFile());
@@ -119,7 +112,6 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
     public void initBindings()
     {
         menuAndToolBar.MENÜPONT_EXCEL_TÖLTÉS.addActionListener(this);
-        menuAndToolBar.MENÜPONT_ISBN_KERES.addActionListener(this);
         menuAndToolBar.MENÜPONT_EXCEL_MENTÉS.addActionListener(this);
 
         menuAndToolBar.TOOLBAR_UJ_KONYV.addActionListener(this);
@@ -225,7 +217,7 @@ public class KönyvtárController implements IControllerMenüvel<KönyvtárContr
             }
         }
 
-        if (e.getSource() == menuAndToolBar.MENÜPONT_ISBN_KERES || e.getSource() == menuAndToolBar.TOOLBAR_UJ_KONYV)
+        if (e.getSource() == menuAndToolBar.TOOLBAR_UJ_KONYV)
         {
             KönyvController könyvController = new KönyvController();
 
