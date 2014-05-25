@@ -240,15 +240,13 @@ public class LibraryController implements IControllerWithMenu<LibraryControllerI
             }
         }
 
-        if (e.getSource() == menuAndToolBar.TOOLBAR_BOOK_DELETE)
+        if (e.getSource() == menuAndToolBar.TOOLBAR_BOOK_DELETE
+                && JOptionPane.showOptionDialog(menuAndToolBar.TOOLBAR_BOOK_DELETE, "Biztosan törölni akarod?", "Törlés megerősítése", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[] { YES, NO }, NO) == JOptionPane.OK_OPTION)
         {
-            if (JOptionPane.showOptionDialog(menuAndToolBar.TOOLBAR_BOOK_DELETE, "Biztosan törölni akarod?", "Törlés megerősítése", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[] { YES, NO }, NO) == JOptionPane.OK_OPTION)
-            {
-                int selectionIndex = model.getBooks().getSelectionIndex();
-                model.getBooks().getList().remove(selectionIndex);
-                // TODO: ugly: use selectioninlist...
-                model.getBooks().fireIntervalRemoved(selectionIndex, selectionIndex);
-            }
+            int selectionIndex = model.getBooks().getSelectionIndex();
+            model.getBooks().getList().remove(selectionIndex);
+            // TODO: ugly: use selectioninlist...
+            model.getBooks().fireIntervalRemoved(selectionIndex, selectionIndex);
         }
     }
 

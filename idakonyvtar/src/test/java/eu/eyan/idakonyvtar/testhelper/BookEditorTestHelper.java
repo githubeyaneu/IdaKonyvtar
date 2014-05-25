@@ -32,6 +32,7 @@ public class BookEditorTestHelper
     public BookEditorTestHelper(Robot robot)
     {
         dialog = findDialog(VISIBLE_DIALOG_FINDER).withTimeout(1000).using(robot);
+        dialog.target.toFront();
     }
 
     public void requireIsbnNotPresent()

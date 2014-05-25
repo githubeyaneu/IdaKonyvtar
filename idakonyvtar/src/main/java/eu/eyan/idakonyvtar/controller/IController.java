@@ -4,15 +4,15 @@ import java.awt.Component;
 
 public interface IController<INPUT, OUTPUT>
 {
-    public Component getView();
+    Component getView();
 
-    public String getTitle();
+    String getTitle();
 
-    public void initData(INPUT input);
+    void initData(INPUT input);
 
-    public void initBindings();
+    void initBindings();
 
-    public OUTPUT getOutput();
+    OUTPUT getOutput();
 
-    public Component getComponentForFocus();
+    Component getComponentForFocus();
 }
