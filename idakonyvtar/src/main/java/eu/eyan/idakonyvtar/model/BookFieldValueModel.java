@@ -8,29 +8,29 @@ import java.util.Set;
 
 import com.jgoodies.binding.value.ValueModel;
 
-public class KönyvMezőValueModel implements ValueModel, PropertyChangeListener
+public class BookFieldValueModel implements ValueModel, PropertyChangeListener
 {
-    private int oszlopIndex;
-    private Könyv model;
+    private int columnIndex;
+    private Book model;
     private Set<PropertyChangeListener> listeners = newHashSet();
 
-    public KönyvMezőValueModel(int oszlopIndex, Könyv könyv)
+    public BookFieldValueModel(int columnIndex, Book book)
     {
-        this.oszlopIndex = oszlopIndex;
-        this.model = könyv;
+        this.columnIndex = columnIndex;
+        this.model = book;
         model.addPropertyChangeListener(this);
     }
 
     @Override
     public Object getValue()
     {
-        return model.getValue(oszlopIndex);
+        return model.getValue(columnIndex);
     }
 
     @Override
     public void setValue(Object newValue)
     {
-        model.setValue(oszlopIndex, (String) newValue);
+        model.setValue(columnIndex, (String) newValue);
     }
 
     @Override
@@ -52,10 +52,10 @@ public class KönyvMezőValueModel implements ValueModel, PropertyChangeListener
     @Override
     public void propertyChange(PropertyChangeEvent evt)
     {
-        if (evt instanceof Könyv.KönyvPropertyChangeEvent)
+        if (evt instanceof Book.BookPropertyChangeEvent)
         {
-            Könyv.KönyvPropertyChangeEvent könyvEvent = (Könyv.KönyvPropertyChangeEvent) evt;
-            if (könyvEvent.getOszlopIndex() == this.oszlopIndex)
+            Book.BookPropertyChangeEvent bookEvent = (Book.BookPropertyChangeEvent) evt;
+            if (bookEvent.getColumnIndex() == this.columnIndex)
             {
                 for (PropertyChangeListener listener : listeners)
                 {

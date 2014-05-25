@@ -4,19 +4,19 @@ import java.util.regex.Matcher;
 
 import org.jdesktop.swingx.sort.RowFilters.GeneralFilter;
 
-public class MagyarRowFilter extends GeneralFilter
+public class SpecialCharacterRowFilter extends GeneralFilter
 {
     private Matcher matcher;
 
-    public MagyarRowFilter(String szűrőSzöveg)
+    public SpecialCharacterRowFilter(String filterText)
     {
-        matcher = MagyarÉkezetHelper.szűrőPattern(szűrőSzöveg).matcher("");
+        matcher = SpecialCharacterHelper.filterPattern(filterText).matcher("");
     }
 
     @Override
     protected boolean include(javax.swing.RowFilter.Entry<? extends Object, ? extends Object> value, int index)
     {
-        matcher.reset(MagyarÉkezetHelper.ékezetNélkül(value.getStringValue(index)));
+        matcher.reset(SpecialCharacterHelper.withoutSpecChars(value.getStringValue(index)));
         return matcher.find();
     }
 }

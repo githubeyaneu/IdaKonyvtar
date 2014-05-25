@@ -17,40 +17,40 @@ import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 
-public abstract class MultiMező<INPUT, EDITOR extends Component> extends JPanel implements MezőEditListener<EDITOR>
+public abstract class MultiField<INPUT, EDITOR extends Component> extends JPanel implements FieldEditListener<EDITOR>
 {
     private static final long serialVersionUID = 1L;
-    private final List<Mező<EDITOR>> mezők = newArrayList();
-    private String oszlopNév;
-    private int számláló = 1;
+    private final List<Field<EDITOR>> fields = newArrayList();
+    private String columnName;
+    private int counter = 1;
 
-    private static class Mező<EDITOR>
+    private static class Field<EDITOR>
     {
         @Getter
         private final EDITOR editor;
         @Getter
-        private final JButton törlés;
+        private final JButton delete;
         @Getter
         private final JPanel panel;
 
-        public Mező(EDITOR editor, JButton button, JPanel mezőPanel)
+        public Field(EDITOR editor, JButton button, JPanel mezőPanel)
         {
             this.editor = editor;
-            this.törlés = button;
+            this.delete = button;
             this.panel = mezőPanel;
         }
     }
 
-    public MultiMező(String oszlopNév)
+    public MultiField(String columnName)
     {
-        this.oszlopNév = oszlopNév;
+        this.columnName = columnName;
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
     }
 
     public void setValues(List<INPUT> values)
     {
         removeAll();
-        mezők.clear();
+        fields.clear();
 
         for (INPUT input : values)
         {
@@ -59,53 +59,53 @@ public abstract class MultiMező<INPUT, EDITOR extends Component> extends JPanel
         addEditor(null, true);
     }
 
-    private void addEditor(INPUT input, boolean utolsó)
+    private void addEditor(INPUT input, boolean last)
     {
         EDITOR editor = getEditor();
-        addMezőEditListener(editor, this);
-        JButton törlésGomb = new JButton("x");
+        addFieldEditListener(editor, this);
+        JButton deleteButton = new JButton("x");
 
         PanelBuilder panelBuilder = new PanelBuilder(new FormLayout("f:p:g, 3dlu, 30dlu", "f:p:g, 3dlu"));
         panelBuilder.add(editor, CC.xy(1, 1));
-        panelBuilder.add(törlésGomb, CC.xy(3, 1));
-        JPanel mezőPanel = panelBuilder.build();
+        panelBuilder.add(deleteButton, CC.xy(3, 1));
+        JPanel fieldPanel = panelBuilder.build();
 
-        if (utolsó)
+        if (last)
         {
-            törlésGomb.setEnabled(false);
+            deleteButton.setEnabled(false);
         }
         else
         {
             setValueInEditor(editor, input);
         }
 
-        final Mező<EDITOR> mező = new Mező<EDITOR>(editor, törlésGomb, mezőPanel);
-        törlésGomb.addActionListener((ActionEvent actionEvent) -> {
-            mezők.remove(mező);
-            remove(mező.getPanel());
+        final Field<EDITOR> field = new Field<EDITOR>(editor, deleteButton, fieldPanel);
+        deleteButton.addActionListener((ActionEvent actionEvent) -> {
+            fields.remove(field);
+            remove(field.getPanel());
             revalidate();
         });
-        mezők.add(mező);
-        add(mezőPanel);
+        fields.add(field);
+        add(fieldPanel);
 
-        mezőPanel.setName(oszlopNév + ".panel." + számláló);
-        editor.setName(oszlopNév + számláló);
-        törlésGomb.setName(oszlopNév + ".delete." + számláló);
-        számláló++;
+        fieldPanel.setName(columnName + ".panel." + counter);
+        editor.setName(columnName + counter);
+        deleteButton.setName(columnName + ".delete." + counter);
+        counter++;
 
         revalidate();
 //        SwingUtilities.getWindowAncestor(this).pack();
     }
 
-    protected abstract void addMezőEditListener(EDITOR editor, MezőEditListener<EDITOR> listener);
+    protected abstract void addFieldEditListener(EDITOR editor, FieldEditListener<EDITOR> listener);
 
     @Override
-    public void mezőEdited(EDITOR source)
+    public void fieldEdited(EDITOR source)
     {
-        Mező<EDITOR> utolsóMező = mezők.get(mezők.size() - 1);
-        if (utolsóMező.getEditor() == source)
+        Field<EDITOR> lastField = fields.get(fields.size() - 1);
+        if (lastField.getEditor() == source)
         {
-            utolsóMező.getTörlés().setEnabled(true);
+            lastField.getDelete().setEnabled(true);
             addEditor(null, true);
         }
     }
@@ -114,13 +114,13 @@ public abstract class MultiMező<INPUT, EDITOR extends Component> extends JPanel
 
     public List<INPUT> getValues()
     {
-        return mezők.stream().map((Mező<EDITOR> mező) -> {
-            return getValue(mező.getEditor());
+        return fields.stream().map((Field<EDITOR> field) -> {
+            return getValue(field.getEditor());
         }).collect(Collectors.toList());
     }
 
     /**
-     * @return Null ha üres!
+     * @return null if empty!
      */
     protected abstract INPUT getValue(EDITOR editor);
 

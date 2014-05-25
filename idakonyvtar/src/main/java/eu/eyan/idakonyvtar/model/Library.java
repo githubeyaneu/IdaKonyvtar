@@ -7,17 +7,17 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
-public class Könyvtár
+public class Library
 {
     @Getter
     @Setter
-    private List<Könyv> könyvek = newArrayList();
+    private List<Book> books = newArrayList();
 
     @Getter
     @Setter
-    private List<String> oszlopok = newArrayList();
+    private List<String> columns = newArrayList();
 
     @Getter
     @Setter
-    private OszlopKonfiguráció konfiguráció = new OszlopKonfiguráció();
+    private ColumnKonfiguration configuration = new ColumnKonfiguration();
 }

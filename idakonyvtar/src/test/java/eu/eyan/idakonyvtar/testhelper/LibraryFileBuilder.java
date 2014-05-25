@@ -10,20 +10,20 @@ import jxl.Workbook;
 import jxl.write.Label;
 import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
-import eu.eyan.idakonyvtar.util.ExcelKezelő;
+import eu.eyan.idakonyvtar.util.ExcelHandler;
 
-public class KönyvtárFileBuilder
+public class LibraryFileBuilder
 {
     private WritableWorkbook workbook = null;
     private List<String[]> sorok = newArrayList();
-    private WritableSheet aktuálisSheet = null;
+    private WritableSheet actualSheet = null;
     File file = new File(System.currentTimeMillis() + ".xls");
 
-    public KönyvtárFileBuilder()
+    public LibraryFileBuilder()
     {
         try
         {
-            workbook = Workbook.createWorkbook(file, ExcelKezelő.getWorkbookSettings());
+            workbook = Workbook.createWorkbook(file, ExcelHandler.getWorkbookSettings());
         }
         catch (IOException e)
         {
@@ -31,13 +31,13 @@ public class KönyvtárFileBuilder
         }
     }
 
-    public KönyvtárFileBuilder withOszlopok(String... oszlopok)
+    public LibraryFileBuilder withColumns(String... columns)
     {
-        for (int i = 0; i < oszlopok.length; i++)
+        for (int i = 0; i < columns.length; i++)
         {
             try
             {
-                aktuálisSheet.addCell(new Label(i, 0, oszlopok[i]));
+                actualSheet.addCell(new Label(i, 0, columns[i]));
             }
             catch (Exception e)
             {
@@ -47,14 +47,14 @@ public class KönyvtárFileBuilder
         return this;
     }
 
-    public KönyvtárFileBuilder withSor(String... sor)
+    public LibraryFileBuilder withRow(String... row)
     {
-        sorok.add(sor);
-        for (int i = 0; i < sor.length; i++)
+        sorok.add(row);
+        for (int i = 0; i < row.length; i++)
         {
             try
             {
-                aktuálisSheet.addCell(new Label(i, sorok.size(), sor[i]));
+                actualSheet.addCell(new Label(i, sorok.size(), row[i]));
             }
             catch (Exception e)
             {
@@ -78,9 +78,9 @@ public class KönyvtárFileBuilder
         return file;
     }
 
-    public KönyvtárFileBuilder withSheet(String sheetName)
+    public LibraryFileBuilder withSheet(String sheetName)
     {
-        aktuálisSheet = workbook.createSheet(sheetName, workbook.getNumberOfSheets());
+        actualSheet = workbook.createSheet(sheetName, workbook.getNumberOfSheets());
         return this;
     }
 }

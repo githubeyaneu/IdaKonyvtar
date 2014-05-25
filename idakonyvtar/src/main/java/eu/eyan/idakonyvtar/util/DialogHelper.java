@@ -25,14 +25,14 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 
 import eu.eyan.idakonyvtar.controller.IController;
-import eu.eyan.idakonyvtar.controller.IControllerMenüvel;
+import eu.eyan.idakonyvtar.controller.IControllerWithMenu;
 import eu.eyan.idakonyvtar.controller.IDialogController;
 
 public class DialogHelper
 {
 
-    public static final String MÉGSEM = "Mégsem";
-    public static final String MENTÉS = "Mentés";
+    public static final String CANCEL = "Mégsem";
+    public static final String SAVE = "Mentés";
 
     /**
      * Blockiert!!!
@@ -67,7 +67,7 @@ public class DialogHelper
 
         controller.initBindings();
         dialog.pack();
-        középretesz(dialog);
+        positionToCenter(dialog);
         controller.addResizeListener(dialog);
 
         // blockiert:
@@ -79,13 +79,13 @@ public class DialogHelper
         return dialog;
     }
 
-    private static void középretesz(Component component)
+    private static void positionToCenter(Component component)
     {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        int szélesség = component.getSize().width;
-        int magasság = component.getSize().height;
-        component.setSize(szélesség, magasság);
-        component.setLocation((screenSize.width - szélesség) / 2, (screenSize.height - magasság) / 2);
+        int width = component.getSize().width;
+        int height = component.getSize().height;
+        component.setSize(width, height);
+        component.setLocation((screenSize.width - width) / 2, (screenSize.height - height) / 2);
     }
 
     private static Component addScrollableInBorders(Component component)
@@ -110,7 +110,7 @@ public class DialogHelper
         controller.initBindings();
         frame.setVisible(true);
         frame.pack();
-        középretesz(frame);
+        positionToCenter(frame);
         if (fullScreen)
         {
             frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -126,10 +126,10 @@ public class DialogHelper
     private static Component getButtons(final OkCancelDialog dialog, final IDialogController<?, ?> dialogController)
     {
         PanelBuilder panelBuilder = new PanelBuilder(new FormLayout("pref:grow,3dlu,pref,3dlu,pref", "pref"));
-        JButton okButton = new JButton(MENTÉS);
-        okButton.setName(MENTÉS);
-        JButton cancelButton = new JButton(MÉGSEM);
-        cancelButton.setName(MÉGSEM);
+        JButton okButton = new JButton(SAVE);
+        okButton.setName(SAVE);
+        JButton cancelButton = new JButton(CANCEL);
+        cancelButton.setName(CANCEL);
         panelBuilder.add(okButton, CC.xy(3, 1));
         panelBuilder.add(cancelButton, CC.xy(5, 1));
         okButton.addActionListener(new ActionListener()
@@ -154,16 +154,16 @@ public class DialogHelper
         return panelBuilder.build();
     }
 
-    public static <INPUT> JFrame runInFrameFullScreen(IControllerMenüvel<INPUT, ?> controller, INPUT input)
+    public static <INPUT> JFrame runInFrameFullScreen(IControllerWithMenu<INPUT, ?> controller, INPUT input)
     {
         return runInFrame(null, controller, input, controller.getMenuBar(), controller.getToolBar(), true);
     }
 
-    public static boolean igenNem(Component parent, String kérdés, String dialogCím)
+    public static boolean yesNo(Component parent, String question, String dialogTitle)
     {
         return JOptionPane.showOptionDialog(parent,
-                kérdés,
-                dialogCím,
+                question,
+                dialogTitle,
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE,
                 null,

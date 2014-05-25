@@ -10,23 +10,23 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import eu.eyan.idakonyvtar.model.Könyv;
+import eu.eyan.idakonyvtar.model.Book;
 
-public class KönyvHelper
+public class BookHelper
 {
     public static final String LISTA_SEPARATOR = " + ";
     public static final String LISTA_SEPARATOR_REGEX = LISTA_SEPARATOR.replace("+", "\\+");
 
     final static Collator collator = Collator.getInstance(new Locale("hu"));
 
-    public static List<String> getOszlopLista(List<Könyv> könyvLista, int oszlopIndex)
+    public static List<String> getColumnList(List<Book> bookList, int columnIndex)
     {
         Set<String> set = newHashSet("");
-        for (Könyv könyv : könyvLista)
+        for (Book book : bookList)
         {
-            if (könyv.getValue(oszlopIndex) != null)
+            if (book.getValue(columnIndex) != null)
             {
-                List<String> values = newArrayList(könyv.getValue(oszlopIndex).split(LISTA_SEPARATOR_REGEX));
+                List<String> values = newArrayList(book.getValue(columnIndex).split(LISTA_SEPARATOR_REGEX));
                 values.forEach((String s) -> s.trim());
                 set.addAll(values);
             }

@@ -12,25 +12,25 @@ import javax.swing.JTextField;
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 import org.jdesktop.swingx.combobox.ListComboBoxModel;
 
-public class MultiMezőJComboBox extends MultiMező<String, JComboBox<String>>
+public class MultiFieldJComboBox extends MultiField<String, JComboBox<String>>
 {
     private static final long serialVersionUID = 1L;
-    private List<String> oszlopLista = newArrayList();
+    private List<String> columnList = newArrayList();
 
-    public MultiMezőJComboBox(String oszlopNév)
+    public MultiFieldJComboBox(String columnName)
     {
-        super(oszlopNév);
+        super(columnName);
     }
 
     @Override
-    protected void addMezőEditListener(JComboBox<String> editor, MezőEditListener<JComboBox<String>> listener)
+    protected void addFieldEditListener(JComboBox<String> editor, FieldEditListener<JComboBox<String>> listener)
     {
         ((JTextField) editor.getEditor().getEditorComponent()).addKeyListener(new KeyAdapter()
         {
             @Override
             public void keyReleased(KeyEvent e)
             {
-                listener.mezőEdited(editor);
+                listener.fieldEdited(editor);
             }
         });
     }
@@ -40,7 +40,7 @@ public class MultiMezőJComboBox extends MultiMező<String, JComboBox<String>>
     protected JComboBox<String> getEditor()
     {
         JComboBox<String> jComboBox = new JComboBox<String>();
-        jComboBox.setModel(new ListComboBoxModel<String>(oszlopLista));
+        jComboBox.setModel(new ListComboBoxModel<String>(columnList));
         // Fontos először seteditable aztán autocomplete mert ez az AC egy FOS
         jComboBox.setEditable(true);
         AutoCompleteDecorator.decorate(jComboBox);
@@ -60,9 +60,9 @@ public class MultiMezőJComboBox extends MultiMező<String, JComboBox<String>>
         ((JTextField) editor.getEditor().getEditorComponent()).setText(value);
     }
 
-    public void setAutoCompleteLista(List<String> oszlopLista)
+    public void setAutoCompleteList(List<String> columnList)
     {
-        this.oszlopLista = oszlopLista;
+        this.columnList = columnList;
     }
 
 }

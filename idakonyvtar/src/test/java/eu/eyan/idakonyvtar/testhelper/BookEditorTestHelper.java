@@ -13,9 +13,9 @@ import org.fest.swing.fixture.ContainerFixture;
 import org.fest.swing.fixture.DialogFixture;
 
 import eu.eyan.idakonyvtar.util.DialogHelper;
-import eu.eyan.idakonyvtar.view.KönyvView;
+import eu.eyan.idakonyvtar.view.BookView;
 
-public class KönyvszerkesztőTestHelper
+public class BookEditorTestHelper
 {
 
     public static final GenericTypeMatcher<JDialog> VISIBLE_DIALOG_FINDER = new GenericTypeMatcher<JDialog>(JDialog.class)
@@ -29,15 +29,15 @@ public class KönyvszerkesztőTestHelper
 
     private DialogFixture dialog;
 
-    public KönyvszerkesztőTestHelper(Robot robot)
+    public BookEditorTestHelper(Robot robot)
     {
         dialog = findDialog(VISIBLE_DIALOG_FINDER).withTimeout(1000).using(robot);
     }
 
     public void requireIsbnNotPresent()
     {
-        requireLabelNotPresent(dialog, KönyvView.ISBN_LABEL);
-        requireTextBoxNotPresent(dialog, KönyvView.ISBN_TEXT);
+        requireLabelNotPresent(dialog, BookView.ISBN_LABEL);
+        requireTextBoxNotPresent(dialog, BookView.ISBN_TEXT);
     }
 
     private void requireTextBoxNotPresent(ContainerFixture<?> container, String textBoxName)
@@ -68,8 +68,8 @@ public class KönyvszerkesztőTestHelper
 
     public void requireIsbnPresent()
     {
-        dialog.label(KönyvView.ISBN_LABEL).requireVisible();
-        dialog.textBox(KönyvView.ISBN_TEXT).requireVisible();
+        dialog.label(BookView.ISBN_LABEL).requireVisible();
+        dialog.textBox(BookView.ISBN_TEXT).requireVisible();
     }
 
     public void setNormalText(String textBoxNév, String szöveg)
@@ -77,14 +77,14 @@ public class KönyvszerkesztőTestHelper
         dialog.textBox(textBoxNév).setText(szöveg);
     }
 
-    public void clickMentés()
+    public void clickSave()
     {
-        dialog.button(DialogHelper.MENTÉS).click();
+        dialog.button(DialogHelper.SAVE).click();
     }
 
-    public void clickMégsem()
+    public void clickCancel()
     {
-        dialog.button(DialogHelper.MÉGSEM).click();
+        dialog.button(DialogHelper.CANCEL).click();
     }
 
     public void cleanUp()
@@ -102,27 +102,27 @@ public class KönyvszerkesztőTestHelper
         dialog.robot.pressKey(keyCode);
     }
 
-    public void enterNormalText(String textBoxNév, String szöveg)
+    public void enterNormalText(String textBoxName, String text)
     {
-        dialog.textBox(textBoxNév).click();
-        dialog.textBox(textBoxNév).robot.enterText(szöveg);
+        dialog.textBox(textBoxName).click();
+        dialog.textBox(textBoxName).robot.enterText(text);
     }
 
-    public void multimezőTöröl(String oszlopnév, int számláló)
+    public void multifieldDelete(String columnName, int counter)
     {
-        dialog.button(oszlopnév + ".delete." + számláló).click();
+        dialog.button(columnName + ".delete." + counter).click();
     }
 
-    public void requireTörölDisabled(String oszlopnév, int számláló)
+    public void requireDeleteDisabled(String columnName, int counter)
     {
-        dialog.button(oszlopnév + ".delete." + számláló).requireDisabled();
+        dialog.button(columnName + ".delete." + counter).requireDisabled();
 
     }
 
-    public void enterComboBoxText(String comboBoxName, String szöveg)
+    public void enterComboBoxText(String comboBoxName, String text)
     {
         dialog.comboBox(comboBoxName).click();
-        dialog.comboBox(comboBoxName).robot.enterText(szöveg);
+        dialog.comboBox(comboBoxName).robot.enterText(text);
         dialog.comboBox(comboBoxName).robot.pressKey(KeyEvent.VK_ESCAPE);
     }
 }

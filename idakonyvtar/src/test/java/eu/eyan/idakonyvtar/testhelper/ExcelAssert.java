@@ -1,6 +1,6 @@
 package eu.eyan.idakonyvtar.testhelper;
 
-import static eu.eyan.idakonyvtar.util.ExcelKezelő.getWorkbookSettings;
+import static eu.eyan.idakonyvtar.util.ExcelHandler.getWorkbookSettings;
 import static org.fest.assertions.Assertions.assertThat;
 
 import java.io.File;
@@ -12,13 +12,13 @@ import jxl.read.biff.BiffException;
 public class ExcelAssert
 {
 
-    public static void assertExcelCella(File forrásfile, String sheetNév, int oszlop, int sor, String expected)
+    public static void assertExcelCell(File sourceFile, String sheetName, int column, int row, String expected)
     {
         Workbook workbook = null;
         try
         {
-            workbook = Workbook.getWorkbook(forrásfile, getWorkbookSettings());
-            assertThat(workbook.getSheet(sheetNév).getCell(oszlop - 1, sor - 1).getContents()).isEqualTo(expected);
+            workbook = Workbook.getWorkbook(sourceFile, getWorkbookSettings());
+            assertThat(workbook.getSheet(sheetName).getCell(column - 1, row - 1).getContents()).isEqualTo(expected);
         }
         catch (BiffException | IOException e)
         {

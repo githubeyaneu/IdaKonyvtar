@@ -4,15 +4,15 @@ import java.text.Normalizer;
 import java.text.Normalizer.Form;
 import java.util.regex.Pattern;
 
-public class MagyarÉkezetHelper
+public class SpecialCharacterHelper
 {
 
-    public static Pattern szűrőPattern(String szűrőSzöveg)
+    public static Pattern filterPattern(String filterText)
     {
-        return Pattern.compile(MagyarÉkezetHelper.ékezetNélkül(szűrőSzöveg), Pattern.CASE_INSENSITIVE);
+        return Pattern.compile(SpecialCharacterHelper.withoutSpecChars(filterText), Pattern.CASE_INSENSITIVE);
     }
 
-    public static String ékezetNélkül(String text)
+    public static String withoutSpecChars(String text)
     {
         return text == null ? null
                 : Normalizer.normalize(text, Form.NFD)

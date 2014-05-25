@@ -24,23 +24,23 @@ import com.google.common.io.Resources;
 import com.jgoodies.binding.adapter.Bindings;
 import com.jgoodies.binding.adapter.ComboBoxAdapter;
 
-import eu.eyan.idakonyvtar.controller.input.KönyvControllerInput;
-import eu.eyan.idakonyvtar.model.Könyv;
-import eu.eyan.idakonyvtar.model.KönyvMezőValueModel;
-import eu.eyan.idakonyvtar.model.OszlopKonfiguráció.OszlopKonfigurációk;
+import eu.eyan.idakonyvtar.controller.input.BookControllerInput;
+import eu.eyan.idakonyvtar.model.Book;
+import eu.eyan.idakonyvtar.model.BookFieldValueModel;
+import eu.eyan.idakonyvtar.model.ColumnKonfiguration.ColumnConfigurations;
 import eu.eyan.idakonyvtar.oszk.Marc;
 import eu.eyan.idakonyvtar.oszk.OszkKereso;
 import eu.eyan.idakonyvtar.oszk.OszkKeresoException;
-import eu.eyan.idakonyvtar.util.KönyvHelper;
-import eu.eyan.idakonyvtar.view.KönyvView;
-import eu.eyan.idakonyvtar.view.MultiMező;
-import eu.eyan.idakonyvtar.view.MultiMezőJComboBox;
-import eu.eyan.idakonyvtar.view.MultiMezőJTextField;
+import eu.eyan.idakonyvtar.util.BookHelper;
+import eu.eyan.idakonyvtar.view.BookView;
+import eu.eyan.idakonyvtar.view.MultiField;
+import eu.eyan.idakonyvtar.view.MultiFieldJComboBox;
+import eu.eyan.idakonyvtar.view.MultiFieldJTextField;
 
-public class KönyvController implements IDialogController<KönyvControllerInput, Könyv>
+public class BookController implements IDialogController<BookControllerInput, Book>
 {
-    private KönyvView view = new KönyvView();
-    private KönyvControllerInput model;
+    private BookView view = new BookView();
+    private BookControllerInput model;
     private List<Window> resizeListeners = newArrayList();
 
     @Override
@@ -52,52 +52,52 @@ public class KönyvController implements IDialogController<KönyvControllerInput
     @Override
     public String getTitle()
     {
-        if (model.getOszlopok().indexOf("Szerző") >= 0)
+        if (model.getColumns().indexOf("Szerző") >= 0)
         {
-            return "Könyv adatainak szerkesztése - " + model.getKönyv().getValue(model.getOszlopok().indexOf("Szerző"));
+            return "Book adatainak szerkesztése - " + model.getBook().getValue(model.getColumns().indexOf("Szerző"));
         }
         else
         {
-            return "Könyv adatainak szerkesztése";
+            return "Book adatainak szerkesztése";
         }
     }
 
     @Override
-    public void initData(KönyvControllerInput model)
+    public void initData(BookControllerInput model)
     {
         this.model = model;
-        view.setOszlopok(model.getOszlopok());
+        view.setColumns(model.getColumns());
         view.setIsbnEnabled(model.isIsbnEnabled());
-        view.setOszlopKonfiguráció(model.getOszlopKonfiguráció());
+        view.setColumnConfiguration(model.getColumnConfiguration());
     }
 
     @Override
     public void initBindings()
     {
-        mezőkAkcióinakCsatolása();
-        view.getIsbnText().addActionListener(isbnKeresés());
+        initFieldsActionBindings();
+        view.getIsbnText().addActionListener(isbnSearch());
     }
 
-    private void mezőkAkcióinakCsatolása()
+    private void initFieldsActionBindings()
     {
-        for (int oszlopIndex = 0; oszlopIndex < model.getOszlopok().size(); oszlopIndex++)
+        for (int columnIndex = 0; columnIndex < model.getColumns().size(); columnIndex++)
         {
-            String oszlopNév = model.getOszlopok().get(oszlopIndex);
-            boolean autoComplete = model.getOszlopKonfiguráció().isIgen(oszlopNév, OszlopKonfigurációk.AUTOCOMPLETE);
-            boolean multi = model.getOszlopKonfiguráció().isIgen(oszlopNév, OszlopKonfigurációk.MULTIMEZŐ);
+            String columnName = model.getColumns().get(columnIndex);
+            boolean autoComplete = model.getColumnConfiguration().isTrue(columnName, ColumnConfigurations.AUTOCOMPLETE);
+            boolean multi = model.getColumnConfiguration().isTrue(columnName, ColumnConfigurations.MULTIFIELD);
             if (autoComplete)
             {
-                List<String> oszlopLista = KönyvHelper.getOszlopLista(model.getKönyvLista(), oszlopIndex);
+                List<String> columnList = BookHelper.getColumnList(model.getBookList(), columnIndex);
                 if (multi)
                 {
-                    MultiMezőJComboBox mmcombo = (MultiMezőJComboBox) view.getSzerkesztők().get(oszlopIndex);
-                    mmcombo.setAutoCompleteLista(oszlopLista);
-                    multimezőBind(mmcombo, new KönyvMezőValueModel(oszlopIndex, model.getKönyv()));
+                    MultiFieldJComboBox mmcombo = (MultiFieldJComboBox) view.getEditors().get(columnIndex);
+                    mmcombo.setAutoCompleteList(columnList);
+                    multimezőBind(mmcombo, new BookFieldValueModel(columnIndex, model.getBook()));
                 }
                 else
                 {
-                    JComboBox<?> comboBox = (JComboBox<?>) view.getSzerkesztők().get(oszlopIndex);
-                    Bindings.bind(comboBox, new ComboBoxAdapter<String>(oszlopLista, new KönyvMezőValueModel(oszlopIndex, model.getKönyv())));
+                    JComboBox<?> comboBox = (JComboBox<?>) view.getEditors().get(columnIndex);
+                    Bindings.bind(comboBox, new ComboBoxAdapter<String>(columnList, new BookFieldValueModel(columnIndex, model.getBook())));
                     AutoCompleteDecorator.decorate(comboBox);
                 }
             }
@@ -105,42 +105,42 @@ public class KönyvController implements IDialogController<KönyvControllerInput
             {
                 if (multi)
                 {
-                    MultiMezőJTextField mmc = (MultiMezőJTextField) view.getSzerkesztők().get(oszlopIndex);
-                    multimezőBind(mmc, new KönyvMezőValueModel(oszlopIndex, model.getKönyv()));
+                    MultiFieldJTextField mmc = (MultiFieldJTextField) view.getEditors().get(columnIndex);
+                    multimezőBind(mmc, new BookFieldValueModel(columnIndex, model.getBook()));
                 }
                 else
                 {
-                    Bindings.bind((JTextField) view.getSzerkesztők().get(oszlopIndex), new KönyvMezőValueModel(oszlopIndex, model.getKönyv()));
+                    Bindings.bind((JTextField) view.getEditors().get(columnIndex), new BookFieldValueModel(columnIndex, model.getBook()));
                 }
             }
         }
     }
 
-    private void multimezőBind(final MultiMező<String, ?> mmc, final KönyvMezőValueModel könyvMezőValueModel)
+    private void multimezőBind(final MultiField<String, ?> mmc, final BookFieldValueModel bookFieldValueModel)
     {
-        könyvMezőValueModel.addValueChangeListener((PropertyChangeEvent propertyChangeEvent) -> {
+        bookFieldValueModel.addValueChangeListener((PropertyChangeEvent propertyChangeEvent) -> {
             if (!Objects.areEqual(propertyChangeEvent.getNewValue(), propertyChangeEvent.getOldValue()))
             {
-                mmc.setValues(getMultiMezőLista((String) propertyChangeEvent.getNewValue()));
+                mmc.setValues(getMultiFieldList((String) propertyChangeEvent.getNewValue()));
             }
         });
-        mmc.setValues(getMultiMezőLista((String) könyvMezőValueModel.getValue()));
+        mmc.setValues(getMultiFieldList((String) bookFieldValueModel.getValue()));
 
         mmc.addPropertyChangeListener((PropertyChangeEvent propertyChangeEvent) -> {
-            könyvMezőValueModel.setValue(Joiner.on(KönyvHelper.LISTA_SEPARATOR).skipNulls().join(mmc.getValues()));
+            bookFieldValueModel.setValue(Joiner.on(BookHelper.LISTA_SEPARATOR).skipNulls().join(mmc.getValues()));
         });
     }
 
-    private static List<String> getMultiMezőLista(String value)
+    private static List<String> getMultiFieldList(String value)
     {
-        String[] strings = (value).split(KönyvHelper.LISTA_SEPARATOR_REGEX);
-        List<String> lista = newArrayList(strings).stream().filter((String s) -> {
+        String[] strings = (value).split(BookHelper.LISTA_SEPARATOR_REGEX);
+        List<String> list = newArrayList(strings).stream().filter((String s) -> {
             return !s.isEmpty();
         }).collect(Collectors.toList());
-        return lista;
+        return list;
     }
 
-    private ActionListener isbnKeresés()
+    private ActionListener isbnSearch()
     {
         return new ActionListener()
         {
@@ -151,9 +151,9 @@ public class KönyvController implements IDialogController<KönyvControllerInput
                 {
                     System.out.println("ISBN Action: " + view.getIsbnText().getText());
                     view.getIsbnText().selectAll();
-                    view.getIsbnKeresőLabel().setText("Keresés");
-                    view.getIsbnKeresőLabel().setIcon(new ImageIcon(Resources.getResource("icons/keresés.gif")));
-                    view.getSzerkesztők().forEach(component -> component.setEnabled(false));
+                    view.getIsbnSearchLabel().setText("Keresés");
+                    view.getIsbnSearchLabel().setIcon(new ImageIcon(Resources.getResource("icons/search.gif")));
+                    view.getEditors().forEach(component -> component.setEnabled(false));
                     // TODO Asynchron
                     SwingUtilities.invokeLater(new Runnable()
                     {
@@ -164,17 +164,17 @@ public class KönyvController implements IDialogController<KönyvControllerInput
                             try
                             {
                                 marcsToIsbn = OszkKereso.getMarcsToIsbn(view.getIsbnText().getText().replaceAll("ö", "0"));
-                                isbnAdatokBedolgozása(marcsToIsbn);
+                                prozessIsbnData(marcsToIsbn);
                             }
                             catch (OszkKeresoException e)
                             {
                                 // FIXME: itt fontos a naplózás
-                                view.getIsbnKeresőLabel().setText("Nincs találat");
-                                view.getIsbnKeresőLabel().setIcon(new ImageIcon(Resources.getResource("icons/hiba.gif")));
+                                view.getIsbnSearchLabel().setText("Nincs találat");
+                                view.getIsbnSearchLabel().setIcon(new ImageIcon(Resources.getResource("icons/error.gif")));
                             }
                             finally
                             {
-                                view.getSzerkesztők().forEach(component -> component.setEnabled(true));
+                                view.getEditors().forEach(component -> component.setEnabled(true));
                                 fireResizeEvent();
                             }
                         }
@@ -185,26 +185,26 @@ public class KönyvController implements IDialogController<KönyvControllerInput
         };
     }
 
-    private void isbnAdatokBedolgozása(List<Marc> marcsToIsbn)
+    private void prozessIsbnData(List<Marc> marcsToIsbn)
     {
-        for (String oszlop : model.getOszlopok())
+        for (String column : model.getColumns())
         {
-            String oszlopÉrték = "";
-            List<Marc> oszlophozRendeltMarcKódok;
+            String columnValue = "";
+            List<Marc> marcCodesToColumns;
             try
             {
-                oszlophozRendeltMarcKódok = model.getOszlopKonfiguráció().getMarcKódok(oszlop);
+                marcCodesToColumns = model.getColumnConfiguration().getMarcCodes(column);
                 for (Marc marc : marcsToIsbn)
                 {
-                    for (Marc oszlopMarc : oszlophozRendeltMarcKódok)
+                    for (Marc columnMarc : marcCodesToColumns)
                     {
-                        if (marcStimmel(marc, oszlopMarc))
+                        if (isMarcsApply(marc, columnMarc))
                         {
-                            oszlopÉrték += oszlopÉrték.equals("") ? marc.getValue() : ", " + marc.getValue();
+                            columnValue += columnValue.equals("") ? marc.getValue() : ", " + marc.getValue();
                         }
                     }
                 }
-                model.getKönyv().setValue(model.getOszlopok().indexOf(oszlop), oszlopÉrték);
+                model.getBook().setValue(model.getColumns().indexOf(column), columnValue);
             }
             catch (Exception e)
             {
@@ -214,7 +214,7 @@ public class KönyvController implements IDialogController<KönyvControllerInput
         }
     }
 
-    private boolean marcStimmel(Marc pontosMarc, Marc pontatlanMarc)
+    private boolean isMarcsApply(Marc pontosMarc, Marc pontatlanMarc)
     {
         if (pontosMarc == null || pontatlanMarc == null || pontosMarc.getMarc1() == null || pontatlanMarc.getMarc1() == null)
         {
@@ -244,9 +244,9 @@ public class KönyvController implements IDialogController<KönyvControllerInput
     }
 
     @Override
-    public Könyv getOutput()
+    public Book getOutput()
     {
-        return model.getKönyv();
+        return model.getBook();
     }
 
     @Override

@@ -5,11 +5,11 @@ import java.awt.event.KeyEvent;
 
 import javax.swing.JTextField;
 
-public class MultiMezőJTextField extends MultiMező<String, JTextField>
+public class MultiFieldJTextField extends MultiField<String, JTextField>
 {
-    public MultiMezőJTextField(String oszlopNév)
+    public MultiFieldJTextField(String columnName)
     {
-        super(oszlopNév);
+        super(columnName);
     }
 
     private static final long serialVersionUID = 1L;
@@ -34,14 +34,14 @@ public class MultiMezőJTextField extends MultiMező<String, JTextField>
     }
 
     @Override
-    protected void addMezőEditListener(JTextField editorComponent, MezőEditListener<JTextField> listener)
+    protected void addFieldEditListener(JTextField editorComponent, FieldEditListener<JTextField> listener)
     {
         editorComponent.addKeyListener(new KeyAdapter()
         {
             @Override
             public void keyReleased(KeyEvent e)
             {
-                listener.mezőEdited(editorComponent);
+                listener.fieldEdited(editorComponent);
             }
         });
     }

@@ -16,32 +16,32 @@ import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 
-import eu.eyan.idakonyvtar.model.OszlopKonfiguráció;
-import eu.eyan.idakonyvtar.model.OszlopKonfiguráció.OszlopKonfigurációk;
+import eu.eyan.idakonyvtar.model.ColumnKonfiguration;
+import eu.eyan.idakonyvtar.model.ColumnKonfiguration.ColumnConfigurations;
 
-public class KönyvView implements IView
+public class BookView implements IView
 {
     public static final String ISBN_TEXT = "isbnText";
 
     public static final String ISBN_LABEL = "isbnLabel";
 
     @Setter
-    private List<String> oszlopok = newArrayList();
+    private List<String> columns = newArrayList();
 
     @Setter
     private boolean isbnEnabled = false;
 
     @Getter
-    private List<Component> szerkesztők = newArrayList();
+    private List<Component> editors = newArrayList();
 
     @Getter
-    private JLabel isbnKeresőLabel = new JLabel();
+    private JLabel isbnSearchLabel = new JLabel();
 
     @Getter
     private JTextField isbnText = new JTextField();
 
     @Setter
-    private OszlopKonfiguráció oszlopKonfiguráció;
+    private ColumnKonfiguration columnConfiguration;
 
     @Override
     public Component getComponent()
@@ -52,7 +52,7 @@ public class KönyvView implements IView
             rowSpec += "pref, 3dlu, pref, 3dlu, ";
         }
         rowSpec += rowSpec + "pref";
-        for (int i = 0; i < oszlopok.size(); i++)
+        for (int i = 0; i < columns.size(); i++)
         {
             rowSpec += ",3dlu ,pref";
         }
@@ -63,48 +63,48 @@ public class KönyvView implements IView
         {
             panelBuilder.addSeparator("Isbn", CC.xyw(1, row, 3));
             row = row + 2;
-            panelBuilder.add(isbnKeresőLabel, CC.xyw(1, row, 1));
-            isbnKeresőLabel.setName(ISBN_LABEL);
+            panelBuilder.add(isbnSearchLabel, CC.xyw(1, row, 1));
+            isbnSearchLabel.setName(ISBN_LABEL);
             panelBuilder.add(isbnText, CC.xyw(3, row, 1));
             isbnText.setName(ISBN_TEXT);
             row = row + 2;
         }
         panelBuilder.addSeparator("Adatok", CC.xyw(1, row, 3));
-        for (int i = 0; i < oszlopok.size(); i++)
+        for (int i = 0; i < columns.size(); i++)
         {
             row = row + 2;
-            String oszlopNév = oszlopok.get(i);
-            panelBuilder.addLabel(oszlopNév, CC.xy(1, row));
+            String columnName = columns.get(i);
+            panelBuilder.addLabel(columnName, CC.xy(1, row));
 
-            Component szerkesztő;
-            boolean multi = oszlopKonfiguráció.isIgen(oszlopNév, OszlopKonfigurációk.MULTIMEZŐ);
-            if (oszlopKonfiguráció.isIgen(oszlopNév, OszlopKonfigurációk.AUTOCOMPLETE))
+            Component editor;
+            boolean multi = columnConfiguration.isTrue(columnName, ColumnConfigurations.MULTIFIELD);
+            if (columnConfiguration.isTrue(columnName, ColumnConfigurations.AUTOCOMPLETE))
             {
                 if (multi)
                 {
-                    szerkesztő = new MultiMezőJComboBox(oszlopNév);
+                    editor = new MultiFieldJComboBox(columnName);
                 }
                 else
                 {
                     JComboBox<String> jComboBox = new JComboBox<String>();
                     jComboBox.setEditable(true);
-                    szerkesztő = jComboBox;
+                    editor = jComboBox;
                 }
             }
             else
             {
                 if (multi)
                 {
-                    szerkesztő = new MultiMezőJTextField(oszlopNév);
+                    editor = new MultiFieldJTextField(columnName);
                 }
                 else
                 {
-                    szerkesztő = new JTextField(20);
+                    editor = new JTextField(20);
                 }
             }
-            szerkesztő.setName(oszlopNév);
-            szerkesztők.add(szerkesztő);
-            panelBuilder.add(szerkesztő, CC.xy(3, row));
+            editor.setName(columnName);
+            editors.add(editor);
+            panelBuilder.add(editor, CC.xy(3, row));
         }
         return panelBuilder.build();
     }

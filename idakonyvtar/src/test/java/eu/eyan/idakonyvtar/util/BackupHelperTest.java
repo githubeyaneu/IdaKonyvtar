@@ -26,10 +26,10 @@ public class BackupHelperTest
     public void test(Charset charset1, Charset charset2)
     {
         // FIXME
-//        String filename = "házikönyvtár.xls";
+//        String filename = "házilibrary.xls";
 //        System.out.println(cnt + " " + charset1 + " " + charset2);
 //        String to = new String(filename.getBytes(charset1));
-//        BackupHelper.zipFile(new File("házikönyvtár.xls"), new File(cnt + "_" + to + ".zip"), charset2);
+//        BackupHelper.zipFile(new File("házilibrary.xls"), new File(cnt + "_" + to + ".zip"), charset2);
 //        cnt++;
     }
 }

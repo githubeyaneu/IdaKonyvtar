@@ -9,13 +9,13 @@ import lombok.Setter;
 
 import org.jdesktop.swingx.JXTable;
 
-public class KönyvTábla extends JXTable
+public class BookTable extends JXTable
 {
     private static final long serialVersionUID = 1L;
 
     @Getter
     @Setter
-    private String üresSzöveg = "Sajnos nem található könyv.";
+    private String emptyText = "Sajnos nem található book.";
 
     @Override
     protected void paintComponent(Graphics g)
@@ -25,7 +25,7 @@ public class KönyvTábla extends JXTable
         {
             Graphics2D g2d = (Graphics2D) g;
             g2d.setColor(Color.BLACK);
-            g2d.drawString(üresSzöveg, 10, 20);
+            g2d.drawString(emptyText, 10, 20);
         }
     }
 }
