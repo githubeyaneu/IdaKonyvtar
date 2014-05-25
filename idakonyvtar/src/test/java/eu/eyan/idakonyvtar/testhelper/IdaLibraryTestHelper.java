@@ -21,6 +21,7 @@ public class IdaLibraryTestHelper
     {
         IdaLibrary.main(new String[] { filenév });
         frame = new FrameFixture(LibraryController.TITLE);
+        frame.target.toFront();
     }
 
     public void requireVisible()

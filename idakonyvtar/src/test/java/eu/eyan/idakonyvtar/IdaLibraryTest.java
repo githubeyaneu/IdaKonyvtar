@@ -82,48 +82,48 @@ public class IdaLibraryTest extends AbstractUiTest
     @Test
     public void testSaveNewBook()
     {
-        library.assertTableCell(2, 1, "A napok hordaléka");
+        library.assertTableCell(2, 1, "original title 1");
         library.clickNewButton();
         library.editor().requireIsbnPresent();
-        library.editor().setNormalText("Cím", "Cím1");
+        library.editor().setNormalText("Cím", "New Title 1");
         library.editor().clickSave();
-        library.assertTableCell(2, 1, "Cím1");
-        library.assertTableCell(2, 2, "A napok hordaléka");
+        library.assertTableCell(2, 1, "New Title 1");
+        library.assertTableCell(2, 2, "original title 1");
     }
 
     @Test
     public void testNewBookSaveNot()
     {
-        library.assertTableCell(2, 1, "A napok hordaléka");
+        library.assertTableCell(2, 1, "original title 1");
         library.clickNewButton();
-        library.editor().setNormalText("Cím", "Cím1");
+        library.editor().setNormalText("Cím", "New Title 1");
         library.editor().clickCancel();
-        library.assertTableCell(2, 1, "A napok hordaléka");
+        library.assertTableCell(2, 1, "original title 1");
     }
 
     @Test
     public void testBookDeleteOk()
     {
-        library.assertTableCell(2, 1, "A napok hordaléka");
+        library.assertTableCell(2, 1, "original title 1");
         library.requireDeleteDisabled();
         library.selectRow(1);
         library.requireDeleteEnabled();
         library.clickDeleteButton();
         library.clickApproveYes();
-        library.assertTableCell(2, 1, "Újabb napok hordaléka");
+        library.assertTableCell(2, 1, "original title 2");
         library.requireDeleteDisabled();
     }
 
     @Test
     public void testBookDeleteCancel()
     {
-        library.assertTableCell(2, 1, "A napok hordaléka");
+        library.assertTableCell(2, 1, "original title 1");
         library.requireDeleteDisabled();
         library.selectRow(1);
         library.requireDeleteEnabled();
         library.clickDeleteButton();
         library.clickApproveNo();
-        library.assertTableCell(2, 1, "A napok hordaléka");
+        library.assertTableCell(2, 1, "original title 1");
         library.requireDeleteEnabled();
     }
 
@@ -145,7 +145,7 @@ public class IdaLibraryTest extends AbstractUiTest
                 .append(HighlightRenderer.HIGHLIGHT_START_TAG)
                 .append("áron")
                 .append(HighlightRenderer.HIGHLIGHT_END_TAG)
-                .append(" ladikján vagy az öregedés tünetei : esszé-regény")
+                .append(" ladikján")
                 .append(HighlightRenderer.HTML_END_TAG)
                 .toString());
         library.assertTableCell(1, 2, "Illyés Gyula");
@@ -155,21 +155,21 @@ public class IdaLibraryTest extends AbstractUiTest
     @Test
     public void testBookEditSave()
     {
-        library.assertTableCell(2, 1, "A napok hordaléka");
+        library.assertTableCell(2, 1, "original title 1");
         library.doubleClick(1);
         library.editor().requireIsbnNotPresent();
-        library.editor().setNormalText("Cím", "Cím1");
+        library.editor().setNormalText("Cím", "New Title 1");
         library.editor().clickSave();
-        library.assertTableCell(2, 1, "Cím1");
+        library.assertTableCell(2, 1, "New Title 1");
     }
 
     @Test
     public void testBookEditCancel()
     {
-        library.assertTableCell(2, 1, "A napok hordaléka");
+        library.assertTableCell(2, 1, "original title 1");
         library.doubleClick(1);
-        library.editor().setNormalText("Cím", "Cím1");
+        library.editor().setNormalText("Cím", "New Title");
         library.editor().clickCancel();
-        library.assertTableCell(2, 1, "A napok hordaléka");
+        library.assertTableCell(2, 1, "original title 1");
     }
 }
