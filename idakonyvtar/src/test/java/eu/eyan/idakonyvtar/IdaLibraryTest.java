@@ -6,7 +6,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import eu.eyan.idakonyvtar.controller.LibraryController;
 import eu.eyan.idakonyvtar.model.ColumnKonfiguration.ColumnConfigurations;
 import eu.eyan.idakonyvtar.testhelper.ExcelAssert;
 import eu.eyan.idakonyvtar.testhelper.IdaLibraryTestHelper;
@@ -35,7 +34,7 @@ public class IdaLibraryTest extends AbstractUiTest
     public void testStartProgram()
     {
         library.requireVisible();
-        library.requireTitle(LibraryController.TITLE);
+        library.checkTitleWithNumber(4);
     }
 
     @Test
@@ -62,6 +61,7 @@ public class IdaLibraryTest extends AbstractUiTest
         {
             library.load(file);
             library.assertTableCell(1, 1, "árvíztűrő tükörfúrógép");
+            library.checkTitleWithNumber(1);
         }
         finally
         {
@@ -72,6 +72,7 @@ public class IdaLibraryTest extends AbstractUiTest
         {
             library.save(file2);
             ExcelAssert.assertExcelCell(file2, ExcelHandler.BOOKS, 1, 2, "árvíztűrő tükörfúrógép");
+            library.checkTitleWithNumber(1);
         }
         finally
         {
@@ -89,6 +90,7 @@ public class IdaLibraryTest extends AbstractUiTest
         library.editor().clickSave();
         library.assertTableCell(2, 1, "New Title 1");
         library.assertTableCell(2, 2, "original title 1");
+        library.checkTitleWithNumber(5);
     }
 
     @Test
@@ -99,6 +101,7 @@ public class IdaLibraryTest extends AbstractUiTest
         library.editor().setNormalText("Cím", "New Title 1");
         library.editor().clickCancel();
         library.assertTableCell(2, 1, "original title 1");
+        library.checkTitleWithNumber(4);
     }
 
     @Test
@@ -112,6 +115,7 @@ public class IdaLibraryTest extends AbstractUiTest
         library.clickApproveYes();
         library.assertTableCell(2, 1, "original title 2");
         library.requireDeleteDisabled();
+        library.checkTitleWithNumber(3);
     }
 
     @Test
@@ -125,6 +129,7 @@ public class IdaLibraryTest extends AbstractUiTest
         library.clickApproveNo();
         library.assertTableCell(2, 1, "original title 1");
         library.requireDeleteEnabled();
+        library.checkTitleWithNumber(4);
     }
 
     @Test
@@ -161,6 +166,7 @@ public class IdaLibraryTest extends AbstractUiTest
         library.editor().setNormalText("Cím", "New Title 1");
         library.editor().clickSave();
         library.assertTableCell(2, 1, "New Title 1");
+        library.checkTitleWithNumber(4);
     }
 
     @Test
@@ -171,5 +177,6 @@ public class IdaLibraryTest extends AbstractUiTest
         library.editor().setNormalText("Cím", "New Title");
         library.editor().clickCancel();
         library.assertTableCell(2, 1, "original title 1");
+        library.checkTitleWithNumber(4);
     }
 }

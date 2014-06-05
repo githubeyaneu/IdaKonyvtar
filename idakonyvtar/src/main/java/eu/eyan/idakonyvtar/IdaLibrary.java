@@ -19,6 +19,6 @@ public class IdaLibrary
         {
             pathname = args[0];
         }
-        DialogHelper.runInFrameFullScreen(new LibraryController(), new LibraryControllerInput(new File(Resources.getResource(pathname).getFile())));
+        DialogHelper.runInFrameFullScreen(new LibraryController(), new LibraryControllerInput(new File(Resources.getResource(pathname).getFile())), LibraryController.TITLE);
     }
 }

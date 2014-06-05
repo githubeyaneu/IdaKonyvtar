@@ -97,7 +97,7 @@ public class DialogHelper
         return scrollPane;
     }
 
-    private static <INPUT> JFrame runInFrame(Component parent, IController<INPUT, ?> controller, INPUT input, JMenuBar jMenuBar, JToolBar toolBar, boolean fullScreen)
+    private static <INPUT> JFrame runInFrame(Component parent, IController<INPUT, ?> controller, INPUT input, JMenuBar jMenuBar, JToolBar toolBar, boolean fullScreen, String name)
     {
         controller.initData(input);
         JXFrame frame = new JXFrame();
@@ -105,7 +105,7 @@ public class DialogHelper
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.add(controller.getView());
         frame.setTitle(controller.getTitle());
-        frame.setName(controller.getTitle());
+        frame.setName(name);
         frame.setJMenuBar(jMenuBar);
         controller.initBindings();
         frame.setVisible(true);
@@ -154,9 +154,9 @@ public class DialogHelper
         return panelBuilder.build();
     }
 
-    public static <INPUT> JFrame runInFrameFullScreen(IControllerWithMenu<INPUT, ?> controller, INPUT input)
+    public static <INPUT> JFrame runInFrameFullScreen(IControllerWithMenu<INPUT, ?> controller, INPUT input, String name)
     {
-        return runInFrame(null, controller, input, controller.getMenuBar(), controller.getToolBar(), true);
+        return runInFrame(null, controller, input, controller.getMenuBar(), controller.getToolBar(), true, name);
     }
 
     public static boolean yesNo(Component parent, String question, String dialogTitle)

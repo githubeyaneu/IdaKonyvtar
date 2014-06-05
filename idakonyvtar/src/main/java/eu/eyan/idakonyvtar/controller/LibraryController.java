@@ -21,6 +21,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -46,6 +48,8 @@ public class LibraryController implements IControllerWithMenu<LibraryControllerI
     public static final String NO = "Nem";
     public static final String YES = "Igen";
     public static final String TITLE = "IdaKönyvtár";
+    public static final String TITLE_SEPARATOR = " - ";
+    public static final String TITLE_PIECES = " db Könyv";
     private final LibraryMenuAndToolBar menuAndToolBar = new LibraryMenuAndToolBar();
     private final LibraryView view = new LibraryView();
     private final LibraryModel model = new LibraryModel();
@@ -83,7 +87,7 @@ public class LibraryController implements IControllerWithMenu<LibraryControllerI
     @Override
     public String getTitle()
     {
-        return TITLE;
+        return TITLE + TITLE_SEPARATOR + model.getBooks().getList().size() + TITLE_PIECES;
     }
 
     @Override
@@ -162,6 +166,37 @@ public class LibraryController implements IControllerWithMenu<LibraryControllerI
                 }
             }
         });
+
+        model.getBooks().addListDataListener(new ListDataListener()
+        {
+
+            @Override
+            public void intervalRemoved(ListDataEvent e)
+            {
+                refreshTitle();
+
+            }
+
+            @Override
+            public void intervalAdded(ListDataEvent e)
+            {
+                refreshTitle();
+
+            }
+
+            @Override
+            public void contentsChanged(ListDataEvent e)
+            {
+                refreshTitle();
+
+            }
+
+        });
+    }
+
+    private void refreshTitle()
+    {
+        ((JFrame) SwingUtilities.getWindowAncestor(view.getComponent())).setTitle(getTitle());
     }
 
     private void editBook()

@@ -128,4 +128,10 @@ public class IdaLibraryTestHelper
     {
         frame.cleanUp();
     }
+
+    public void checkTitleWithNumber(int numberOfBooks)
+    {
+        requireTitle(LibraryController.TITLE + LibraryController.TITLE_SEPARATOR + numberOfBooks + LibraryController.TITLE_PIECES);
+
+    }
 }

@@ -98,9 +98,16 @@ public class ExcelHandler
         for (int actualRow = 1; actualRow < sheet.getRows(); actualRow++)
         {
             Book book = new Book(sheet.getColumns() + 1);
+//            boolean isEmpty = true;
             for (int actualColumn = 0; actualColumn < sheet.getColumns(); actualColumn++)
             {
-                book.setValue(actualColumn, sheet.getCell(actualColumn, actualRow).getContents());
+                String contents = sheet.getCell(actualColumn, actualRow).getContents();
+//                if (contents != null && contents.length() != 0)
+//                {
+//                    isEmpty = false;
+//                    System.out.println("-" + contents + "-");
+//                }
+                book.setValue(actualColumn, contents);
             }
             library.getBooks().add(book);
         }
