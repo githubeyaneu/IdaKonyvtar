@@ -7,6 +7,7 @@ import java.io.File;
 
 import org.fest.swing.core.MouseButton;
 import org.fest.swing.core.matcher.JButtonMatcher;
+import org.fest.swing.fixture.DialogFixture;
 import org.fest.swing.fixture.FrameFixture;
 
 import eu.eyan.idakonyvtar.IdaLibrary;
@@ -133,5 +134,21 @@ public class IdaLibraryTestHelper
     {
         requireTitle(LibraryController.TITLE + LibraryController.TITLE_SEPARATOR + numberOfBooks + LibraryController.TITLE_PIECES);
 
+    }
+
+    public void clickExit()
+    {
+        frame.close();
+
+    }
+
+    public DialogFixture exitDialog()
+    {
+        return frame.dialog();
+    }
+
+    public void requireInvisible()
+    {
+        assertThat(frame.target.isVisible()).isFalse();
     }
 }

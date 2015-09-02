@@ -10,21 +10,17 @@ import lombok.Getter;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 
-public class LibraryView
+public class LibraryView extends AbstractView
 {
     @Getter
     private final BookTable bookTable = new BookTable();
 
-    private JScrollPane scrollPane;
-
-    public Component getComponent()
+    @Override
+    public Component createViewComponent()
     {
-        if (scrollPane == null)
-        {
-            JPanel panel = new JPanel(new FormLayout("pref:grow", "pref, pref:grow"));
-            scrollPane = new JScrollPane(bookTable);
-            panel.add(scrollPane, CC.xy(1, 2));
-        }
+        JPanel panel = new JPanel(new FormLayout("pref:grow", "pref, pref:grow"));
+        JScrollPane scrollPane = new JScrollPane(bookTable);
+        panel.add(scrollPane, CC.xy(1, 2));
         return scrollPane;
     }
 }

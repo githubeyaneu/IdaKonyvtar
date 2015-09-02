@@ -8,3 +8,7 @@
 /test.xls
 /teszt.xls
 /backup
+/src/main/resources/backup/*
+.cache*
+.project
+*.xls

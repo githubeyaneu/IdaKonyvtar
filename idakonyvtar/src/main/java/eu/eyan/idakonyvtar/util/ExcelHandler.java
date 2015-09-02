@@ -157,7 +157,7 @@ public class ExcelHandler
                     writablesheet2.addCell(new Label(column, sor, table[column][sor]));
                 }
             }
-            // FIXME: konfig mentése
+            // FIXME: save konfiguration... question: is it possible to change any konfiguration from the application?
             workbook.write();
             workbook.close();
         }

@@ -62,11 +62,6 @@ public class BookEditorTest extends AbstractUiTest
         bookEditor = new BookEditorTestHelper(BasicRobot.robotWithCurrentAwtHierarchy());
     }
 
-    public static void main(String[] args)
-    {
-        new BookEditorTest().setUp();
-    }
-
     @After
     public void tearDown()
     {
@@ -133,5 +128,10 @@ public class BookEditorTest extends AbstractUiTest
     public void test2()
     {
         bookEditor.clickSave();
+    }
+
+    public static void main(String[] args)
+    {
+        new BookEditorTest().setUp();
     }
 }

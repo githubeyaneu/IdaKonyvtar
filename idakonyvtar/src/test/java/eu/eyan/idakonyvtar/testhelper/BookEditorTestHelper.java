@@ -126,4 +126,9 @@ public class BookEditorTestHelper
         dialog.comboBox(comboBoxName).robot.enterText(text);
         dialog.comboBox(comboBoxName).robot.pressKey(KeyEvent.VK_ESCAPE);
     }
+
+    public void requireNormalText(String textBoxName, String text)
+    {
+        dialog.textBox(textBoxName).requireText(text);
+    }
 }

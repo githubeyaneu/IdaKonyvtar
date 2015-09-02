@@ -19,7 +19,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import eu.eyan.idakonyvtar.model.ColumnKonfiguration;
 import eu.eyan.idakonyvtar.model.ColumnKonfiguration.ColumnConfigurations;
 
-public class BookView implements IView
+public class BookView extends AbstractView
 {
     public static final String ISBN_TEXT = "isbnText";
 
@@ -44,7 +44,7 @@ public class BookView implements IView
     private ColumnKonfiguration columnConfiguration;
 
     @Override
-    public Component getComponent()
+    protected Component createViewComponent()
     {
         String rowSpec = "";
         if (isbnEnabled)

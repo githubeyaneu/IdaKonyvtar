@@ -13,7 +13,6 @@ public enum MarcCodes
         this.marc1 = marc1;
         this.marc2 = marc2;
         this.marc3 = marc3;
-
     }
 
     public String getMarc1()
@@ -21,28 +20,13 @@ public enum MarcCodes
         return marc1;
     }
 
-    public void setMarc1(String marc1)
-    {
-        this.marc1 = marc1;
-    }
-
     public String getMarc2()
     {
         return marc2;
     }
 
-    public void setMarc2(String marc2)
-    {
-        this.marc2 = marc2;
-    }
-
     public String getMarc3()
     {
         return marc3;
-    }
-
-    public void setMarc3(String marc3)
-    {
-        this.marc3 = marc3;
     }
 }

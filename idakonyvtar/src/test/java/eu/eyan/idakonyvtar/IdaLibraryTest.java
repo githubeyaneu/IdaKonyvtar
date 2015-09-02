@@ -2,6 +2,7 @@ package eu.eyan.idakonyvtar;
 
 import java.io.File;
 
+import org.fest.swing.core.matcher.JButtonMatcher;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -178,5 +179,25 @@ public class IdaLibraryTest extends AbstractUiTest
         library.editor().clickCancel();
         library.assertTableCell(2, 1, "original title 1");
         library.checkTitleWithNumber(4);
+    }
+
+    @Test
+    public void testExitNo()
+    {
+        library.requireVisible();
+        library.clickExit();
+        library.exitDialog().requireVisible();
+        library.exitDialog().button(JButtonMatcher.withText("Mégsem")).click();
+        library.requireVisible();
+    }
+
+    @Test
+    public void testExitYes()
+    {
+        library.requireVisible();
+        library.clickExit();
+        library.exitDialog().requireVisible();
+        library.exitDialog().button(JButtonMatcher.withText("Igen")).click();
+        library.requireInvisible();
     }
 }

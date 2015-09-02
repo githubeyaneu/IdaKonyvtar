@@ -1,6 +1,7 @@
 package eu.eyan.idakonyvtar;
 
 import java.io.File;
+import java.net.URL;
 
 import com.google.common.io.Resources;
 
@@ -19,6 +20,14 @@ public class IdaLibrary
         {
             pathname = args[0];
         }
-        DialogHelper.runInFrameFullScreen(new LibraryController(), new LibraryControllerInput(new File(Resources.getResource(pathname).getFile())), LibraryController.TITLE);
+
+        File fileToOpen = new File(pathname);
+        if (!fileToOpen.exists())
+        {
+            URL resource = Resources.getResource(pathname);
+            fileToOpen = new File(resource.getFile());
+        }
+        System.out.println("Resource -> File: " + fileToOpen);
+        DialogHelper.runInFrameFullScreen(new LibraryController(), new LibraryControllerInput(fileToOpen), LibraryController.TITLE);
     }
 }
