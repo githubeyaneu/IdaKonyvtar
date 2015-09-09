@@ -1,11 +1,20 @@
 package eu.eyan.idakonyvtar.model
 
-//import eu.eyan.idakonyvtar.model.Book
+import java.util.ArrayList
+import lombok.Getter
+import lombok.Setter
 
 class LibraryS {
-  //val books: List[Book] = List()
 
-  //List < String > columns = newArrayList()
+  @Getter
+  @Setter
+  var books: java.util.List[Book] = new ArrayList()
 
-  //ColumnKonfiguration configuration = new ColumnKonfiguration()
+  @Getter
+  @Setter
+  var columns: java.util.List[String] = new ArrayList()
+
+  @Getter
+  @Setter
+  var configuration: ColumnKonfiguration = new ColumnKonfiguration()
 }
