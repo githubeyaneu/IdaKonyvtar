@@ -6,15 +6,28 @@ import lombok.Setter
 
 class LibraryS {
 
-  @Getter
-  @Setter
   var books: java.util.List[Book] = new ArrayList()
 
-  @Getter
-  @Setter
   var columns: java.util.List[String] = new ArrayList()
 
-  @Getter
-  @Setter
   var configuration: ColumnKonfiguration = new ColumnKonfiguration()
+
+  def getConfiguration(): ColumnKonfiguration = {
+    configuration
+  }
+  def getBooks(): java.util.List[Book] = {
+    books
+  }
+  def getColumns(): java.util.List[String] = {
+    columns
+  }
+  def setConfiguration(c: ColumnKonfiguration) = {
+    configuration = c
+  }
+  def setBooks(b: java.util.List[Book]) = {
+    books = b
+  }
+  def setColumns(v: java.util.List[String]) = {
+    columns = v
+  }
 }

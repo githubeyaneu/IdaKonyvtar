@@ -5,12 +5,11 @@ import lombok.Setter;
 
 import com.jgoodies.binding.list.SelectionInList;
 
-public class LibraryModel
-{
-    @Getter
-    private SelectionInList<Book> books = new SelectionInList<Book>();
+public class LibraryModel {
+	@Getter
+	private SelectionInList<Book> books = new SelectionInList<Book>();
 
-    @Getter
-    @Setter
-    private Library library;
+	@Getter
+	@Setter
+	private LibraryS library;
 }
