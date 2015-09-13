@@ -23,15 +23,15 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import eu.eyan.idakonyvtar.model.Book;
-import eu.eyan.idakonyvtar.model.LibraryS;
+import eu.eyan.idakonyvtar.model.Library;
 
 public class ExcelHandler {
 	public static final String COLUMN_CONFIGURATION = "OszlopKonfiguráció";
 	public static final String BOOKS = "Könyvek";
 
-	public static LibraryS readLibrary(final File file) {
+	public static Library readLibrary(final File file) {
 		backup(file);
-		LibraryS library = new LibraryS();
+		Library library = new Library();
 		try {
 			Workbook workbook = Workbook.getWorkbook(file,
 					getWorkbookSettings());
@@ -71,7 +71,7 @@ public class ExcelHandler {
 		return sheet;
 	}
 
-	private static void readColumnConfiguration(LibraryS library, Sheet sheet) {
+	private static void readColumnConfiguration(Library library, Sheet sheet) {
 		String[][] table = new String[sheet.getColumns()][sheet.getRows()];
 		for (int actualColumn = 0; actualColumn < sheet.getColumns(); actualColumn++) {
 			for (int actualRow = 0; actualRow < sheet.getRows(); actualRow++) {
@@ -82,7 +82,7 @@ public class ExcelHandler {
 		library.getConfiguration().setTable(table);
 	}
 
-	private static void readBooks(LibraryS library, Sheet sheet) {
+	private static void readBooks(Library library, Sheet sheet) {
 		for (int actualColumn = 0; actualColumn < sheet.getColumns(); actualColumn++) {
 			library.getColumns().add(
 					sheet.getCell(actualColumn, 0).getContents());
@@ -105,7 +105,7 @@ public class ExcelHandler {
 		}
 	}
 
-	public static void saveLibrary(File targetFile, LibraryS library) {
+	public static void saveLibrary(File targetFile, Library library) {
 		if (targetFile.exists() && !targetFile.isFile()) {
 			System.out.println("not File");
 			return;

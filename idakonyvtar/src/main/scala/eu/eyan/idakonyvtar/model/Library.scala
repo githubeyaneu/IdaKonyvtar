@@ -4,7 +4,7 @@ import java.util.ArrayList
 import lombok.Getter
 import lombok.Setter
 
-class LibraryS {
+class Library {
 
   var books: java.util.List[Book] = new ArrayList()
 

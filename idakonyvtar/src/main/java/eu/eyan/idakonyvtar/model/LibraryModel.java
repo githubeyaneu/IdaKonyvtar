@@ -11,5 +11,5 @@ public class LibraryModel {
 
 	@Getter
 	@Setter
-	private LibraryS library;
+	private Library library;
 }
