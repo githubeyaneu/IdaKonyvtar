@@ -138,7 +138,7 @@ public class DialogHelper
             public void actionPerformed(ActionEvent e)
             {
                 dialogController.onOk();
-                dialog.ok = true;
+                dialog.setOk(true);
                 dialog.dispose();
             }
         });

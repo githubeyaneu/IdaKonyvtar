@@ -4,16 +4,20 @@ import java.awt.Window;
 
 import javax.swing.JDialog;
 
-import lombok.Getter;
+public class OkCancelDialog extends JDialog {
+	public OkCancelDialog(Window owner) {
+		super(owner);
+	}
 
-public class OkCancelDialog extends JDialog
-{
-    public OkCancelDialog(Window owner)
-    {
-        super(owner);
-    }
+	public boolean isOk() {
+		return ok;
+	}
 
-    private static final long serialVersionUID = 1L;
+	public void setOk(boolean ok) {
+		this.ok = ok;
+	}
 
-    @Getter boolean ok = false;
+	private static final long serialVersionUID = 1L;
+
+	private boolean ok = false;
 }

@@ -19,7 +19,7 @@ public class IdaLibraryTestHelper {
 
 	public void start(String filenév) {
 		IdaLibrary.main(new String[] { filenév });
-		frame = new FrameFixture(LibraryController.TITLE);
+		frame = new FrameFixture(LibraryController.TITLE());
 		frame.target.toFront();
 	}
 
@@ -83,12 +83,12 @@ public class IdaLibraryTestHelper {
 	}
 
 	public void clickApproveYes() {
-		frame.dialog().button(JButtonMatcher.withText(LibraryController.YES))
+		frame.dialog().button(JButtonMatcher.withText(LibraryController.YES()))
 				.click();
 	}
 
 	public void clickApproveNo() {
-		frame.dialog().button(JButtonMatcher.withText(LibraryController.NO))
+		frame.dialog().button(JButtonMatcher.withText(LibraryController.NO()))
 				.click();
 	}
 
@@ -113,9 +113,9 @@ public class IdaLibraryTestHelper {
 	}
 
 	public void checkTitleWithNumber(int numberOfBooks) {
-		requireTitle(LibraryController.TITLE
-				+ LibraryController.TITLE_SEPARATOR + numberOfBooks
-				+ LibraryController.TITLE_PIECES);
+		requireTitle(LibraryController.TITLE()
+				+ LibraryController.TITLE_SEPARATOR() + numberOfBooks
+				+ LibraryController.TITLE_PIECES());
 
 	}
 

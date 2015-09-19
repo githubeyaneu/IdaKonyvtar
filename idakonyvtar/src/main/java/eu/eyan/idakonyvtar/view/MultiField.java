@@ -11,118 +11,116 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import lombok.Getter;
-
 import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 
-public abstract class MultiField<INPUT, EDITOR extends Component> extends JPanel implements FieldEditListener<EDITOR>
-{
-    private static final long serialVersionUID = 1L;
-    private final List<Field<EDITOR>> fields = newArrayList();
-    private String columnName;
-    private int counter = 1;
+public abstract class MultiField<INPUT, EDITOR extends Component> extends
+		JPanel implements FieldEditListener<EDITOR> {
+	private static final long serialVersionUID = 1L;
+	private final List<Field<EDITOR>> fields = newArrayList();
+	private String columnName;
+	private int counter = 1;
 
-    private static class Field<EDITOR>
-    {
-        @Getter
-        private final EDITOR editor;
-        @Getter
-        private final JButton delete;
-        @Getter
-        private final JPanel panel;
+	private static class Field<EDITOR> {
+		private final EDITOR editor;
+		private final JButton delete;
+		private final JPanel panel;
 
-        public Field(EDITOR editor, JButton button, JPanel mezőPanel)
-        {
-            this.editor = editor;
-            this.delete = button;
-            this.panel = mezőPanel;
-        }
-    }
+		public Field(EDITOR editor, JButton button, JPanel mezőPanel) {
+			this.editor = editor;
+			this.delete = button;
+			this.panel = mezőPanel;
+		}
 
-    public MultiField(String columnName)
-    {
-        this.columnName = columnName;
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-    }
+		public EDITOR getEditor() {
+			return editor;
+		}
 
-    public void setValues(List<INPUT> values)
-    {
-        removeAll();
-        fields.clear();
+		public JButton getDelete() {
+			return delete;
+		}
 
-        for (INPUT input : values)
-        {
-            addEditor(input, false);
-        }
-        addEditor(null, true);
-    }
+		public JPanel getPanel() {
+			return panel;
+		}
+	}
 
-    private void addEditor(INPUT input, boolean last)
-    {
-        EDITOR editor = getEditor();
-        addFieldEditListener(editor, this);
-        JButton deleteButton = new JButton("x");
+	public MultiField(String columnName) {
+		this.columnName = columnName;
+		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+	}
 
-        PanelBuilder panelBuilder = new PanelBuilder(new FormLayout("f:p:g, 3dlu, 30dlu", "f:p:g, 3dlu"));
-        panelBuilder.add(editor, CC.xy(1, 1));
-        panelBuilder.add(deleteButton, CC.xy(3, 1));
-        JPanel fieldPanel = panelBuilder.build();
+	public void setValues(List<INPUT> values) {
+		removeAll();
+		fields.clear();
 
-        if (last)
-        {
-            deleteButton.setEnabled(false);
-        }
-        else
-        {
-            setValueInEditor(editor, input);
-        }
+		for (INPUT input : values) {
+			addEditor(input, false);
+		}
+		addEditor(null, true);
+	}
 
-        final Field<EDITOR> field = new Field<EDITOR>(editor, deleteButton, fieldPanel);
-        deleteButton.addActionListener((ActionEvent actionEvent) -> {
-            fields.remove(field);
-            remove(field.getPanel());
-            revalidate();
-        });
-        fields.add(field);
-        add(fieldPanel);
+	private void addEditor(INPUT input, boolean last) {
+		EDITOR editor = getEditor();
+		addFieldEditListener(editor, this);
+		JButton deleteButton = new JButton("x");
 
-        fieldPanel.setName(columnName + ".panel." + counter);
-        editor.setName(columnName + counter);
-        deleteButton.setName(columnName + ".delete." + counter);
-        counter++;
+		PanelBuilder panelBuilder = new PanelBuilder(new FormLayout(
+				"f:p:g, 3dlu, 30dlu", "f:p:g, 3dlu"));
+		panelBuilder.add(editor, CC.xy(1, 1));
+		panelBuilder.add(deleteButton, CC.xy(3, 1));
+		JPanel fieldPanel = panelBuilder.build();
 
-        revalidate();
-//        SwingUtilities.getWindowAncestor(this).pack();
-    }
+		if (last) {
+			deleteButton.setEnabled(false);
+		} else {
+			setValueInEditor(editor, input);
+		}
 
-    protected abstract void addFieldEditListener(EDITOR editor, FieldEditListener<EDITOR> listener);
+		final Field<EDITOR> field = new Field<EDITOR>(editor, deleteButton,
+				fieldPanel);
+		deleteButton.addActionListener((ActionEvent actionEvent) -> {
+			fields.remove(field);
+			remove(field.getPanel());
+			revalidate();
+		});
+		fields.add(field);
+		add(fieldPanel);
 
-    @Override
-    public void fieldEdited(EDITOR source)
-    {
-        Field<EDITOR> lastField = fields.get(fields.size() - 1);
-        if (lastField.getEditor() == source)
-        {
-            lastField.getDelete().setEnabled(true);
-            addEditor(null, true);
-        }
-    }
+		fieldPanel.setName(columnName + ".panel." + counter);
+		editor.setName(columnName + counter);
+		deleteButton.setName(columnName + ".delete." + counter);
+		counter++;
 
-    protected abstract EDITOR getEditor();
+		revalidate();
+		// SwingUtilities.getWindowAncestor(this).pack();
+	}
 
-    public List<INPUT> getValues()
-    {
-        return fields.stream().map((Field<EDITOR> field) -> {
-            return getValue(field.getEditor());
-        }).collect(Collectors.toList());
-    }
+	protected abstract void addFieldEditListener(EDITOR editor,
+			FieldEditListener<EDITOR> listener);
 
-    /**
-     * @return null if empty!
-     */
-    protected abstract INPUT getValue(EDITOR editor);
+	@Override
+	public void fieldEdited(EDITOR source) {
+		Field<EDITOR> lastField = fields.get(fields.size() - 1);
+		if (lastField.getEditor() == source) {
+			lastField.getDelete().setEnabled(true);
+			addEditor(null, true);
+		}
+	}
 
-    protected abstract void setValueInEditor(EDITOR editor, INPUT value);
+	protected abstract EDITOR getEditor();
+
+	public List<INPUT> getValues() {
+		return fields.stream().map((Field<EDITOR> field) -> {
+			return getValue(field.getEditor());
+		}).collect(Collectors.toList());
+	}
+
+	/**
+	 * @return null if empty!
+	 */
+	protected abstract INPUT getValue(EDITOR editor);
+
+	protected abstract void setValueInEditor(EDITOR editor, INPUT value);
 }

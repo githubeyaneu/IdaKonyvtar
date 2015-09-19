@@ -1,8 +1,6 @@
 package eu.eyan.idakonyvtar.model
 
 import java.util.ArrayList
-import lombok.Getter
-import lombok.Setter
 
 class Library {
 

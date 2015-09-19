@@ -2,91 +2,99 @@ package eu.eyan.idakonyvtar.controller.input;
 
 import java.util.List;
 
-import lombok.Getter;
-import lombok.Setter;
 import eu.eyan.idakonyvtar.model.Book;
 import eu.eyan.idakonyvtar.model.ColumnKonfiguration;
 
-public class BookControllerInput
-{
+public class BookControllerInput {
 
-    public final static boolean ISBN_ENABLED = true;
+	public final static boolean ISBN_ENABLED = true;
 
-    @Getter
-    @Setter
-    private Book book;
+	private Book book;
 
-    @Getter
-    @Setter
-    private List<String> columns;
+	private List<String> columns;
 
-    @Getter
-    private boolean isbnEnabled = false;
+	private boolean isbnEnabled = false;
 
-    @Getter
-    private ColumnKonfiguration columnConfiguration = null;
+	public boolean isIsbnEnabled() {
+		return isbnEnabled;
+	}
 
-    @Getter
-    private List<Book> bookList;
+	public ColumnKonfiguration getColumnConfiguration() {
+		return columnConfiguration;
+	}
 
-    private BookControllerInput()
-    {
-    }
+	public List<Book> getBookList() {
+		return bookList;
+	}
 
-    public static class Builder
-    {
-        private BookControllerInput input = new BookControllerInput();
+	private ColumnKonfiguration columnConfiguration = null;
 
-        public Builder withBook(Book book)
-        {
-            this.input.book = book;
-            return this;
-        }
+	private List<Book> bookList;
 
-        public Builder withBookList(List<Book> bookList)
-        {
-            this.input.bookList = bookList;
-            return this;
-        }
+	private BookControllerInput() {
+	}
 
-        public Builder withColumns(List<String> columnok)
-        {
-            this.input.columns = columnok;
-            return this;
-        }
+	public Book getBook() {
+		return book;
+	}
 
-        public Builder withIsbnEnabled(boolean isbnEnabled)
-        {
-            this.input.isbnEnabled = isbnEnabled;
-            return this;
-        }
+	public void setBook(Book book) {
+		this.book = book;
+	}
 
-        public Builder withColumnConfiguration(ColumnKonfiguration columnConfiguration)
-        {
-            this.input.columnConfiguration = columnConfiguration;
-            return this;
-        }
+	public List<String> getColumns() {
+		return columns;
+	}
 
-        public BookControllerInput build()
-        {
-            if (this.input.book == null)
-            {
-                throw new RuntimeException("A könyv nem lehet null");
-            }
-            if (this.input.bookList == null)
-            {
-                throw new RuntimeException("A könyvlista nem lehet null");
-            }
-            if (this.input.columns == null)
-            {
-                throw new RuntimeException("Az oszlop nem lehet null");
-            }
-            if (this.input.columnConfiguration == null)
-            {
-                throw new RuntimeException("Az oszlopkonfiguráció nem lehet null");
-            }
-            return this.input;
-        }
+	public void setColumns(List<String> columns) {
+		this.columns = columns;
+	}
 
-    }
+	public static class Builder {
+		private BookControllerInput input = new BookControllerInput();
+
+		public Builder withBook(Book book) {
+			this.input.setBook(book);
+			return this;
+		}
+
+		public Builder withBookList(List<Book> bookList) {
+			this.input.bookList = bookList;
+			return this;
+		}
+
+		public Builder withColumns(List<String> columnok) {
+			this.input.setColumns(columnok);
+			return this;
+		}
+
+		public Builder withIsbnEnabled(boolean isbnEnabled) {
+			this.input.isbnEnabled = isbnEnabled;
+			return this;
+		}
+
+		public Builder withColumnConfiguration(
+				ColumnKonfiguration columnConfiguration) {
+			this.input.columnConfiguration = columnConfiguration;
+			return this;
+		}
+
+		public BookControllerInput build() {
+			if (this.input.getBook() == null) {
+				throw new RuntimeException("A könyv nem lehet null");
+			}
+			if (this.input.bookList == null) {
+				throw new RuntimeException("A könyvlista nem lehet null");
+			}
+			if (this.input.getColumns() == null) {
+				throw new RuntimeException("Az oszlop nem lehet null");
+			}
+			if (this.input.columnConfiguration == null) {
+				throw new RuntimeException(
+						"Az oszlopkonfiguráció nem lehet null");
+			}
+			return this.input;
+		}
+
+	}
 }

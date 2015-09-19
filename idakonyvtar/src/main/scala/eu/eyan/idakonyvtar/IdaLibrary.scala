@@ -1,8 +1,8 @@
 package eu.eyan.idakonyvtar
 
 import com.google.common.io.Resources
-import eu.eyan.idakonyvtar.controller.LibraryController
 import eu.eyan.idakonyvtar.controller.input.LibraryControllerInput
+import eu.eyan.idakonyvtar.controller.LibraryController
 import eu.eyan.idakonyvtar.util.DialogHelper
 import java.io.File
 
