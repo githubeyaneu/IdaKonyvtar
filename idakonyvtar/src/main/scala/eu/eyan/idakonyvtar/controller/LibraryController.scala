@@ -1,6 +1,5 @@
 package eu.eyan.idakonyvtar.controller
 
-import eu.eyan.idakonyvtar.controller.input.BookControllerInput.ISBN_ENABLED
 import javax.swing.JFileChooser.APPROVE_OPTION
 import java.awt.Component
 import java.awt.event.ActionEvent
@@ -143,12 +142,8 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
     val editorDialog = DialogHelper.startModalDialog(
       view.getComponent(),
       bookController,
-      new BookControllerInput.Builder()
-        .withBook(new Book(model.getBooks().getList().get(selectedBookIndex)))
-        .withColumns(model.getLibrary().getColumns())
-        .withColumnConfiguration(model.getLibrary().getConfiguration())
-        .withBookList(model.getLibrary().getBooks())
-        .build())
+      new BookControllerInput(
+        new Book(model.getBooks().getList().get(selectedBookIndex)), model.getLibrary().getColumns(), model.getLibrary().getConfiguration(), model.getLibrary().getBooks()));
     if (editorDialog.isOk()) {
       model.getBooks().getList().set(selectedBookIndex, bookController.getOutput())
       // TODO: ugly: use selectioninlist...
@@ -179,13 +174,8 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
       val bookController = new BookController()
 
       val editorDialog = DialogHelper.startModalDialog(
-        view.getComponent(), bookController, new BookControllerInput.Builder()
-          .withBook(newPreviousBook(model.getLibrary().getColumns().size()))
-          .withBookList(model.getBooks().getList())
-          .withColumns(model.getLibrary().getColumns())
-          .withIsbnEnabled(ISBN_ENABLED)
-          .withColumnConfiguration(model.getLibrary().getConfiguration())
-          .build())
+        view.getComponent(), bookController, new BookControllerInput(
+          newPreviousBook(model.getLibrary().getColumns().size()), model.getLibrary().getColumns(), model.getLibrary().getConfiguration(), model.getBooks().getList(), true));
       if (editorDialog.isOk()) {
         model.getBooks().getList().add(0, bookController.getOutput())
         savePreviousBook(bookController.getOutput())
