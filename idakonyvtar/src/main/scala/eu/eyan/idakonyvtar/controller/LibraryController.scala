@@ -83,7 +83,7 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
     } else {
       view.getBookTable().setEmptyText("Nincs book a listában.")
     }
-    val dataModel = new LibraryListTableModel(model.getBooks(), model.getLibrary().getColumns(), model.getLibrary().getConfiguration());
+    val dataModel = LibraryListTableModel(model.getBooks(), model.getLibrary().getColumns(), model.getLibrary().getConfiguration());
     view.getBookTable().setModel(dataModel)
   }
 
