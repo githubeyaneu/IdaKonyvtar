@@ -8,7 +8,7 @@ import java.util.List;
 
 import com.jgoodies.binding.beans.Model;
 
-public class Book extends Model implements Cloneable {
+public class Book extends Model {
 	private static final long serialVersionUID = 1L;
 	final List<String> values = newArrayList();
 

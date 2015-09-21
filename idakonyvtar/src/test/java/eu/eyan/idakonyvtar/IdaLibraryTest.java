@@ -3,12 +3,12 @@ package eu.eyan.idakonyvtar;
 import java.io.File;
 
 import org.fest.swing.core.matcher.JButtonMatcher;
-import org.fest.swing.image.ScreenshotTaker;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import eu.eyan.idakonyvtar.model.ColumnKonfiguration.ColumnConfigurations;
 import eu.eyan.idakonyvtar.testhelper.ExcelAssert;
 import eu.eyan.idakonyvtar.testhelper.IdaLibraryTestHelper;
@@ -46,6 +46,7 @@ public class IdaLibraryTest extends AbstractUiTest {
 	}
 
 	@Test
+	@SuppressFBWarnings(value = "RV_RETURN_VALUE_IGNORED_BAD_PRACTICE", justification = "test cleanup")
 	public void testLoadAndSave() {
 		File file = new LibraryFileBuilder()
 				.withSheet(ExcelHandler.BOOKS)

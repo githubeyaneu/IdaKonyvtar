@@ -25,7 +25,7 @@ object LibraryListTableModel {
 }
 
 class LibraryListTableModel(listModel: SelectionInList[Book], showingColumnIndices: List[Int], columnNames: Array[String])
-    extends AbstractTableAdapter[Book](listModel: ListModel[_], columnNames: _*) {
+    extends AbstractTableAdapter[Book](listModel.asInstanceOf[ListModel[_]]: ListModel[_], columnNames: _*) {
 
   def getSelectedBook(selectedBookIndex: Int) = listModel.getSelection()
 

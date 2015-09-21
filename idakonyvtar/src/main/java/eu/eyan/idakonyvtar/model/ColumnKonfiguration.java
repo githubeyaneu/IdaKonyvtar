@@ -64,7 +64,7 @@ public class ColumnKonfiguration {
 		return -1;
 	}
 
-	public List<Marc> getMarcCodes(String columnName) throws Exception {
+	public List<Marc> getMarcCodes(String columnName) throws MarcException {
 		ArrayList<Marc> ret = newArrayList();
 		try {
 			String[] marcCodeTexts = getValue(columnName,
@@ -76,7 +76,7 @@ public class ColumnKonfiguration {
 				}
 			}
 		} catch (Exception e) {
-			throw new Exception(
+			throw new MarcException(
 					"A Marc kódot nem lehet a configurationból beolvasni: "
 							+ columnName);
 		}

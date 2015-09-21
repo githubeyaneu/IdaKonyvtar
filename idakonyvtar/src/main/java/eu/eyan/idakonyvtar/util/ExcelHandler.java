@@ -29,7 +29,7 @@ public class ExcelHandler {
 	public static final String COLUMN_CONFIGURATION = "OszlopKonfiguráció";
 	public static final String BOOKS = "Könyvek";
 
-	public static Library readLibrary(final File file) {
+	public static Library readLibrary(final File file) throws LibraryException {
 		backup(file);
 		Library library = new Library();
 		try {
@@ -105,10 +105,10 @@ public class ExcelHandler {
 		}
 	}
 
-	public static void saveLibrary(File targetFile, Library library) {
+	public static void saveLibrary(File targetFile, Library library)
+			throws LibraryException {
 		if (targetFile.exists() && !targetFile.isFile()) {
-			System.out.println("not File");
-			return;
+			throw new LibraryException("Nem file: " + targetFile);
 		}
 
 		if (targetFile.exists()) {
@@ -123,8 +123,7 @@ public class ExcelHandler {
 		try {
 			WritableWorkbook workbook = Workbook.createWorkbook(targetFile,
 					getWorkbookSettings());
-			WritableSheet writablesheet1 = workbook.createSheet(new String(
-					BOOKS), 0);
+			WritableSheet writablesheet1 = workbook.createSheet(BOOKS, 0);
 			for (int columnIndex = 0; columnIndex < library.getColumns().size(); columnIndex++) {
 				writablesheet1.addCell(new Label(columnIndex, 0, library
 						.getColumns().get(columnIndex)));
@@ -158,20 +157,25 @@ public class ExcelHandler {
 		}
 	}
 
-	private static void backup(File fileToSave) {
+	private static void backup(File fileToSave) throws LibraryException {
 		String sourceLibrary = FilenameUtils.getFullPath(fileToSave
 				.getAbsolutePath());
 		String sourceFileName = FilenameUtils.getName(fileToSave
 				.getAbsolutePath());
 		File backupLibrary = new File(sourceLibrary + "backup");
-		backupLibrary.mkdirs();
-		File backupFile = new File(
-				backupLibrary.getAbsoluteFile()
-						+ File.separator
-						+ sourceFileName
-						+ "_backup_"
-						+ new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss")
-								.format(new Date()) + ".zip");
-		BackupHelper.zipFile(fileToSave, backupFile);
+		if (backupLibrary.mkdirs()) {
+			File backupFile = new File(
+					backupLibrary.getAbsoluteFile()
+							+ File.separator
+							+ sourceFileName
+							+ "_backup_"
+							+ new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss")
+									.format(new Date()) + ".zip");
+			BackupHelper.zipFile(fileToSave, backupFile);
+		} else {
+			throw new LibraryException(
+					"Nem sikerült a backup könyvtárt létrehozni: "
+							+ backupLibrary);
+		}
 	}
 }

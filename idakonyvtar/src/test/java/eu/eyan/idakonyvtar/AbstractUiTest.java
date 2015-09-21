@@ -8,7 +8,11 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.Timeout;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 public class AbstractUiTest {
+
+	@SuppressFBWarnings(value = "URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD", justification = "Testrule")
 	@Rule
 	public Timeout globalTimeout = new Timeout(60, TimeUnit.SECONDS);
 

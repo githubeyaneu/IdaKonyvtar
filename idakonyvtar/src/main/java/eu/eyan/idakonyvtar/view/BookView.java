@@ -13,6 +13,7 @@ import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import eu.eyan.idakonyvtar.model.ColumnKonfiguration;
 import eu.eyan.idakonyvtar.model.ColumnKonfiguration.ColumnConfigurations;
 
@@ -20,6 +21,18 @@ public class BookView extends AbstractView {
 	public static final String ISBN_TEXT = "isbnText";
 
 	public static final String ISBN_LABEL = "isbnLabel";
+
+	private List<String> columns = newArrayList();
+
+	private boolean isbnEnabled;
+
+	private final List<Component> editors = newArrayList();
+
+	private final JLabel isbnSearchLabel = new JLabel();
+
+	private final JTextField isbnText = new JTextField();
+
+	private ColumnKonfiguration columnConfiguration;// NOPMD
 
 	public List<Component> getEditors() {
 		return editors;
@@ -33,37 +46,28 @@ public class BookView extends AbstractView {
 		return isbnText;
 	}
 
-	public void setIsbnEnabled(boolean isbnEnabled) {
+	public void setIsbnEnabled(final boolean isbnEnabled) {
 		this.isbnEnabled = isbnEnabled;
 	}
 
-	public void setColumnConfiguration(ColumnKonfiguration columnConfiguration) {
+	public void setColumnConfiguration(
+			final ColumnKonfiguration columnConfiguration) {
 		this.columnConfiguration = columnConfiguration;
 	}
 
-	private List<String> columns = newArrayList();
-
-	private boolean isbnEnabled = false;
-
-	private List<Component> editors = newArrayList();
-
-	private JLabel isbnSearchLabel = new JLabel();
-
-	private JTextField isbnText = new JTextField();
-
-	private ColumnKonfiguration columnConfiguration;
-
 	@Override
+	@SuppressFBWarnings(value = "SBSC_USE_STRINGBUFFER_CONCATENATION", justification = "toScala will solve it.")
 	protected Component createViewComponent() {
 		String rowSpec = "";
 		if (isbnEnabled) {
-			rowSpec += "pref, 3dlu, pref, 3dlu, ";
+			rowSpec += "pref, 3dlu, pref, 3dlu, ";// NOPMD
 		}
-		rowSpec += rowSpec + "pref";
+		rowSpec += rowSpec + "pref";// NOPMD
+
 		for (int i = 0; i < columns.size(); i++) {
-			rowSpec += ",3dlu ,pref";
+			rowSpec += ",3dlu ,pref"; // NOPMD
 		}
-		PanelBuilder panelBuilder = new PanelBuilder(new FormLayout(
+		final PanelBuilder panelBuilder = new PanelBuilder(new FormLayout(
 				"pref, 3dlu, pref:grow", rowSpec));
 
 		int row = 1;
@@ -79,26 +83,26 @@ public class BookView extends AbstractView {
 		panelBuilder.addSeparator("Adatok", CC.xyw(1, row, 3));
 		for (int i = 0; i < columns.size(); i++) {
 			row = row + 2;
-			String columnName = columns.get(i);
+			final String columnName = columns.get(i);
 			panelBuilder.addLabel(columnName, CC.xy(1, row));
 
 			Component editor;
-			boolean multi = columnConfiguration.isTrue(columnName,
+			final boolean multi = columnConfiguration.isTrue(columnName,
 					ColumnConfigurations.MULTIFIELD);
 			if (columnConfiguration.isTrue(columnName,
 					ColumnConfigurations.AUTOCOMPLETE)) {
 				if (multi) {
-					editor = new MultiFieldJComboBox(columnName);
+					editor = new MultiFieldJComboBox(columnName); // NOPMD
 				} else {
-					JComboBox<String> jComboBox = new JComboBox<String>();
+					final JComboBox<String> jComboBox = new JComboBox<String>();// NOPMD
 					jComboBox.setEditable(true);
 					editor = jComboBox;
 				}
 			} else {
 				if (multi) {
-					editor = new MultiFieldJTextField(columnName);
+					editor = new MultiFieldJTextField(columnName); // NOPMD
 				} else {
-					editor = new JTextField(20);
+					editor = new JTextField(20); // NOPMD
 				}
 			}
 			editor.setName(columnName);
@@ -108,7 +112,7 @@ public class BookView extends AbstractView {
 		return panelBuilder.build();
 	}
 
-	public void setColumns(List<String> columns) {
+	public void setColumns(final List<String> columns) {
 		this.columns = columns;
 	}
 }

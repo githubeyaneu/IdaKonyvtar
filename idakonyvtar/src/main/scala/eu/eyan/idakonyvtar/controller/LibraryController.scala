@@ -70,7 +70,7 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
     resetTableModel()
     view.getBookTable().setSelectionModel(new SingleListSelectionAdapter(model.getBooks().getSelectionIndexHolder()))
     view.getBookTable().setEnabled(true)
-    view.getBookTable().setDefaultRenderer(new Object().getClass, highlightRenderer)
+    view.getBookTable().setDefaultRenderer(classOf[Object], highlightRenderer)
     view.getBookTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
     view.getComponent()
   }

@@ -9,26 +9,24 @@ import java.io.IOException;
 import jxl.Workbook;
 import jxl.read.biff.BiffException;
 
-public class ExcelAssert
-{
+public class ExcelAssert {
 
-    public static void assertExcelCell(File sourceFile, String sheetName, int column, int row, String expected)
-    {
-        Workbook workbook = null;
-        try
-        {
-            workbook = Workbook.getWorkbook(sourceFile, getWorkbookSettings());
-            assertThat(workbook.getSheet(sheetName).getCell(column - 1, row - 1).getContents()).isEqualTo(expected);
-        }
-        catch (BiffException | IOException e)
-        {
-            e.printStackTrace();
-        }
-        finally
-        {
-            workbook.close();
-        }
+	public static void assertExcelCell(File sourceFile, String sheetName,
+			int column, int row, String expected) {
+		Workbook workbook = null;
+		try {
+			workbook = Workbook.getWorkbook(sourceFile, getWorkbookSettings());
+			assertThat(
+					workbook.getSheet(sheetName).getCell(column - 1, row - 1)
+							.getContents()).isEqualTo(expected);
+		} catch (BiffException | IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (workbook != null) {
+				workbook.close();
+			}
+		}
 
-    }
+	}
 
 }
