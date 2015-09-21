@@ -22,7 +22,7 @@ import com.jgoodies.binding.adapter.ComboBoxAdapter
 import eu.eyan.idakonyvtar.controller.input.BookControllerInput
 import eu.eyan.idakonyvtar.model.Book
 import eu.eyan.idakonyvtar.model.BookFieldValueModel
-import eu.eyan.idakonyvtar.model.ColumnKonfiguration.ColumnConfigurations
+import eu.eyan.idakonyvtar.model.ColumnConfigurations
 import eu.eyan.idakonyvtar.oszk.Marc
 import eu.eyan.idakonyvtar.oszk.OszkKereso
 import eu.eyan.idakonyvtar.oszk.OszkKeresoException

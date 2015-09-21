@@ -9,7 +9,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import eu.eyan.idakonyvtar.model.ColumnKonfiguration.ColumnConfigurations;
+import eu.eyan.idakonyvtar.model.ColumnConfigurations;
 import eu.eyan.idakonyvtar.testhelper.ExcelAssert;
 import eu.eyan.idakonyvtar.testhelper.IdaLibraryTestHelper;
 import eu.eyan.idakonyvtar.testhelper.LibraryFileBuilder;

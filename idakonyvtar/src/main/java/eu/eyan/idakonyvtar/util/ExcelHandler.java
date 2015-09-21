@@ -89,7 +89,7 @@ public class ExcelHandler {
 		}
 
 		for (int actualRow = 1; actualRow < sheet.getRows(); actualRow++) {
-			Book book = new Book(sheet.getColumns() + 1);
+			Book book = Book.apply(sheet.getColumns() + 1);
 			// boolean isEmpty = true;
 			for (int actualColumn = 0; actualColumn < sheet.getColumns(); actualColumn++) {
 				String contents = sheet.getCell(actualColumn, actualRow)
@@ -163,19 +163,20 @@ public class ExcelHandler {
 		String sourceFileName = FilenameUtils.getName(fileToSave
 				.getAbsolutePath());
 		File backupLibrary = new File(sourceLibrary + "backup");
-		if (backupLibrary.mkdirs()) {
-			File backupFile = new File(
-					backupLibrary.getAbsoluteFile()
-							+ File.separator
-							+ sourceFileName
-							+ "_backup_"
-							+ new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss")
-									.format(new Date()) + ".zip");
-			BackupHelper.zipFile(fileToSave, backupFile);
-		} else {
-			throw new LibraryException(
-					"Nem sikerült a backup könyvtárt létrehozni: "
-							+ backupLibrary);
-		}
+		// if (
+		backupLibrary.mkdirs();
+		File backupFile = new File(
+				backupLibrary.getAbsoluteFile()
+						+ File.separator
+						+ sourceFileName
+						+ "_backup_"
+						+ new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss")
+								.format(new Date()) + ".zip");
+		BackupHelper.zipFile(fileToSave, backupFile);
+		// } else {
+		// throw new LibraryException(
+		// "Nem sikerült a backup könyvtárt létrehozni: "
+		// + backupLibrary);
+		// }
 	}
 }

@@ -15,7 +15,7 @@ import com.jgoodies.forms.layout.FormLayout;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import eu.eyan.idakonyvtar.model.ColumnKonfiguration;
-import eu.eyan.idakonyvtar.model.ColumnKonfiguration.ColumnConfigurations;
+import eu.eyan.idakonyvtar.model.ColumnConfigurations;
 
 public class BookView extends AbstractView {
 	public static final String ISBN_TEXT = "isbnText";

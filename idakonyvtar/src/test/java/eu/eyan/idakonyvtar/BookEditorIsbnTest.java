@@ -1,9 +1,7 @@
 package eu.eyan.idakonyvtar;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static eu.eyan.idakonyvtar.model.ColumnKonfiguration.ColumnConfigurations.AUTOCOMPLETE;
-import static eu.eyan.idakonyvtar.model.ColumnKonfiguration.ColumnConfigurations.MARC_CODE;
-import static eu.eyan.idakonyvtar.model.ColumnKonfiguration.ColumnConfigurations.MULTIFIELD;
+import static eu.eyan.idakonyvtar.model.ColumnConfigurations.*;
 
 import java.awt.event.KeyEvent;
 import java.util.List;

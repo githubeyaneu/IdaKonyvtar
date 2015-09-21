@@ -1,8 +1,8 @@
 package eu.eyan.idakonyvtar;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static eu.eyan.idakonyvtar.model.ColumnKonfiguration.ColumnConfigurations.AUTOCOMPLETE;
-import static eu.eyan.idakonyvtar.model.ColumnKonfiguration.ColumnConfigurations.MULTIFIELD;
+import static eu.eyan.idakonyvtar.model.ColumnConfigurations.AUTOCOMPLETE;
+import static eu.eyan.idakonyvtar.model.ColumnConfigurations.MULTIFIELD;
 import static org.fest.assertions.Assertions.assertThat;
 
 import java.awt.event.KeyEvent;
@@ -32,6 +32,7 @@ public class BookEditorTest extends AbstractUiTest {
 		Book book = new Book.Builder(columns.size()).withValue(0, "Érték1")
 				.build();
 		bookController = new BookController();
+		// new ColumnKonfiguration.Builder(3, 1)
 		BookControllerInput bookControllerInput = new BookControllerInput(book,
 				columns, new ColumnKonfiguration.Builder(3, columns.size() + 1)
 						.withRow("", MULTIFIELD.getName(),

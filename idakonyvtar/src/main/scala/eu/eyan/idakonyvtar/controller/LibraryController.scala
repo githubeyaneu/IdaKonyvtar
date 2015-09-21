@@ -88,7 +88,7 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
 
   def initData(input: LibraryControllerInput): Unit = {
     readLibrary(input.getFile());
-    previousBook = new Book(model.getLibrary().getColumns().size())
+    previousBook = Book(model.getLibrary().getColumns().size())
   }
 
   def readLibrary(file: File) = {
@@ -143,7 +143,7 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
       view.getComponent(),
       bookController,
       new BookControllerInput(
-        new Book(model.getBooks().getList().get(selectedBookIndex)), model.getLibrary().getColumns(), model.getLibrary().getConfiguration(), model.getLibrary().getBooks()));
+        Book(model.getBooks().getList().get(selectedBookIndex)), model.getLibrary().getColumns(), model.getLibrary().getConfiguration(), model.getLibrary().getBooks()));
     if (editorDialog.isOk()) {
       model.getBooks().getList().set(selectedBookIndex, bookController.getOutput)
       // TODO: ugly: use selectioninlist...
@@ -202,7 +202,7 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
   }
 
   def savePreviousBook(book: Book) = {
-    previousBook = new Book(model.getLibrary().getColumns().size())
+    previousBook = Book(model.getLibrary().getColumns().size())
     model.getLibrary().getConfiguration().getRememberingColumns().foreach(x => {
       val columnIndex = model.getLibrary().getColumns().indexOf(x);
       previousBook.setValue(columnIndex, book.getValue(columnIndex))
@@ -210,7 +210,7 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
   }
 
   def newPreviousBook(size: Int): Book = {
-    val newBook = new Book(size);
+    val newBook = Book(size);
     model.getLibrary().getConfiguration().getRememberingColumns().foreach(rememberingColumn => {
       val columnIndex = model.getLibrary().getColumns().indexOf(rememberingColumn)
       newBook.setValue(columnIndex, previousBook.getValue(columnIndex))

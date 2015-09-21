@@ -5,7 +5,7 @@ import com.jgoodies.binding.adapter.AbstractTableAdapter
 import com.jgoodies.binding.list.SelectionInList
 import eu.eyan.idakonyvtar.model.Book
 import eu.eyan.idakonyvtar.model.ColumnKonfiguration
-import eu.eyan.idakonyvtar.model.ColumnKonfiguration.ColumnConfigurations
+import eu.eyan.idakonyvtar.model.ColumnConfigurations
 import javax.swing.ListModel
 
 object LibraryListTableModel {

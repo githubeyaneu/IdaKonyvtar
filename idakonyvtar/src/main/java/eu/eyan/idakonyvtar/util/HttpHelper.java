@@ -10,6 +10,7 @@ import java.net.URL;
 import com.google.common.base.Charsets;
 
 public class HttpHelper {
+	public static long ct = System.currentTimeMillis();
 
 	public static String postUrl(final String request,
 			final String urlParameters) throws IOException {
@@ -56,7 +57,4 @@ public class HttpHelper {
 
 		return ret.toString();
 	}
-
-	public static long ct = System.currentTimeMillis();
-
 }
