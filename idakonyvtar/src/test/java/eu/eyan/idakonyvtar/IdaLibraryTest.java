@@ -3,6 +3,7 @@ package eu.eyan.idakonyvtar;
 import java.io.File;
 
 import org.fest.swing.core.matcher.JButtonMatcher;
+import org.fest.swing.image.ScreenshotTaker;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -37,7 +38,7 @@ public class IdaLibraryTest extends AbstractUiTest {
 
 	@Test
 	@Ignore
-	// FIXME: Implement
+	// FIXME: Implement next feature
 	public void testMenu() {
 		library.clickMenu(LibraryMenuAndToolBar.ISBN_SEARCH);
 		library.editor().clickCancel();
@@ -73,7 +74,7 @@ public class IdaLibraryTest extends AbstractUiTest {
 	}
 
 	@Test
-	public void testSaveNewBook() {
+	public void testSaveNewBook() throws Exception {
 		library.assertTableCell(2, 1, "original title 1");
 		library.clickNewButton();
 		library.editor().requireIsbnPresent();

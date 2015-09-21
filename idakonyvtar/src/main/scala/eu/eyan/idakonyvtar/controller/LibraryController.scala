@@ -145,7 +145,7 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
       new BookControllerInput(
         new Book(model.getBooks().getList().get(selectedBookIndex)), model.getLibrary().getColumns(), model.getLibrary().getConfiguration(), model.getLibrary().getBooks()));
     if (editorDialog.isOk()) {
-      model.getBooks().getList().set(selectedBookIndex, bookController.getOutput())
+      model.getBooks().getList().set(selectedBookIndex, bookController.getOutput)
       // TODO: ugly: use selectioninlist...
       model.getBooks().fireSelectedContentsChanged()
     }
@@ -177,8 +177,8 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
         view.getComponent(), bookController, new BookControllerInput(
           newPreviousBook(model.getLibrary().getColumns().size()), model.getLibrary().getColumns(), model.getLibrary().getConfiguration(), model.getBooks().getList(), true));
       if (editorDialog.isOk()) {
-        model.getBooks().getList().add(0, bookController.getOutput())
-        savePreviousBook(bookController.getOutput())
+        model.getBooks().getList().add(0, bookController.getOutput)
+        savePreviousBook(bookController.getOutput)
         // TODO: ugly: use selectioninlist...
         model.getBooks().fireIntervalAdded(0, 0);
       }

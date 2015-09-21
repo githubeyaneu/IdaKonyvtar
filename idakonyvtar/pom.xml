@@ -9,7 +9,12 @@
 
 	<name>idakonyvtar</name>
 
-	<description>Frey Károlyné, Ida könyvtára</description>
+	<description>Hungarian: Frey Károlyné, Ida könyvtára
+
+English: Ida's Library
+
+Developed by András Frey
+idakonyvtar@eyan.eu</description>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -207,12 +212,12 @@
 			<version>r03</version>
 		</dependency>
 
-<!-- 		<dependency> -->
-<!-- 			<groupId>org.projectlombok</groupId> -->
-<!-- 			<artifactId>lombok</artifactId> -->
-<!-- 			<version>1.12.4</version> -->
-<!-- 			<scope>provided</scope> -->
-<!-- 		</dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>org.projectlombok</groupId> -->
+		<!-- <artifactId>lombok</artifactId> -->
+		<!-- <version>1.12.4</version> -->
+		<!-- <scope>provided</scope> -->
+		<!-- </dependency> -->
 
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -252,4 +257,25 @@
 		</dependency>
 
 	</dependencies>
+
+	<url>https://github.com/githubeyaneu/IdaKonyvtar</url>
+
+	<scm>
+		<url>https://github.com/githubeyaneu/IdaKonyvtar</url>
+	</scm>
+
+	<issueManagement>
+		<url>https://github.com/githubeyaneu/IdaKonyvtar/issues</url>
+		<system>Github</system>
+	</issueManagement>
+
+	<ciManagement>
+		<url>http://jenkins.eyan.eu/job/IdaKonyvtar_Windows/</url>
+		<system>Jenkins</system>
+	</ciManagement>
+
+	<organization>
+		<name>eyan.eu</name>
+	</organization>
+
 </project>
