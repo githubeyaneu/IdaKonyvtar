@@ -40,19 +40,19 @@ public class IdaLibraryTest extends AbstractUiTest {
 	@Ignore
 	// FIXME: Implement next feature
 	public void testMenu() {
-		library.clickMenu(LibraryMenuAndToolBar.ISBN_SEARCH);
+		library.clickMenu(LibraryMenuAndToolBar.ISBN_SEARCH());
 		library.editor().clickCancel();
-		library.clickMenu(LibraryMenuAndToolBar.FILE);
+		library.clickMenu(LibraryMenuAndToolBar.FILE());
 	}
 
 	@Test
 	@SuppressFBWarnings(value = "RV_RETURN_VALUE_IGNORED_BAD_PRACTICE", justification = "test cleanup")
 	public void testLoadAndSave() {
 		File file = new LibraryFileBuilder()
-				.withSheet(ExcelHandler.BOOKS)
+				.withSheet(ExcelHandler.BOOKS())
 				.withColumns("column1", "column2")
 				.withRow("árvíztűrő tükörfúrógép", "ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP")
-				.withSheet(ExcelHandler.COLUMN_CONFIGURATION)
+				.withSheet(ExcelHandler.COLUMN_CONFIGURATION())
 				.withColumns("",
 						ColumnConfigurations.SHOW_IN_TABLE().getName(), "ko2")
 				.withRow("column1", "igen", "")
@@ -67,7 +67,7 @@ public class IdaLibraryTest extends AbstractUiTest {
 		File file2 = new File(System.currentTimeMillis() + ".xls");
 		try {
 			library.save(file2);
-			ExcelAssert.assertExcelCell(file2, ExcelHandler.BOOKS, 1, 2,
+			ExcelAssert.assertExcelCell(file2, ExcelHandler.BOOKS(), 1, 2,
 					"árvíztűrő tükörfúrógép");
 			library.checkTitleWithNumber(1);
 		} finally {
@@ -129,22 +129,24 @@ public class IdaLibraryTest extends AbstractUiTest {
 		library.assertTableCell(
 				1,
 				1,
-				new StringBuilder("").append(HighlightRenderer.HTML_START_TAG)
+				new StringBuilder("")
+						.append(HighlightRenderer.HTML_START_TAG())
 						.append("Tamási ")
-						.append(HighlightRenderer.HIGHLIGHT_START_TAG)
+						.append(HighlightRenderer.HIGHLIGHT_START_TAG())
 						.append("Áron")
-						.append(HighlightRenderer.HIGHLIGHT_END_TAG)
-						.append(HighlightRenderer.HTML_END_TAG).toString());
+						.append(HighlightRenderer.HIGHLIGHT_END_TAG())
+						.append(HighlightRenderer.HTML_END_TAG()).toString());
 		library.assertTableCell(
 				2,
 				2,
-				new StringBuilder("").append(HighlightRenderer.HTML_START_TAG)
+				new StringBuilder("")
+						.append(HighlightRenderer.HTML_START_TAG())
 						.append("Kh")
-						.append(HighlightRenderer.HIGHLIGHT_START_TAG)
+						.append(HighlightRenderer.HIGHLIGHT_START_TAG())
 						.append("áron")
-						.append(HighlightRenderer.HIGHLIGHT_END_TAG)
+						.append(HighlightRenderer.HIGHLIGHT_END_TAG())
 						.append(" ladikján")
-						.append(HighlightRenderer.HTML_END_TAG).toString());
+						.append(HighlightRenderer.HTML_END_TAG()).toString());
 		library.assertTableCell(1, 2, "Illyés Gyula");
 		library.assertTableRowCount(2);
 	}

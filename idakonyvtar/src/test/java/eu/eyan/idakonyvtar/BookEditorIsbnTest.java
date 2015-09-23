@@ -63,7 +63,7 @@ public class BookEditorIsbnTest extends AbstractUiTest {
 	@Test
 	public void testIsbnRead() {
 		bookEditor.requireIsbnPresent();
-		bookEditor.setNormalText(BookView.ISBN_TEXT, "9789631193701");
+		bookEditor.setNormalText(BookView.ISBN_TEXT(), "9789631193701");
 		bookEditor.keyboard(KeyEvent.VK_ENTER);
 		bookEditor.requireNormalText("cim", "Abigél");
 	}

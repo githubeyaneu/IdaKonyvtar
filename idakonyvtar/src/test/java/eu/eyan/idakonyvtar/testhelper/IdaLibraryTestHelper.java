@@ -40,8 +40,8 @@ public class IdaLibraryTestHelper {
 	}
 
 	public void load(File file) {
-		clickMenu(LibraryMenuAndToolBar.FILE);
-		clickMenu(LibraryMenuAndToolBar.LOAD_LIBRARY);
+		clickMenu(LibraryMenuAndToolBar.FILE());
+		clickMenu(LibraryMenuAndToolBar.LOAD_LIBRARY());
 		frame.fileChooser().selectFile(file).approve();
 	}
 
@@ -51,13 +51,13 @@ public class IdaLibraryTestHelper {
 	}
 
 	public void save(File file) {
-		clickMenu(LibraryMenuAndToolBar.FILE);
-		clickMenu(LibraryMenuAndToolBar.SAVE_LIBRARY);
+		clickMenu(LibraryMenuAndToolBar.FILE());
+		clickMenu(LibraryMenuAndToolBar.SAVE_LIBRARY());
 		frame.fileChooser().selectFile(file).approve();
 	}
 
 	public void clickNewButton() {
-		frame.button(LibraryMenuAndToolBar.ADD_NEW_BOOK).click();
+		frame.button(LibraryMenuAndToolBar.ADD_NEW_BOOK()).click();
 
 	}
 
@@ -66,7 +66,7 @@ public class IdaLibraryTestHelper {
 	}
 
 	public void requireDeleteDisabled() {
-		frame.button(LibraryMenuAndToolBar.DELETE_BOOK).requireDisabled();
+		frame.button(LibraryMenuAndToolBar.DELETE_BOOK()).requireDisabled();
 
 	}
 
@@ -75,11 +75,11 @@ public class IdaLibraryTestHelper {
 	}
 
 	public void requireDeleteEnabled() {
-		frame.button(LibraryMenuAndToolBar.DELETE_BOOK).requireEnabled();
+		frame.button(LibraryMenuAndToolBar.DELETE_BOOK()).requireEnabled();
 	}
 
 	public void clickDeleteButton() {
-		frame.button(LibraryMenuAndToolBar.DELETE_BOOK).click();
+		frame.button(LibraryMenuAndToolBar.DELETE_BOOK()).click();
 	}
 
 	public void clickApproveYes() {
@@ -93,7 +93,7 @@ public class IdaLibraryTestHelper {
 	}
 
 	public void filter(String filter) {
-		frame.textBox(LibraryMenuAndToolBar.FILTER).robot.enterText(filter);
+		frame.textBox(LibraryMenuAndToolBar.FILTER()).robot.enterText(filter);
 	}
 
 	public void assertTableRowCount(int rowsCount) {

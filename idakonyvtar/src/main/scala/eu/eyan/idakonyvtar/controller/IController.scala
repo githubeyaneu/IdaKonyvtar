@@ -4,15 +4,15 @@ import java.awt.Component;
 
 trait IController[INPUT, OUTPUT] {
 
-  def getView: Component
+  def getView(): Component
 
-  def getTitle: String
+  def getTitle(): String
 
   def initData(input: INPUT)
 
-  def initBindings
+  def initBindings()
 
-  def getOutput: OUTPUT
+  def getOutput(): OUTPUT
 
-  def getComponentForFocus: Component
+  def getComponentForFocus(): Component
 }
