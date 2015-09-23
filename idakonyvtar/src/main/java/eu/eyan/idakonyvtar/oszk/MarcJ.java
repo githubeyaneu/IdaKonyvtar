@@ -1,13 +1,13 @@
 package eu.eyan.idakonyvtar.oszk;
 
-public class Marc
+public class MarcJ
 {
     private String marc1;
     private String marc2;
     private String marc3;
     private String value;
 
-    public Marc(String marc1, String marc2, String marc3,
+    public MarcJ(String marc1, String marc2, String marc3,
             String value)
     {
         this.marc1 = marc1;

@@ -14,5 +14,4 @@ public class MarcHelper {
 		}
 		return null;
 	}
-
 }

@@ -25,7 +25,6 @@ import eu.eyan.idakonyvtar.model.BookFieldValueModel
 import eu.eyan.idakonyvtar.model.ColumnConfigurations
 import eu.eyan.idakonyvtar.oszk.Marc
 import eu.eyan.idakonyvtar.oszk.OszkKereso
-import eu.eyan.idakonyvtar.oszk.OszkKeresoException
 import eu.eyan.idakonyvtar.util.BookHelper
 import eu.eyan.idakonyvtar.view.BookView
 import eu.eyan.idakonyvtar.view.MultiField
@@ -33,6 +32,7 @@ import eu.eyan.idakonyvtar.view.MultiFieldJComboBox
 import eu.eyan.idakonyvtar.view.MultiFieldJTextField
 import scala.collection.JavaConversions._
 import java.beans.PropertyChangeListener
+import eu.eyan.idakonyvtar.oszk.OszkKeresoException
 
 class BookController extends IDialogController[BookControllerInput, Book] {
   val view = new BookView()

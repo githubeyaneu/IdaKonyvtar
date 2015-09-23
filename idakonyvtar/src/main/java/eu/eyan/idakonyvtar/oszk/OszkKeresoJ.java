@@ -11,7 +11,7 @@ import org.unix4j.Unix4j;
 
 import eu.eyan.idakonyvtar.util.HttpHelper;
 
-public class OszkKereso {
+public class OszkKeresoJ {
 	public static String isbnKeresOszkban(final String isbn) throws IOException {
 		// Login1
 		final String session_id = findTextInUrl(

@@ -1,11 +1,10 @@
 package eu.eyan.idakonyvtar.model;
 
 import com.google.common.collect.Lists.newArrayList
-
 import java.util.ArrayList
 import java.util.List
-
 import eu.eyan.idakonyvtar.oszk.Marc
+import eu.eyan.idakonyvtar.util.LibraryException
 
 object ColumnKonfiguration {
   class Builder(columns: Int, rows: Int) {
@@ -99,7 +98,7 @@ class ColumnKonfiguration {
       }
     } catch {
       case e: Exception =>
-        throw new MarcException(
+        throw new LibraryException(
           "A Marc kódot nem lehet a configurationból beolvasni: "
             + columnName);
     }
