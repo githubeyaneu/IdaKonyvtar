@@ -14,8 +14,8 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import eu.eyan.idakonyvtar.model.ColumnKonfiguration;
 import eu.eyan.idakonyvtar.model.ColumnConfigurations;
+import eu.eyan.idakonyvtar.model.ColumnKonfiguration;
 
 public class BookView extends AbstractView {
 	public static final String ISBN_TEXT = "isbnText";
@@ -88,9 +88,9 @@ public class BookView extends AbstractView {
 
 			Component editor;
 			final boolean multi = columnConfiguration.isTrue(columnName,
-					ColumnConfigurations.MULTIFIELD);
+					ColumnConfigurations.MULTIFIELD());
 			if (columnConfiguration.isTrue(columnName,
-					ColumnConfigurations.AUTOCOMPLETE)) {
+					ColumnConfigurations.AUTOCOMPLETE())) {
 				if (multi) {
 					editor = new MultiFieldJComboBox(columnName); // NOPMD
 				} else {

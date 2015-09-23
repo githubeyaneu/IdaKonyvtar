@@ -1,7 +1,6 @@
 package eu.eyan.idakonyvtar;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static eu.eyan.idakonyvtar.model.ColumnConfigurations.*;
 
 import java.awt.event.KeyEvent;
 import java.util.List;
@@ -16,6 +15,7 @@ import org.junit.Test;
 import eu.eyan.idakonyvtar.controller.BookController;
 import eu.eyan.idakonyvtar.controller.input.BookControllerInput;
 import eu.eyan.idakonyvtar.model.Book;
+import eu.eyan.idakonyvtar.model.ColumnConfigurations;
 import eu.eyan.idakonyvtar.model.ColumnKonfiguration;
 import eu.eyan.idakonyvtar.testhelper.BookEditorTestHelper;
 import eu.eyan.idakonyvtar.util.DialogHelper;
@@ -34,8 +34,10 @@ public class BookEditorIsbnTest extends AbstractUiTest {
 		bookController = new BookController();
 		BookControllerInput bookControllerInput = new BookControllerInput(book,
 				columns, new ColumnKonfiguration.Builder(4, columns.size() + 1)
-						.withRow("", MULTIFIELD.getName(),
-								AUTOCOMPLETE.getName(), MARC_CODE.getName())
+						.withRow("",
+								ColumnConfigurations.MULTIFIELD().getName(),
+								ColumnConfigurations.AUTOCOMPLETE().getName(),
+								ColumnConfigurations.MARC_CODE().getName())
 						.withRow(columns.get(0), "", "", "")
 						.withRow(columns.get(1), "", "igen", "")
 						.withRow(columns.get(2), "igen", "", "")

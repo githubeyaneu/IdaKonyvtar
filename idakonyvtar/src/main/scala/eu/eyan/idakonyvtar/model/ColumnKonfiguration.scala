@@ -8,27 +8,6 @@ import java.util.List
 import eu.eyan.idakonyvtar.oszk.Marc
 
 object ColumnKonfiguration {
-  //  object ColumnConfigurations extends Enumeration {
-  //
-  //    type ColumnConfigurations = ColumnConfigurationsValue
-  //
-  //    case class ColumnConfigurationsValue(name: String) extends Val(name) {
-  //      def getName() = name
-  //    }
-  //
-  //    //  val CANCEL_BUTTON = ControlTextInternalValue("Cancel", "Cancel the changes and dismiss the dialog")
-  //    //  val OK_BUTTON = ControlTextInternalValue("OK", "Save the changes and dismiss the dialog")
-  //    val MULTIFIELD = ColumnConfigurationsInternalValue("MultiMező")
-  //    val AUTOCOMPLETE = ColumnConfigurationsInternalValue("AutoComplete")
-  //    val MARC_CODE = ColumnConfigurationsInternalValue("MarcKód")
-  //    val REMEMBERING = ColumnConfigurationsInternalValue("Emlékező")
-  //    val SHOW_IN_TABLE = ColumnConfigurationsInternalValue("Táblázatban")
-  //
-  //    protected final def ColumnConfigurationsInternalValue(name: String): ColumnConfigurationsValue =
-  //      ColumnConfigurationsValue(name)
-  //
-  //  }
-
   class Builder(columns: Int, rows: Int) {
     val columnConfiguration = new ColumnKonfiguration()
     var actualRow: Int = 0
@@ -41,6 +20,7 @@ object ColumnKonfiguration {
     //      this
     //    }
 
+    //FIXME: varargs benutzen
     def withRow(value1: String): Builder = {
       val values = Array(value1)
       for (i <- 0 until values.length) this.columnConfiguration.getTable()(i)(actualRow) = values(i)
@@ -65,6 +45,7 @@ object ColumnKonfiguration {
       actualRow = actualRow + 1
       this
     }
+    //FIXME: varargs benutzen
 
     def build() = columnConfiguration
   }
@@ -75,11 +56,11 @@ class ColumnKonfiguration {
 
   var table: Array[Array[String]] = null
 
-  def isTrue(columnName: String, columnConfiguration: ColumnConfigurations) =
+  def isTrue(columnName: String, columnConfiguration: ColumnConfigurations.ColumnConfigurationsValue) =
     getValue(columnName, columnConfiguration).equalsIgnoreCase("Igen")
 
   def getValue(columnName: String,
-               columnConfiguration: ColumnConfigurations): String = {
+               columnConfiguration: ColumnConfigurations.ColumnConfigurationsValue): String = {
     val columnIndex = getColumnIndex(columnName)
     val configurationIndex = getConfigurationIndex(columnConfiguration)
 
@@ -97,7 +78,7 @@ class ColumnKonfiguration {
     -1
   }
 
-  def getConfigurationIndex(configurationName: ColumnConfigurations): Int = {
+  def getConfigurationIndex(configurationName: ColumnConfigurations.ColumnConfigurationsValue): Int = {
     for (columnIndex <- 0 until table.length) {
       if (table(columnIndex)(0).equalsIgnoreCase(configurationName.getName())) {
         return columnIndex
