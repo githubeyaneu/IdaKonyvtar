@@ -53,9 +53,8 @@ public class IdaLibraryTest extends AbstractUiTest {
 				.withColumns("column1", "column2")
 				.withRow("árvíztűrő tükörfúrógép", "ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP")
 				.withSheet(ExcelHandler.COLUMN_CONFIGURATION())
-				.withColumns("",
-						ColumnConfigurations.SHOW_IN_TABLE().getName(), "ko2")
-				.withRow("column1", "igen", "")
+				.withColumns("", ColumnConfigurations.SHOW_IN_TABLE().name(),
+						"ko2").withRow("column1", "igen", "")
 				.withRow("column2 tükörfúrógép", "nem", "").save();
 		try {
 			library.load(file);

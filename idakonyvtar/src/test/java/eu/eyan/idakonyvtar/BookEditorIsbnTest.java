@@ -36,9 +36,9 @@ public class BookEditorIsbnTest extends AbstractUiTest {
 
 		ColumnKonfiguration columnConfig = new ColumnKonfiguration.Builder(4,
 				columns.size() + 1)
-				.withRow("", ColumnConfigurations.MULTIFIELD().getName(),
-						ColumnConfigurations.AUTOCOMPLETE().getName(),
-						ColumnConfigurations.MARC_CODE().getName())
+				.withRow("", ColumnConfigurations.MULTIFIELD().name(),
+						ColumnConfigurations.AUTOCOMPLETE().name(),
+						ColumnConfigurations.MARC_CODE().name())
 				.withRow(columns.get(0), "", "", "")
 				.withRow(columns.get(1), "", "igen", "")
 				.withRow(columns.get(2), "igen", "", "")

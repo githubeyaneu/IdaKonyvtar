@@ -1,29 +1,32 @@
-package eu.eyan.idakonyvtar.model;
+package eu.eyan.idakonyvtar.model
 
-import com.google.common.collect.Sets.newHashSet;
+import com.google.common.collect.Sets.newHashSet
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeEvent
+import java.beans.PropertyChangeListener
 import scala.collection.JavaConverters._
 
-import com.jgoodies.binding.value.ValueModel;
+import com.jgoodies.binding.value.ValueModel
+
+import scala.collection.mutable.Set
 
 class BookFieldValueModel(columnIndex: Int, model: Book) extends ValueModel with PropertyChangeListener {
+
   model.addPropertyChangeListener(this);
 
-  val listeners: java.util.Set[PropertyChangeListener] = newHashSet()
+  val listeners: Set[PropertyChangeListener] = Set()
 
   def getValue() = model.getValue(columnIndex)
 
   def setValue(newValue: Object) = model.setValue(columnIndex, newValue.asInstanceOf[String])
 
-  def addValueChangeListener(listener: PropertyChangeListener) = listeners.add(listener)
+  def addValueChangeListener(listener: PropertyChangeListener) = listeners += listener
 
-  def removeValueChangeListener(listener: PropertyChangeListener) = listeners.remove(listener)
+  def removeValueChangeListener(listener: PropertyChangeListener) = listeners -= listener
 
   def propertyChange(evt: PropertyChangeEvent) =
-    if (evt.isInstanceOf[Book.BookPropertyChangeEvent]) {
-      val bookEvent = evt.asInstanceOf[Book.BookPropertyChangeEvent]
-      if (bookEvent.getColumnIndex() == this.columnIndex) listeners.asScala.foreach(listener => listener.propertyChange(evt))
+    evt match {
+      case bookEvent: Book.BookPropertyChangeEvent =>
+        if (bookEvent.getColumnIndex() == this.columnIndex) listeners.foreach(listener => listener.propertyChange(evt))
     }
 }

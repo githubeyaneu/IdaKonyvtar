@@ -1,27 +1,20 @@
 package eu.eyan.idakonyvtar.model;
 
-import com.google.common.collect.Lists.newArrayList
+import java.beans.PropertyChangeEvent
 
-import java.beans.PropertyChangeEvent;
-import java.util.Collections;
+import scala.collection.mutable.MutableList
 
-import com.jgoodies.binding.beans.Model;
+import com.jgoodies.binding.beans.Model
 
 object Book {
   def apply(columnCount: Int): Book = {
-    val vals: java.util.List[String] = newArrayList()
-    for (i <- 0 until columnCount) vals.add("")
-    new Book(newArrayList(vals))
+    new Book(MutableList.fill[String](columnCount)(""))
   }
 
-  def apply(book: Book): Book = {
-    val newBook = Book(book.values.size())
-    Collections.copy(newBook.values, book.values)
-    newBook
-  }
+  def apply(book: Book): Book = new Book(book.values.clone())
 
-  class BookPropertyChangeEvent(source: Object, propertyName: String,
-                                oldValue: Object, newValue: Object, val columnIndex: Int) extends PropertyChangeEvent(source, propertyName, oldValue, newValue) {
+  class BookPropertyChangeEvent(source: Object, propertyName: String, oldValue: Object, newValue: Object, val columnIndex: Int)
+      extends PropertyChangeEvent(source, propertyName, oldValue, newValue) {
     def getColumnIndex() = columnIndex
   }
 
@@ -37,17 +30,17 @@ object Book {
   }
 }
 
-class Book(val values: java.util.List[String]) extends Model {
+class Book(val values: MutableList[String]) extends Model {
 
   def setValue(columnIndex: Int, value: String) = {
-    val oldValue = this.values.get(columnIndex);
+    val oldValue: String = this.values(columnIndex);
     // FIXME: AutoCompleteDecorator Problem: Disgusting Hack but works...
     if (value != null /* && !value.equals("") */ ) {
-      this.values.set(columnIndex, value)
+      values(columnIndex) = value
       firePropertyChange(new Book.BookPropertyChangeEvent(this, "PROP", oldValue, value, columnIndex))
     }
   }
 
-  def getValue(columnIndex: Int) = values.get(columnIndex)
+  def getValue(columnIndex: Int) = values(columnIndex)
 
 }

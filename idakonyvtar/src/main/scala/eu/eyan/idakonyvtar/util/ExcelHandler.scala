@@ -73,12 +73,12 @@ object ExcelHandler {
     val table = Array.ofDim[String](sheet.getColumns(), sheet.getRows())
     for (actualColumn <- 0 until sheet.getColumns(); actualRow <- 0 until sheet.getRows())
       table(actualColumn)(actualRow) = sheet.getCell(actualColumn, actualRow).getContents()
-    library.getConfiguration().setTable(table)
+    library.configuration.setTable(table)
   }
 
   def readBooks(library: Library, sheet: Sheet) = {
     for (actualColumn <- 0 until sheet.getColumns())
-      library.getColumns().add(sheet.getCell(actualColumn, 0).getContents())
+      library.columns += sheet.getCell(actualColumn, 0).getContents()
 
     for (actualRow <- 1 until sheet.getRows()) {
       val book = Book.apply(sheet.getColumns() + 1)
@@ -92,7 +92,7 @@ object ExcelHandler {
         // }
         book.setValue(actualColumn, contents)
       }
-      library.getBooks().add(book);
+      library.books.add(book);
     }
   }
 
@@ -114,16 +114,16 @@ object ExcelHandler {
     try {
       val workbook = Workbook.createWorkbook(targetFile, getWorkbookSettings())
       val writablesheet1 = workbook.createSheet(BOOKS, 0)
-      for (columnIndex <- 0 until library.getColumns().size()) {
-        writablesheet1.addCell(new Label(columnIndex, 0, library.getColumns().get(columnIndex)))
-        for (bookIndex <- 0 until library.getBooks().size()) {
+      for (columnIndex <- 0 until library.columns.size) {
+        writablesheet1.addCell(new Label(columnIndex, 0, library.columns(columnIndex)))
+        for (bookIndex <- 0 until library.books.size()) {
           val cellFormat = new WritableCellFormat()
           cellFormat.setWrap(true)
-          writablesheet1.addCell(new Label(columnIndex, bookIndex + 1, library.getBooks().get(bookIndex).getValue(columnIndex), cellFormat))
+          writablesheet1.addCell(new Label(columnIndex, bookIndex + 1, library.books.get(bookIndex).getValue(columnIndex), cellFormat))
         }
       }
       val writablesheet2 = workbook.createSheet(COLUMN_CONFIGURATION, 1)
-      val table = library.getConfiguration().getTable()
+      val table = library.configuration.getTable()
       for (column <- 0 until table.length; sor <- 0 until table(0).length)
         writablesheet2.addCell(new Label(column, sor, table(column)(sor)))
 

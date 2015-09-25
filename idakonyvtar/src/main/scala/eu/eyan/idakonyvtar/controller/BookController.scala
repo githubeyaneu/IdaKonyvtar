@@ -142,7 +142,7 @@ class BookController extends IDialogController[BookControllerInput, Book] {
         val values = for (
           marcFromOszk <- marcsFromOszk;
           marcFromColumn <- marcCodesFromColumns if (isMarcsApply(marcFromOszk, marcFromColumn))
-        ) yield marcFromOszk.getValue()
+        ) yield marcFromOszk.value
         model.book.setValue(model.columns.indexOf(column), values.mkString(", "))
       } catch {
         case e: Exception =>
@@ -152,11 +152,11 @@ class BookController extends IDialogController[BookControllerInput, Book] {
     })
 
   private def isMarcsApply(marcFromOszk: Marc, marcFromColumn: Marc) = {
-    if (marcFromOszk == null || marcFromColumn == null || marcFromOszk.getMarc1() == null || marcFromColumn.getMarc1() == null)
+    if (marcFromOszk == null || marcFromColumn == null || marcFromOszk.marc1 == null || marcFromColumn.marc1 == null)
       false
-    else marcFromOszk.getMarc1().equalsIgnoreCase(marcFromColumn.getMarc1()) &&
-      (marcFromColumn.getMarc2().equals("") || marcFromOszk.getMarc2().equalsIgnoreCase(marcFromColumn.getMarc2())) &&
-      (marcFromColumn.getMarc3().equals("") || marcFromOszk.getMarc3().equalsIgnoreCase(marcFromColumn.getMarc3()))
+    else marcFromOszk.marc1.equalsIgnoreCase(marcFromColumn.marc1) &&
+      (marcFromColumn.marc2.equals("") || marcFromOszk.marc2.equalsIgnoreCase(marcFromColumn.marc2)) &&
+      (marcFromColumn.marc3.equals("") || marcFromOszk.marc3.equalsIgnoreCase(marcFromColumn.marc3))
   }
 
   def onOk = {}

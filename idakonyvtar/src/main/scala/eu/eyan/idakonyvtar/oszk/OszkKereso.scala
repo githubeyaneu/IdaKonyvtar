@@ -3,7 +3,6 @@ package eu.eyan.idakonyvtar.oszk;
 import com.google.common.collect.Lists.newArrayList;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -11,14 +10,19 @@ import org.unix4j.Unix4j;
 
 import eu.eyan.idakonyvtar.util.HttpHelper;
 
+/**
+ * This is the code to acquire the hungarian book data -> this is why it is not translated.
+ */
 object OszkKereso {
+
   @throws(classOf[IOException])
   def isbnKeresOszkban(isbn: String): String = {
+
     // Login1
     val session_id = findTextInUrl(
       "http://nektar1.oszk.hu/LVbin/LibriVision/lv_login.html",
       "USER_LOGIN=Nektar_LV_user&USER_PASSWORD=Nektar&LanguageCode=hu&CountryCode=hu&HtmlSetCode=default&lv_action=LV_Login&image3.x=17&image3.y=9",
-      "SESSIO", "SESSION_ID=", "([0-9]*_[0-9]*)", "&");
+      "SESSIO", "SESSION_ID=", "([0-9]*_[0-9]*)", "&")
     // System.out.println("Session Id:" + session_id);
 
     // Login2
@@ -27,7 +31,7 @@ object OszkKereso {
         "http://nektar1.oszk.hu/LVbin/LibriVision/lv_search_form.html?SESSION_ID="
           + session_id
           + "&lv_action=LV_Search_Form&HTML_SEARCH_TYPE=SIMPLE&DB_ID=2",
-        "");
+        "")
 
     // Keresés aztán Marc rövid formátum keresése
     val marcLink = findTextInUrl(
@@ -36,18 +40,16 @@ object OszkKereso {
         + session_id
         + "&lv_action=LV_Search&QUERY_ID=T_1391112123&ADD_QUERY=-1&SEARCH_TYPE=QUERY_SIMPLE&HTML_SEARCH_TYPE=SIMPLE&USE=BN&_QUERY="
         + isbn + "&QUERY=" + isbn + "&sub_button=Keres%C3%A9s",
-      "A record MARC form", "href=\"", ".*", "\">MARC form");
+      "A record MARC form", "href=\"", ".*", "\">MARC form")
     // System.out.println("marcLink:" + marcLink);
 
     // Marc rövid, marc hosszú keresése
     val fullMarcLink = findTextInUrl(
-      "http://nektar1.oszk.hu/LVbin/LibriVision/" + marcLink, "",
-      "Teljes megjelenítés", "href=\"", ".*", "\">Teljes");
+      "http://nektar1.oszk.hu/LVbin/LibriVision/" + marcLink, "", "Teljes megjelenítés", "href=\"", ".*", "\">Teljes")
     // System.out.println("fullMarcLink:" + fullMarcLink);
 
     // Marc hosszú
-    HttpHelper.postUrl("http://nektar1.oszk.hu/LVbin/LibriVision/"
-      + fullMarcLink, "");
+    HttpHelper.postUrl("http://nektar1.oszk.hu/LVbin/LibriVision/" + fullMarcLink, "")
   }
 
   @throws(classOf[IOException])
@@ -57,7 +59,7 @@ object OszkKereso {
                     regexPost: String): String = {
 
     val postUrl = HttpHelper.postUrl(host, postParameter)
-    val line = Unix4j.fromString(postUrl).grep(lineGrep).toStringResult().toString()
+    val line = Unix4j.fromString(postUrl).grep(lineGrep).toStringResult()
     val matcher = Pattern.compile(regex_prefix + regex + regexPost).matcher(line)
     matcher.find()
     val group = matcher.group()
@@ -66,8 +68,8 @@ object OszkKereso {
   }
 
   @throws(classOf[OszkKeresoException])
-  def getMarcsToIsbn(isbn: String): java.util.List[Marc] = {
-    val marcs: java.util.List[Marc] = newArrayList();
+  def getMarcsToIsbn(isbn: String) = {
+    val marcs: java.util.List[Marc] = new java.util.ArrayList()
     try {
       var source = isbnKeresOszkban(isbn)
       // String source = FileUtils.readFileToString(new
@@ -79,6 +81,9 @@ object OszkKereso {
       marcTableMatcher.find()
       val marcTable = marcTableMatcher.group()
       // System.out.println(marcTable);
+
+      //      val pattern = "<tr.*?</tr".r
+      //      pattern.findAllIn(marcTable)
 
       val marcSorMatcher = Pattern.compile("<tr.*?</tr").matcher(marcTable)
       var lastMarc1 = ""
@@ -119,6 +124,6 @@ object OszkKereso {
       }
     }
     // System.out.println("Siker");
-    return marcs;
+    marcs
   }
 }

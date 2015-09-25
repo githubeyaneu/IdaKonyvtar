@@ -35,8 +35,8 @@ public class BookEditorTest extends AbstractUiTest {
 
 		ColumnKonfiguration columnConfiguration = new ColumnKonfiguration.Builder(
 				3, columns.size() + 1)
-				.withRow("", ColumnConfigurations.MULTIFIELD().getName(),
-						ColumnConfigurations.AUTOCOMPLETE().getName())
+				.withRow("", ColumnConfigurations.MULTIFIELD().name(),
+						ColumnConfigurations.AUTOCOMPLETE().name())
 				.withRow(columns.get(0), "", "")
 				.withRow(columns.get(1), "", "igen")
 				.withRow(columns.get(2), "igen", "")
