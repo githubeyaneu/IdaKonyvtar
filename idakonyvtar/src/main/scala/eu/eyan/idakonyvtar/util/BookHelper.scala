@@ -1,39 +1,25 @@
 package eu.eyan.idakonyvtar.util;
 
-import com.google.common.collect.Lists.newArrayList;
-import com.google.common.collect.Sets.newHashSet;
+import java.text.Collator
+import java.util.Locale
 
-import java.text.Collator;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import scala.collection.JavaConversions._
-
-import eu.eyan.idakonyvtar.model.Book;
+import eu.eyan.idakonyvtar.model.Book
 
 object BookHelper {
   val LISTA_SEPARATOR = " + "
   val LISTA_SEPARATOR_REGEX = LISTA_SEPARATOR.replace("+", "\\+")
 
   val COLLATOR = Collator.getInstance(new Locale("hu"))
+  COLLATOR.setStrength(Collator.SECONDARY); // a == A, a < Ä
 
-  def getColumnList(bookList: java.util.List[Book], columnIndex: Int): java.util.List[String] = {
-    val set: java.util.Set[String] = newHashSet("")
-    for (book <- bookList) {
-      if (book.getValue(columnIndex) != null) {
-        book.getValue(columnIndex).split(LISTA_SEPARATOR_REGEX).map(_.trim()).foreach(set.add(_))
-      }
-    }
-    val list = newArrayList(set)
-
-    COLLATOR.setStrength(Collator.SECONDARY); // a == A, a < Ä
-    Collections.sort(list, new Comparator[String]() {
-      override def compare(o1: String, o2: String): Int = {
-        COLLATOR.compare(o1, o2)
-      }
-    })
-    return list;
+  def getColumnList(bookList: Seq[Book], columnIndex: Int) = {
+    bookList
+      .filter(_.getValue(columnIndex) != null) // only not nulls
+      .map(_.getValue(columnIndex)) // get the values of the column
+      .map(_.split(LISTA_SEPARATOR_REGEX)) // get all values if multifield
+      .flatten // take the whole list
+      .map(_.trim)
+      .distinct
+      .sortWith((s1: String, s2: String) => COLLATOR.compare(s1, s2) < 0)
   }
 }

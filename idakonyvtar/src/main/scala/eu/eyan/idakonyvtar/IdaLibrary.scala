@@ -9,6 +9,7 @@ import java.io.File
 object IdaLibrary {
 
   val DEFAULT_LIBRARY = "library.xls";
+  val VERSION = "1.1.1"
 
   def main(args: Array[String]): Unit = {
     val pathname = if (args.isEmpty || args(0) == null) DEFAULT_LIBRARY; else args(0);
@@ -23,4 +24,5 @@ object IdaLibrary {
 
     DialogHelper.runInFrameFullScreen(new LibraryController(), new LibraryControllerInput(fileToOpen), LibraryController.TITLE);
   }
+
 }

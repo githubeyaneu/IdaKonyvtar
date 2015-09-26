@@ -8,9 +8,9 @@ import eu.eyan.idakonyvtar.util.LibraryException
 
 object ColumnKonfiguration {
   class Builder(columns: Int, rows: Int) {
-    val columnConfiguration = new ColumnKonfiguration()
+    val columnConfiguration = new ColumnKonfiguration(Array.ofDim[String](columns, rows))
     var actualRow: Int = 0
-    columnConfiguration.setTable(Array.ofDim[String](columns, rows))
+    //columnConfiguration.setTable()
 
     @varargs def withRow(values: String*): Builder = {
       for (i <- 0 until values.length) this.columnConfiguration.getTable()(i)(actualRow) = values(i)
@@ -23,10 +23,7 @@ object ColumnKonfiguration {
 }
 
 //FIXME: Refactor, because it cannot be understood, constant pain i t a
-class ColumnKonfiguration {
-
-  type ColumnKonfigurationTable = Array[Array[String]]
-  var table: ColumnKonfigurationTable = null
+class ColumnKonfiguration(val table: Array[Array[String]]) {
 
   def isTrue(columnName: String, columnConfiguration: ColumnConfigurationsValue) =
     getValue(columnName, columnConfiguration).equalsIgnoreCase("Igen")
@@ -65,6 +62,6 @@ class ColumnKonfiguration {
 
   def getTable() = table
 
-  def setTable(table: ColumnKonfigurationTable) = this.table = table
+  //def setTable(table: ColumnKonfigurationTable) = this.table = table
 
 }

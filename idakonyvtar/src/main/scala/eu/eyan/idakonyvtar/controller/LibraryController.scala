@@ -9,11 +9,8 @@ import java.awt.event.MouseEvent
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import java.io.File
-
 import scala.collection.JavaConversions.asScalaBuffer
-
 import com.jgoodies.binding.adapter.SingleListSelectionAdapter
-
 import eu.eyan.idakonyvtar.controller.LibraryController.NO
 import eu.eyan.idakonyvtar.controller.LibraryController.TITLE
 import eu.eyan.idakonyvtar.controller.LibraryController.TITLE_PIECES
@@ -43,6 +40,7 @@ import javax.swing.event.ListDataListener
 import javax.swing.event.ListSelectionEvent
 import javax.swing.event.ListSelectionListener
 import javax.swing.filechooser.FileNameExtensionFilter
+import eu.eyan.idakonyvtar.model.Library
 
 object LibraryController {
   val NO = "Nem"
@@ -65,9 +63,13 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
   def getOutput(): Void = null
   def getComponentForFocus(): java.awt.Component = menuAndToolBar.TOOLBAR_SEARCH
   def getTitle() = TITLE + TITLE_SEPARATOR + model.books.getList().size() + TITLE_PIECES
-  def saveLibrary(file: File) = ExcelHandler.saveLibrary(file, model.library)
   def refreshTitle() = SwingUtilities.getWindowAncestor(view.getComponent()).asInstanceOf[JFrame].setTitle(getTitle())
   def getMenuBar() = menuAndToolBar.getMenuBar()
+  def saveLibrary(file: File) =
+    try ExcelHandler.saveLibrary(file, model.library)
+    catch {
+      case le: LibraryException =>
+    }
 
   def getView() = {
     view.getComponent()
@@ -96,10 +98,20 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
 
   private def readLibrary(file: File) = {
     System.out.println("Loading file: " + file)
-    model.library = ExcelHandler.readLibrary(file)
+    try model.library = ExcelHandler.readLibrary(file)
+    catch {
+      case le: LibraryException => showErrorDialog("Hiba a beolvasáskor", le)
+    }
+
     model.books.getList().clear()
     model.books.setList(model.library.books)
     resetTableModel()
+  }
+
+  private def showErrorDialog(msg: String, e: Throwable, shown: Set[Throwable] = Set()): Unit = {
+    if (e.getCause != null && !shown.contains(e.getCause))
+      showErrorDialog(msg + ", " + e.getLocalizedMessage, e.getCause, shown + e)
+    else JOptionPane.showMessageDialog(null, msg + ", " + e.getLocalizedMessage)
   }
 
   def initBindings(): Unit = {
@@ -216,4 +228,5 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
     })
     newBook
   }
+
 }

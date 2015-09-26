@@ -3,6 +3,7 @@ package eu.eyan.idakonyvtar.oszk;
 import static org.fest.assertions.Assertions.assertThat;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -35,11 +36,11 @@ public class OszkKeresoTest {
 
 	@Test
 	public void marc_parse_muxik() throws OszkKeresoException {
-		List<Marc> abigel = OszkKereso.getMarcsToIsbn("9789631193701");
+		Collection<Marc> abigel = OszkKereso.getMarcsToIsbn("9789631193701");
 		assertThat(MarcHelper.findMarc(abigel, MarcCodes.CIM)).isEqualTo(
 				"Abigél");
 
-		List<Marc> marai = OszkKereso.getMarcsToIsbn("9789632273822");
+		Collection<Marc> marai = OszkKereso.getMarcsToIsbn("9789632273822");
 		assertThat(MarcHelper.findMarc(marai, MarcCodes.CIM)).isEqualTo(
 				"Hallgatni akartam");
 	}
