@@ -1,20 +1,18 @@
 package eu.eyan.idakonyvtar.view;
 
-import com.google.common.collect.Lists.newArrayList;
-
-import java.awt.Component;
-import java.util.List;
-
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-
-import com.jgoodies.forms.builder.PanelBuilder;
-import com.jgoodies.forms.factories.CC;
-import com.jgoodies.forms.layout.FormLayout;
-
-import eu.eyan.idakonyvtar.model.ColumnConfigurations;
-import eu.eyan.idakonyvtar.model.ColumnKonfiguration;
+import com.google.common.collect.Lists.newArrayList
+import java.awt.Component
+import javax.swing.JComboBox
+import javax.swing.JLabel
+import javax.swing.JTextField
+import com.jgoodies.forms.builder.PanelBuilder
+import com.jgoodies.forms.factories.CC
+import com.jgoodies.forms.layout.FormLayout
+import eu.eyan.idakonyvtar.model.ColumnConfigurations
+import eu.eyan.idakonyvtar.model.ColumnKonfiguration
+import com.jgoodies.forms.layout.RowSpec
+import AbstractView._
+import scala.collection.mutable.MutableList
 
 object BookView {
   val ISBN_TEXT = "isbnText";
@@ -23,79 +21,64 @@ object BookView {
 
 class BookView extends AbstractView {
 
-  var columns: java.util.List[String] = newArrayList()
-
-  var isbnEnabled: Boolean = false
-
-  val editors: java.util.List[Component] = newArrayList()
-
+  val editors: MutableList[Component] = MutableList()
   val isbnSearchLabel = new JLabel()
-
   val isbnText = new JTextField()
 
+  var columns: List[String] = null
+  def setColumns(columns: List[String]) = this.columns = columns
+
+  var isbnEnabled: Boolean = false
+  def setIsbnEnabled(isbnEnabled: Boolean): Unit = this.isbnEnabled = isbnEnabled
+
   var columnConfiguration: ColumnKonfiguration = null
-
-  def getEditors() = editors
-
-  def getIsbnSearchLabel() = isbnSearchLabel
-
-  def getIsbnText() = isbnText
-
-  def setIsbnEnabled(isbnEnabled: Boolean): Unit = { this.isbnEnabled = isbnEnabled }
-
-  def setColumnConfiguration(columnConfiguration: ColumnKonfiguration) = { this.columnConfiguration = columnConfiguration }
-
-  def setColumns(columns: java.util.List[String]) = this.columns = columns
+  def setColumnConfiguration(columnConfiguration: ColumnKonfiguration) = this.columnConfiguration = columnConfiguration
 
   protected override def createViewComponent(): Component = {
-    var rowSpec = ""
-    if (isbnEnabled) {
-      rowSpec += "pref, 3dlu, pref, 3dlu, "
-    }
-    rowSpec += rowSpec + "pref"
+    val layout = new FormLayout("pref, 3dlu, pref:grow")
+    val panelBuilder = new PanelBuilder(layout)
 
-    for (i <- 0 until columns.size()) rowSpec += ",3dlu ,pref"
-
-    val panelBuilder = new PanelBuilder(new FormLayout("pref, 3dlu, pref:grow", rowSpec))
-
-    var row = 1
+    var row = 0
 
     if (isbnEnabled) {
+      row += addRow(layout, "pref")
       panelBuilder.addSeparator("Isbn", CC.xyw(1, row, 3))
-      row = row + 2
+
+      row += addRow(layout, "3dlu, pref")
       panelBuilder.add(isbnSearchLabel, CC.xyw(1, row, 1))
       isbnSearchLabel.setName(BookView.ISBN_LABEL)
       panelBuilder.add(isbnText, CC.xyw(3, row, 1))
       isbnText.setName(BookView.ISBN_TEXT)
-      row = row + 2
     }
 
+    row += addRow(layout, "3dlu, pref")
     panelBuilder.addSeparator("Adatok", CC.xyw(1, row, 3))
 
-    for (i <- 0 until columns.size()) {
-      row = row + 2;
-      val columnName = columns.get(i)
+    for (i <- 0 until columns.size) {
+      row += addRow(layout, "3dlu, pref")
+      val columnName = columns(i)
       panelBuilder.addLabel(columnName, CC.xy(1, row))
 
-      var editor: Component = null
-      val multi = columnConfiguration.isTrue(columnName, ColumnConfigurations.MULTIFIELD)
-      if (columnConfiguration.isTrue(columnName, ColumnConfigurations.AUTOCOMPLETE)) {
-        if (multi) {
-          editor = new MultiFieldJComboBox(columnName)
+      val isMultiEditorField = columnConfiguration.isTrue(columnName, ColumnConfigurations.MULTIFIELD)
+      val isAutocompleteField = columnConfiguration.isTrue(columnName, ColumnConfigurations.AUTOCOMPLETE)
+      val editor: Component =
+        if (isAutocompleteField) {
+          if (isMultiEditorField) {
+            new MultiFieldJComboBox(columnName)
+          } else {
+            val jComboBox = new JComboBox[String]()
+            jComboBox.setEditable(true)
+            jComboBox
+          }
         } else {
-          val jComboBox = new JComboBox[String]()
-          jComboBox.setEditable(true)
-          editor = jComboBox
+          if (isMultiEditorField) {
+            new MultiFieldJTextField(columnName)
+          } else {
+            new JTextField(20)
+          }
         }
-      } else {
-        if (multi) {
-          editor = new MultiFieldJTextField(columnName)
-        } else {
-          editor = new JTextField(20)
-        }
-      }
       editor.setName(columnName)
-      editors.add(editor)
+      editors += editor
       panelBuilder.add(editor, CC.xy(3, row))
     }
     panelBuilder.build()

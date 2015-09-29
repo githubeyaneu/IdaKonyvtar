@@ -58,7 +58,7 @@ class BookController extends IDialogController[BookControllerInput, Book] {
 
   def initBindings() = {
     initFieldsActionBindings
-    view.getIsbnText().addActionListener(isbnSearch())
+    view.isbnText.addActionListener(isbnSearch())
   }
 
   private def initFieldsActionBindings = {
@@ -70,21 +70,21 @@ class BookController extends IDialogController[BookControllerInput, Book] {
       if (autoComplete) {
         val columnList = BookHelper.getColumnList(model.bookList, columnIndex)
         if (multi) {
-          val mmcombo: MultiFieldJComboBox = view.getEditors().get(columnIndex).asInstanceOf[MultiFieldJComboBox]
+          val mmcombo: MultiFieldJComboBox = view.editors(columnIndex).asInstanceOf[MultiFieldJComboBox]
           mmcombo.setAutoCompleteList(columnList)
           multiFieldBind(mmcombo, new BookFieldValueModel(columnIndex, model.book))
         } else {
-          val comboBox: JComboBox[_] = view.getEditors().get(columnIndex).asInstanceOf[JComboBox[_]]
+          val comboBox: JComboBox[_] = view.editors(columnIndex).asInstanceOf[JComboBox[_]]
           val adapter = new ComboBoxAdapter[String](columnList, new BookFieldValueModel(columnIndex, model.book))
           Bindings.bind(comboBox, adapter)
           AutoCompleteDecorator.decorate(comboBox)
         }
       } else {
         if (multi) {
-          val mmc: MultiFieldJTextField = view.getEditors().get(columnIndex).asInstanceOf[MultiFieldJTextField]
+          val mmc: MultiFieldJTextField = view.editors(columnIndex).asInstanceOf[MultiFieldJTextField]
           multiFieldBind(mmc, new BookFieldValueModel(columnIndex, model.book))
         } else {
-          Bindings.bind(view.getEditors().get(columnIndex).asInstanceOf[JTextField], new BookFieldValueModel(columnIndex, model.book))
+          Bindings.bind(view.editors(columnIndex).asInstanceOf[JTextField], new BookFieldValueModel(columnIndex, model.book))
         }
       }
     }
@@ -107,25 +107,25 @@ class BookController extends IDialogController[BookControllerInput, Book] {
 
   private def isbnSearch(): ActionListener = new ActionListener() {
     override def actionPerformed(e: ActionEvent) = {
-      if (e.getSource() == view.getIsbnText()) {
-        view.getIsbnText().selectAll()
-        view.getIsbnSearchLabel().setText("Keresés")
-        view.getIsbnSearchLabel().setIcon(new ImageIcon(Resources.getResource("icons/search.gif")))
-        view.getEditors().foreach(_.setEnabled(false))
+      if (e.getSource() == view.isbnText) {
+        view.isbnText.selectAll()
+        view.isbnSearchLabel.setText("Keresés")
+        view.isbnSearchLabel.setIcon(new ImageIcon(Resources.getResource("icons/search.gif")))
+        view.editors.foreach(_.setEnabled(false))
 
         //TODO Asynchron
         SwingUtilities.invokeLater(new Runnable() {
           override def run() {
             try {
-              val marcsToIsbn = OszkKereso.getMarcsToIsbn(view.getIsbnText().getText().replaceAll("ö", "0"))
+              val marcsToIsbn = OszkKereso.getMarcsToIsbn(view.isbnText.getText().replaceAll("ö", "0"))
               prozessIsbnData(marcsToIsbn)
             } catch {
               case e: OszkKeresoException =>
                 // FIXME: itt fontos a naplózás
-                view.getIsbnSearchLabel().setText("Nincs találat")
-                view.getIsbnSearchLabel().setIcon(new ImageIcon(Resources.getResource("icons/error.gif")))
+                view.isbnSearchLabel.setText("Nincs találat")
+                view.isbnSearchLabel.setIcon(new ImageIcon(Resources.getResource("icons/error.gif")))
             } finally {
-              view.getEditors().foreach(_.setEnabled(true))
+              view.editors.foreach(_.setEnabled(true))
               fireResizeEvent()
             }
           }
@@ -165,7 +165,7 @@ class BookController extends IDialogController[BookControllerInput, Book] {
 
   def getOutput = model.book
 
-  def getComponentForFocus(): Component = view.getIsbnText()
+  def getComponentForFocus(): Component = view.isbnText
 
   def addResizeListener(window: Window) = this.resizeListeners.add(window)
 

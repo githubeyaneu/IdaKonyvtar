@@ -1,9 +1,7 @@
 package eu.eyan.idakonyvtar.view;
 
-import com.google.common.collect.Lists.newArrayList
 import java.awt.Component
 import java.awt.event.ActionEvent
-import java.util.List
 import java.util.stream.Collectors
 import javax.swing.BoxLayout
 import javax.swing.JButton
@@ -13,6 +11,8 @@ import com.jgoodies.forms.factories.CC
 import com.jgoodies.forms.layout.FormLayout
 import scala.collection.JavaConversions._
 import java.awt.event.ActionListener
+import scala.collection.mutable.MutableList
+import scala.collection.mutable.ListBuffer
 
 abstract class MultiField[INPUT, EDITOR <: Component](columnName: String) extends JPanel with FieldEditListener[EDITOR] {
 
@@ -28,7 +28,7 @@ abstract class MultiField[INPUT, EDITOR <: Component](columnName: String) extend
 
   class Field[EDITOR](val editor: EDITOR, val delete: JButton, val panel: JPanel)
 
-  val fields: java.util.List[Field[EDITOR]] = newArrayList()
+  val fields: ListBuffer[Field[EDITOR]] = ListBuffer()
   var counter = 1
   setLayout(new BoxLayout(this, BoxLayout.Y_AXIS))
 
@@ -59,28 +59,27 @@ abstract class MultiField[INPUT, EDITOR <: Component](columnName: String) extend
     val field = new Field[EDITOR](editor, deleteButton, fieldPanel)
     deleteButton.addActionListener(new ActionListener {
       override def actionPerformed(actionEvent: ActionEvent) = {
-        fields.remove(field)
+        fields -= field
         remove(field.panel)
         revalidate()
       }
     })
-    fields.add(field);
-    add(fieldPanel);
+    fields += field
+    add(fieldPanel)
 
-    fieldPanel.setName(columnName + ".panel." + counter);
-    editor.setName(columnName + counter);
-    deleteButton.setName(columnName + ".delete." + counter);
+    fieldPanel.setName(columnName + ".panel." + counter)
+    editor.setName(columnName + counter)
+    deleteButton.setName(columnName + ".delete." + counter)
     counter = counter + 1
 
-    revalidate();
-    // SwingUtilities.getWindowAncestor(this).pack();
+    revalidate()
   }
 
   def fieldEdited(source: EDITOR) = {
-    val lastField = fields.get(fields.size() - 1)
+    val lastField = fields(fields.size() - 1)
     if (lastField.editor == source) {
       lastField.delete.setEnabled(true)
-      addEditor(null.asInstanceOf[INPUT], true);
+      addEditor(null.asInstanceOf[INPUT], true)
     }
   }
 

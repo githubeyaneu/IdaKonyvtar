@@ -1,9 +1,7 @@
 package eu.eyan.idakonyvtar.view;
 
-import com.google.common.collect.Lists.newArrayList
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
-import java.util.List
 import javax.swing.JComboBox
 import javax.swing.JTextField
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator
@@ -11,7 +9,7 @@ import org.jdesktop.swingx.combobox.ListComboBoxModel;
 import javax.swing.ComboBoxModel
 
 class MultiFieldJComboBox(columnName: String) extends MultiField[String, JComboBox[String]](columnName) {
-  var columnList: java.util.List[String] = newArrayList()
+  var columnList: java.util.List[String] = com.google.common.collect.Lists.newArrayList() // java.util because of dependencies
 
   protected def addFieldEditListener(editor: JComboBox[String], listener: FieldEditListener[JComboBox[String]]) = {
     editor.getEditor().getEditorComponent().asInstanceOf[JTextField].addKeyListener(new KeyAdapter() {
