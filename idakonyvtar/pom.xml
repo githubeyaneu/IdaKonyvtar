@@ -263,6 +263,14 @@ idakonyvtar@eyan.eu</description>
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>ch.randelshofer</groupId>
+			<artifactId>monte</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/resources/lib/MonteScreenRecorder.jar</systemPath>
+		</dependency>
+
 	</dependencies>
 
 	<url>https://github.com/githubeyaneu/IdaKonyvtar</url>

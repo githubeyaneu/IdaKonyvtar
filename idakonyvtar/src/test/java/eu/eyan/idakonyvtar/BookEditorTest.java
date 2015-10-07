@@ -22,6 +22,7 @@ import eu.eyan.idakonyvtar.model.ColumnConfigurations;
 import eu.eyan.idakonyvtar.model.ColumnKonfiguration;
 import eu.eyan.idakonyvtar.testhelper.BookEditorTestHelper;
 import eu.eyan.idakonyvtar.util.DialogHelper;
+import eu.eyan.idakonyvtar.util.TestVideoRecorder;
 
 public class BookEditorTest extends AbstractUiTest {
 	private BookEditorTestHelper bookEditor;
@@ -59,6 +60,9 @@ public class BookEditorTest extends AbstractUiTest {
 
 		bookEditor = new BookEditorTestHelper(
 				BasicRobot.robotWithCurrentAwtHierarchy());
+
+		TestVideoRecorder.setComponentToRecord(bookEditor
+				.getComponentToRecord());
 	}
 
 	@After

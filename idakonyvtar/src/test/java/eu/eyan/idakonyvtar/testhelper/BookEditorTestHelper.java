@@ -2,9 +2,12 @@ package eu.eyan.idakonyvtar.testhelper;
 
 import static org.fest.swing.finder.WindowFinder.findDialog;
 
+import java.awt.Component;
+import java.awt.Window;
 import java.awt.event.KeyEvent;
 
 import javax.swing.JDialog;
+import javax.swing.SwingUtilities;
 
 import org.fest.assertions.Fail;
 import org.fest.swing.core.GenericTypeMatcher;
@@ -109,5 +112,9 @@ public class BookEditorTestHelper {
 
 	public void requireNormalText(String textBoxName, String text) {
 		dialog.textBox(textBoxName).requireText(text);
+	}
+
+	public Component getComponentToRecord() {
+		return SwingUtilities.getRoot(dialog.target);
 	}
 }

@@ -2,6 +2,7 @@ package eu.eyan.idakonyvtar.testhelper;
 
 import static org.fest.assertions.Assertions.assertThat;
 
+import java.awt.Component;
 import java.awt.Point;
 import java.io.File;
 
@@ -130,5 +131,9 @@ public class IdaLibraryTestHelper {
 
 	public void requireInvisible() {
 		assertThat(frame.target.isVisible()).isFalse();
+	}
+
+	public Component getComponentToRecord() {
+		return frame.target;
 	}
 }
