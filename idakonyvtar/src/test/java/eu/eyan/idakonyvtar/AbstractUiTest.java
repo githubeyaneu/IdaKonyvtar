@@ -14,7 +14,7 @@ import eu.eyan.idakonyvtar.util.TestVideoRecorder;
 import eu.eyan.idakonyvtar.util.TestVideoRecorder.VideoRunner;
 
 @RunWith(VideoRunner.class)
-public class AbstractUiTest {
+public abstract class AbstractUiTest {
 
 	@SuppressFBWarnings(value = "URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD", justification = "Testrule")
 	@Rule

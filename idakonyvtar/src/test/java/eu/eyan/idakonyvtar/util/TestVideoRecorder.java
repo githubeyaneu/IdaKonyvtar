@@ -73,7 +73,7 @@ public class TestVideoRecorder {
 					}
 					try {
 						TestVideoRecorder.start(componentToRecord,
-								"failed_gui_tests", testVideoCounter + "_"
+								"FailedTestVideos", testVideoCounter + "_"
 										+ testName);
 						super.evaluate();
 						TestVideoRecorder.stopUndVideoVerwerfen();
