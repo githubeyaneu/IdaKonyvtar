@@ -1,0 +1,5 @@
+<FindBugsFilter>
+	<Match>
+		<Source name=".*\.java" />
+	</Match>
+</FindBugsFilter>

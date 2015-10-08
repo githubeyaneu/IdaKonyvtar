@@ -293,4 +293,17 @@ idakonyvtar@eyan.eu</description>
 		<name>eyan.eu</name>
 	</organization>
 
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
+				<version>3.0.1</version>
+				<configuration>
+					<includeFilterFile>src/main/resources/findbugs/findbugs-include.xml</includeFilterFile>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
+
 </project>
