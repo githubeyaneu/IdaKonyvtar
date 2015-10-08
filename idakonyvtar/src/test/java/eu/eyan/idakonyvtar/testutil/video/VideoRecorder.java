@@ -67,13 +67,14 @@ public class VideoRecorder {
 	}
 
 	public void stopUndVideoVerwerfen() {
+		File videoFile = screenRecorder.getVideoFile();
 		try {
 			stop();
 		} catch (IOException e) {
 			e.printStackTrace();// FIXME
 		} finally {
-			if (screenRecorder.getVideoFile() != null && screenRecorder.getVideoFile().exists() && screenRecorder.getVideoFile().isFile()) {
-				screenRecorder.getVideoFile().delete();
+			if (videoFile != null && videoFile.exists() && videoFile.isFile()) {
+				videoFile.delete();
 			}
 		}
 	}
