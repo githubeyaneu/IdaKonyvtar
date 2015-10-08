@@ -3,7 +3,6 @@ package eu.eyan.idakonyvtar.testhelper;
 import static org.fest.swing.finder.WindowFinder.findDialog;
 
 import java.awt.Component;
-import java.awt.Window;
 import java.awt.event.KeyEvent;
 
 import javax.swing.JDialog;
@@ -20,8 +19,7 @@ import eu.eyan.idakonyvtar.view.BookView;
 
 public class BookEditorTestHelper {
 
-	public static final GenericTypeMatcher<JDialog> VISIBLE_DIALOG_FINDER = new GenericTypeMatcher<JDialog>(
-			JDialog.class) {
+	public static final GenericTypeMatcher<JDialog> VISIBLE_DIALOG_FINDER = new GenericTypeMatcher<JDialog>(JDialog.class) {
 		@Override
 		protected boolean isMatching(JDialog jDialog) {
 			return jDialog.isVisible();
@@ -31,8 +29,7 @@ public class BookEditorTestHelper {
 	private DialogFixture dialog;
 
 	public BookEditorTestHelper(Robot robot) {
-		dialog = findDialog(VISIBLE_DIALOG_FINDER).withTimeout(1000).using(
-				robot);
+		dialog = findDialog(VISIBLE_DIALOG_FINDER).withTimeout(1000).using(robot);
 		dialog.target.toFront();
 	}
 
@@ -41,8 +38,7 @@ public class BookEditorTestHelper {
 		requireTextBoxNotPresent(dialog, BookView.ISBN_TEXT());
 	}
 
-	private void requireTextBoxNotPresent(ContainerFixture<?> container,
-			String textBoxName) {
+	private void requireTextBoxNotPresent(ContainerFixture<?> container, String textBoxName) {
 		try {
 			container.label(textBoxName);
 		} catch (Exception e) {
@@ -51,8 +47,7 @@ public class BookEditorTestHelper {
 		Fail.fail();
 	}
 
-	private void requireLabelNotPresent(ContainerFixture<?> container,
-			String labelName) {
+	private void requireLabelNotPresent(ContainerFixture<?> container, String labelName) {
 		try {
 			container.label(labelName).requireVisible();
 		} catch (Exception e) {

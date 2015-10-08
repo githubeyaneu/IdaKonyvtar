@@ -13,9 +13,9 @@ import eu.eyan.idakonyvtar.model.ColumnConfigurations;
 import eu.eyan.idakonyvtar.testhelper.ExcelAssert;
 import eu.eyan.idakonyvtar.testhelper.IdaLibraryTestHelper;
 import eu.eyan.idakonyvtar.testhelper.LibraryFileBuilder;
+import eu.eyan.idakonyvtar.testutil.video.VideoRunner;
 import eu.eyan.idakonyvtar.util.ExcelHandler;
 import eu.eyan.idakonyvtar.util.HighlightRenderer;
-import eu.eyan.idakonyvtar.util.TestVideoRecorder;
 import eu.eyan.idakonyvtar.view.LibraryMenuAndToolBar;
 
 public class IdaLibraryTest extends AbstractUiTest {
@@ -24,7 +24,7 @@ public class IdaLibraryTest extends AbstractUiTest {
 	@Before
 	public void setUp() {
 		library.start(null);
-		TestVideoRecorder.setComponentToRecord(library.getComponentToRecord());
+		VideoRunner.setComponentToRecord(library.getComponentToRecord());
 	}
 
 	@After

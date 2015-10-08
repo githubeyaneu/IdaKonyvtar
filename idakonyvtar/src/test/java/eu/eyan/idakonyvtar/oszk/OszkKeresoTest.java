@@ -4,7 +4,6 @@ import static org.fest.assertions.Assertions.assertThat;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.fest.assertions.Fail;
@@ -24,8 +23,7 @@ public class OszkKeresoTest {
 	@Test
 	public void isbnKeresOszkban_muxik() {
 		try {
-			assertThat(OszkKereso.isbnKeresOszkban("9789631193701")).contains(
-					"Abigél");
+			assertThat(OszkKereso.isbnKeresOszkban("9789631193701")).contains("Abigél");
 			// assertThat(OszkKereso.isbnKeresOszkban("9789633708316")).contains("Királyok");
 			// assertThat(OszkKereso.isbnKeresOszkban("9789632273822")).contains("Hallgatni");
 		} catch (IOException e) {
@@ -37,11 +35,9 @@ public class OszkKeresoTest {
 	@Test
 	public void marc_parse_muxik() throws OszkKeresoException {
 		Collection<Marc> abigel = OszkKereso.getMarcsToIsbn("9789631193701");
-		assertThat(MarcHelper.findMarc(abigel, MarcCodes.CIM)).isEqualTo(
-				"Abigél");
+		assertThat(MarcHelper.findMarc(abigel, MarcCodes.CIM)).isEqualTo("Abigél");
 
 		Collection<Marc> marai = OszkKereso.getMarcsToIsbn("9789632273822");
-		assertThat(MarcHelper.findMarc(marai, MarcCodes.CIM)).isEqualTo(
-				"Hallgatni akartam");
+		assertThat(MarcHelper.findMarc(marai, MarcCodes.CIM)).isEqualTo("Hallgatni akartam");
 	}
 }
