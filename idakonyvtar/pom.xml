@@ -277,6 +277,7 @@ idakonyvtar@eyan.eu</description>
 
 	<scm>
 		<url>https://github.com/githubeyaneu/IdaKonyvtar</url>
+		<developerConnection>scm:git:git:///C:/DEVELOPING_1/projects/IdaKonyvtar/idakonyvtar</developerConnection>
 	</scm>
 
 	<issueManagement>

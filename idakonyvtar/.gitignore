@@ -13,3 +13,4 @@
 .project
 *.xls
 /FailedTestVideos
+release.properties
