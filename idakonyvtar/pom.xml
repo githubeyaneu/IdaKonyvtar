@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 
@@ -277,8 +278,9 @@ idakonyvtar@eyan.eu</description>
 	<scm>
 		<url>https://github.com/githubeyaneu/IdaKonyvtar</url>
 		<developerConnection>scm:git:git:///C:/DEVELOPING_1/projects/IdaKonyvtar/idakonyvtar</developerConnection>
-	  <tag>idakonyvtar-1.1.1</tag>
-  </scm>
+		<connection>scm:git:git:///C:/DEVELOPING_1/projects/IdaKonyvtar/idakonyvtar</connection>
+		<tag>idakonyvtar-1.1.1</tag>
+	</scm>
 
 	<issueManagement>
 		<url>https://github.com/githubeyaneu/IdaKonyvtar/issues</url>
