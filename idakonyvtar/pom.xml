@@ -5,7 +5,7 @@
 
 	<groupId>eu.eyan</groupId>
 	<artifactId>idakonyvtar</artifactId>
-	<version>1.1.1</version>
+	<version>1.1.1-SNAPSHOT</version>
 
 	<name>idakonyvtar</name>
 
@@ -16,6 +16,30 @@ English: Ida's Library
 Developed by András Frey
 idakonyvtar@eyan.eu</description>
 
+
+	<url>https://github.com/githubeyaneu/IdaKonyvtar</url>
+
+	<scm>
+<!-- 		<url>https://github.com/githubeyaneu/IdaKonyvtar</url> -->
+<!-- 		<developerConnection>scm:local|C:/DEVELOPING_1/projects/IdaKonyvtar|idakonyvtar</developerConnection> -->
+		<connection>scm:local|C:/DEVELOPING_1/projects/IdaKonyvtar|idakonyvtar</connection>
+		<tag>idakonyvtar-1.1.1</tag>
+	</scm>
+
+	<issueManagement>
+		<url>https://github.com/githubeyaneu/IdaKonyvtar/issues</url>
+		<system>Github</system>
+	</issueManagement>
+
+	<ciManagement>
+		<url>http://jenkins.eyan.eu/job/IdaKonyvtar_Windows/</url>
+		<system>Jenkins</system>
+	</ciManagement>
+
+	<organization>
+		<name>eyan.eu</name>
+	</organization>
+	
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<!-- project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding -->
@@ -272,29 +296,6 @@ idakonyvtar@eyan.eu</description>
 		</dependency>
 
 	</dependencies>
-
-	<url>https://github.com/githubeyaneu/IdaKonyvtar</url>
-
-	<scm>
-<!-- 		<url>https://github.com/githubeyaneu/IdaKonyvtar</url> -->
-<!-- 		<developerConnection>scm:local|C:/DEVELOPING_1/projects/IdaKonyvtar|idakonyvtar</developerConnection> -->
-		<connection>scm:local|C:/DEVELOPING_1/projects/IdaKonyvtar|idakonyvtar</connection>
-		<tag>idakonyvtar-1.1.1</tag>
-	</scm>
-
-	<issueManagement>
-		<url>https://github.com/githubeyaneu/IdaKonyvtar/issues</url>
-		<system>Github</system>
-	</issueManagement>
-
-	<ciManagement>
-		<url>http://jenkins.eyan.eu/job/IdaKonyvtar_Windows/</url>
-		<system>Jenkins</system>
-	</ciManagement>
-
-	<organization>
-		<name>eyan.eu</name>
-	</organization>
 
 	<reporting>
 		<plugins>
