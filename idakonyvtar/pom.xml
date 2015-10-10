@@ -276,9 +276,9 @@ idakonyvtar@eyan.eu</description>
 	<url>https://github.com/githubeyaneu/IdaKonyvtar</url>
 
 	<scm>
-		<url>https://github.com/githubeyaneu/IdaKonyvtar</url>
-		<developerConnection>scm:git:file://localhost/C:/DEVELOPING_1/projects/IdaKonyvtar/idakonyvtar</developerConnection>
-		<connection>scm:git:file://localhost/C:/DEVELOPING_1/projects/IdaKonyvtar/idakonyvtar</connection>
+<!-- 		<url>https://github.com/githubeyaneu/IdaKonyvtar</url> -->
+<!-- 		<developerConnection>scm:local|C:/DEVELOPING_1/projects/IdaKonyvtar|idakonyvtar</developerConnection> -->
+		<connection>scm:local|C:/DEVELOPING_1/projects/IdaKonyvtar|idakonyvtar</connection>
 		<tag>idakonyvtar-1.1.1</tag>
 	</scm>
 
