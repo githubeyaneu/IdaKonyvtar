@@ -95,7 +95,10 @@ object OszkKereso {
         }
         lastMarc3 = marc3
 
-        new Marc(lastMarc1, lastMarc2, lastMarc3, value)
+        val m = new Marc(lastMarc1, lastMarc2, lastMarc3, value)
+        println()
+        println(m)
+        m
       }
 
       //FIXME java test
