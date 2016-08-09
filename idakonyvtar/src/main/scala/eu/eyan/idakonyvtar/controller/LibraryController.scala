@@ -41,6 +41,9 @@ import javax.swing.event.ListSelectionEvent
 import javax.swing.event.ListSelectionListener
 import javax.swing.filechooser.FileNameExtensionFilter
 import eu.eyan.idakonyvtar.model.Library
+import eu.eyan.util.awt.AwtHelper._
+import eu.eyan.log.LogWindow
+import eu.eyan.log.Log
 
 object LibraryController {
   val NO = "Nem"
@@ -97,7 +100,7 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
   }
 
   private def readLibrary(file: File) = {
-    System.out.println("Loading file: " + file)
+    Log.info("Loading file: " + file)
     try model.library = ExcelHandler.readLibrary(file)
     catch {
       case le: LibraryException => showErrorDialog("Hiba a beolvasáskor", le)
@@ -117,6 +120,7 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
   def initBindings(): Unit = {
     menuAndToolBar.MENU_EXCEL_LOAD.addActionListener(this)
     menuAndToolBar.MENU_EXCEL_SAVE.addActionListener(this)
+    menuAndToolBar.MENU_OPEN_DEBUG_WINDOW.addActionListener(newActionListener(e => { LogWindow.show() }))
 
     menuAndToolBar.TOOLBAR_NEW_BOOK.addActionListener(this)
     menuAndToolBar.TOOLBAR_BOOK_DELETE.addActionListener(this)
@@ -179,7 +183,7 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
         jFileChooser.setApproveButtonText("Mentés")
         jFileChooser.setFileFilter(new FileNameExtensionFilter("Excel97 fájlok", "xls"))
         if (jFileChooser.showOpenDialog(menuAndToolBar.MENU_EXCEL_SAVE) == APPROVE_OPTION) {
-          System.out.println("Save " + jFileChooser.getSelectedFile())
+          Log.info("Save " + jFileChooser.getSelectedFile())
           saveLibrary(jFileChooser.getSelectedFile())
         }
 
@@ -215,7 +219,8 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
 
   private def savePreviousBook(book: Book) = {
     model.library.configuration.getRememberingColumns().foreach(colName => {
-      val columnIndex = model.library.columns.indexOf(colName);
+      val columnIndex = model.library.columns.indexOf(colName)
+      Log.info("LibraryController.savePreviousBook")
       previousBook.setValue(columnIndex, book.getValue(columnIndex))
     })
   }
@@ -224,6 +229,7 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
     val newBook = Book(size)
     model.library.configuration.getRememberingColumns().foreach(rememberingColumn => {
       val columnIndex = model.library.columns.indexOf(rememberingColumn)
+      Log.info("LibraryController.newPreviousBook")
       newBook.setValue(columnIndex, previousBook.getValue(columnIndex))
     })
     newBook

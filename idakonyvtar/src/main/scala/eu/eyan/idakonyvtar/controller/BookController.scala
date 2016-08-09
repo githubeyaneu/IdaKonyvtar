@@ -35,6 +35,7 @@ import javax.swing.JComboBox
 import javax.swing.JOptionPane
 import javax.swing.JTextField
 import javax.swing.SwingUtilities
+import eu.eyan.log.Log
 
 class BookController extends IDialogController[BookControllerInput, Book] {
   val view = new BookView()
@@ -45,9 +46,9 @@ class BookController extends IDialogController[BookControllerInput, Book] {
 
   def getTitle =
     if (model.columns.indexOf("Szerző") >= 0)
-      "Book adatainak szerkesztése - " + model.book.getValue(model.columns.indexOf("Szerző"))
+      "Könyv adatainak szerkesztése - " + model.book.getValue(model.columns.indexOf("Cím"))
     else
-      "Book adatainak szerkesztése"
+      "Könyv adatainak szerkesztése"
 
   def initData(model: BookControllerInput) = {
     this.model = model
@@ -93,8 +94,10 @@ class BookController extends IDialogController[BookControllerInput, Book] {
   private def multiFieldBind(mmc: MultiField[String, _], bookFieldValueModel: BookFieldValueModel) = {
     bookFieldValueModel.addValueChangeListener(new PropertyChangeListener {
       override def propertyChange(evt: PropertyChangeEvent) =
-        if (evt.getNewValue() != evt.getOldValue())
+        if (evt.getNewValue() != evt.getOldValue()) {
+          Log.debug("Listener: " + evt.getOldValue + " -> " + evt.getNewValue)
           mmc.setValues(getMultiFieldList(evt.getNewValue().asInstanceOf[String]))
+        }
     })
 
     mmc.setValues(getMultiFieldList(bookFieldValueModel.getValue()))
@@ -143,6 +146,7 @@ class BookController extends IDialogController[BookControllerInput, Book] {
           marcFromOszk <- marcsFromOszk;
           marcFromColumn <- marcCodesFromColumns if (isMarcsApply(marcFromOszk, marcFromColumn))
         ) yield marcFromOszk.value
+        Log.info("BookController.prozessIsbnData")
         model.book.setValue(model.columns.indexOf(column), values.mkString(", "))
       } catch {
         case e: Exception =>

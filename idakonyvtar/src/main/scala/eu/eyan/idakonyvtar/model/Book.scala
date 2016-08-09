@@ -5,11 +5,12 @@ import java.beans.PropertyChangeEvent
 import scala.collection.mutable.MutableList
 
 import com.jgoodies.binding.beans.Model
+import eu.eyan.log.Log
+import eu.eyan.log.Log
 
 object Book {
-  def apply(columnCount: Int): Book = {
+  def apply(columnCount: Int): Book =
     new Book(MutableList.fill[String](columnCount)(""))
-  }
 
   def apply(book: Book): Book = new Book(book.values.clone())
 
@@ -22,6 +23,7 @@ object Book {
     val book = Book(columnCount)
 
     def withValue(columnIndex: Int, value: String): Builder = {
+      Log.debug("Book.Builder.withValue")
       book.setValue(columnIndex, value)
       this
     }
@@ -37,10 +39,12 @@ class Book(val values: MutableList[String]) extends Model {
     // FIXME: AutoCompleteDecorator Problem: Disgusting Hack but works...
     if (value != null /* && !value.equals("") */ ) {
       values(columnIndex) = value
+      Log.debug("fire " + value)
       firePropertyChange(new Book.BookPropertyChangeEvent(this, "PROP", oldValue, value, columnIndex))
     }
   }
 
   def getValue(columnIndex: Int) = values(columnIndex)
 
+  override def toString(): String = values.mkString(" - ")
 }

@@ -13,6 +13,7 @@ import scala.collection.JavaConversions._
 import java.awt.event.ActionListener
 import scala.collection.mutable.MutableList
 import scala.collection.mutable.ListBuffer
+import eu.eyan.log.Log
 
 abstract class MultiField[INPUT, EDITOR <: Component](columnName: String) extends JPanel with FieldEditListener[EDITOR] {
 
@@ -33,6 +34,7 @@ abstract class MultiField[INPUT, EDITOR <: Component](columnName: String) extend
   setLayout(new BoxLayout(this, BoxLayout.Y_AXIS))
 
   def setValues(values: java.util.List[INPUT]) = {
+    Log.debug(values.mkString(", "))
     removeAll()
     fields.clear()
 

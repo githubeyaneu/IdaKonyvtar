@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 
@@ -19,11 +20,11 @@ idakonyvtar@eyan.eu</description>
 	<url>https://github.com/githubeyaneu/IdaKonyvtar</url>
 
 	<scm>
-<!-- 		<url>https://github.com/githubeyaneu/IdaKonyvtar</url> -->
-<!-- 		<developerConnection>scm:local|C:/DEVELOPING_1/projects/IdaKonyvtar|idakonyvtar</developerConnection> -->
-<!-- 		<connection>scm:local|C:/DEVELOPING_1/projects/IdaKonyvtar|idakonyvtar</connection> -->
-<!-- 		<connection>scm:git:git@localserver:C:/DEVELOPING_1/projects/IdaKonyvtar/idakonyvtar</connection> -->
-			<developerConnection>scm:git:file://localhost/C:/DEVELOPING_1/projects/IdaKonyvtar:idakonyvtar</developerConnection>
+		<!-- <url>https://github.com/githubeyaneu/IdaKonyvtar</url> -->
+		<!-- <developerConnection>scm:local|C:/DEVELOPING_1/projects/IdaKonyvtar|idakonyvtar</developerConnection> -->
+		<!-- <connection>scm:local|C:/DEVELOPING_1/projects/IdaKonyvtar|idakonyvtar</connection> -->
+		<!-- <connection>scm:git:git@localserver:C:/DEVELOPING_1/projects/IdaKonyvtar/idakonyvtar</connection> -->
+		<developerConnection>scm:git:file://localhost/C:/DEVELOPING_1/projects/IdaKonyvtar:idakonyvtar</developerConnection>
 		<tag>idakonyvtar-1.1.1</tag>
 	</scm>
 
@@ -40,7 +41,7 @@ idakonyvtar@eyan.eu</description>
 	<organization>
 		<name>eyan.eu</name>
 	</organization>
-	
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<!-- project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding -->
@@ -177,6 +178,12 @@ idakonyvtar@eyan.eu</description>
 		<!-- </dependency> -->
 
 		<dependency>
+			<groupId>eu.eyan.util</groupId>
+			<artifactId>eyan_helper</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		
+		<dependency>
 			<groupId>net.sourceforge.jexcelapi</groupId>
 			<artifactId>jxl</artifactId>
 			<version>2.6.12</version>
@@ -264,6 +271,15 @@ idakonyvtar@eyan.eu</description>
 
 
 		<!-- TEST DEPENDENCIES -->
+
+		<!-- https://mvnrepository.com/artifact/org.specs2/specs2_2.11 -->
+		<dependency>
+			<groupId>org.specs2</groupId>
+			<artifactId>specs2_2.11</artifactId>
+			<version>3.7</version>
+			<type>pom</type>
+		</dependency>
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>

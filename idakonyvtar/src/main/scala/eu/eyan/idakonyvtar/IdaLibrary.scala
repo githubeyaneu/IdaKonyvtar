@@ -5,6 +5,7 @@ import eu.eyan.idakonyvtar.controller.input.LibraryControllerInput
 import eu.eyan.idakonyvtar.controller.LibraryController
 import eu.eyan.idakonyvtar.util.DialogHelper
 import java.io.File
+import eu.eyan.log.Log
 
 object IdaLibrary {
 
@@ -20,9 +21,8 @@ object IdaLibrary {
       else
         new File(pathname);
 
-    println("Resource -> File: " + fileToOpen);
+    Log.info("Resource -> File: " + fileToOpen);
 
     DialogHelper.runInFrameFullScreen(new LibraryController(), new LibraryControllerInput(fileToOpen), LibraryController.TITLE);
   }
-
 }

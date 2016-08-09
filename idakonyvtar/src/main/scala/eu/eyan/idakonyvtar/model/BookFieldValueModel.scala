@@ -9,6 +9,7 @@ import scala.collection.JavaConverters._
 import com.jgoodies.binding.value.ValueModel
 
 import scala.collection.mutable.Set
+import eu.eyan.log.Log
 
 class BookFieldValueModel(columnIndex: Int, model: Book) extends ValueModel with PropertyChangeListener {
 
@@ -18,7 +19,10 @@ class BookFieldValueModel(columnIndex: Int, model: Book) extends ValueModel with
 
   def getValue() = model.getValue(columnIndex)
 
-  def setValue(newValue: Object) = model.setValue(columnIndex, newValue.asInstanceOf[String])
+  def setValue(newValue: Object) = {
+    Log.debug("BookFieldValueModel.setValue")
+    model.setValue(columnIndex, newValue.asInstanceOf[String])
+  }
 
   def addValueChangeListener(listener: PropertyChangeListener) = listeners += listener
 

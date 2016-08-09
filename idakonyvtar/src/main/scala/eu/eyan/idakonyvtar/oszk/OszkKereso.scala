@@ -7,6 +7,7 @@ import org.unix4j.Unix4j
 import com.google.common.collect.Lists
 
 import eu.eyan.idakonyvtar.util.HttpHelper
+import eu.eyan.log.Log
 
 /*
  * This is the code to acquire the hungarian book data -> that is why it is not translated.
@@ -27,7 +28,7 @@ object OszkKereso {
       "http://nektar1.oszk.hu/LVbin/LibriVision/lv_login.html",
       "USER_LOGIN=Nektar_LV_user&USER_PASSWORD=Nektar&LanguageCode=hu&CountryCode=hu&HtmlSetCode=default&lv_action=LV_Login&image3.x=17&image3.y=9",
       "SESSIO", "SESSION_ID=", "([0-9]*_[0-9]*)", "&")
-    // System.out.println("Session Id:" + session_id);
+    Log.debug("Session Id:" + session_id);
 
     // Login2
     HttpHelper
@@ -45,12 +46,12 @@ object OszkKereso {
       "href=\"",
       ".*",
       "\">MARC form")
-    // System.out.println("marcLink:" + marcLink);
+    Log.debug("marcLink:" + marcLink);
 
     // Marc rövid, marc hosszú keresése
     val fullMarcLink = findTextInUrl(
       "http://nektar1.oszk.hu/LVbin/LibriVision/" + marcLink, "", "Teljes megjelenítés", "href=\"", ".*", "\">Teljes")
-    // System.out.println("fullMarcLink:" + fullMarcLink);
+    Log.debug("fullMarcLink:" + fullMarcLink);
 
     // Marc hosszú
     HttpHelper.postUrl("http://nektar1.oszk.hu/LVbin/LibriVision/" + fullMarcLink, "")
