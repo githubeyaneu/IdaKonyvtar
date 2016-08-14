@@ -30,41 +30,26 @@ public class BookEditorIsbnTest extends AbstractUiTest {
 
 	@Before
 	public void setUp() {
-		List<String> columns = newArrayList("szimpla", "ac", "mm", "mmac",
-				"cim");
-		Book book = new Book.Builder(columns.size()).withValue(0, "Érték1")
-				.build();
+		List<String> columns = newArrayList("szimpla", "ac", "mm", "mmac", "cim");
+		Book book = new Book.Builder(columns.size()).withValue(0, "Érték1").build();
 
-		ColumnKonfiguration columnConfig = new ColumnKonfiguration.Builder(4,
-				columns.size() + 1)
-				.withRow("", ColumnConfigurations.MULTIFIELD().name(),
-						ColumnConfigurations.AUTOCOMPLETE().name(),
-						ColumnConfigurations.MARC_CODE().name())
-				.withRow(columns.get(0), "", "", "")
-				.withRow(columns.get(1), "", "igen", "")
-				.withRow(columns.get(2), "igen", "", "")
-				.withRow(columns.get(3), "igen", "igen", "")
-				.withRow(columns.get(4), "nem", "nem", "245-10-a").build();
+		ColumnKonfiguration columnConfig = new ColumnKonfiguration.Builder(4, columns.size() + 1)
+				.withRow("", ColumnConfigurations.MULTIFIELD().name(), ColumnConfigurations.AUTOCOMPLETE().name(), ColumnConfigurations.MARC_CODE().name())
+				.withRow(columns.get(0), "", "", "").withRow(columns.get(1), "", "igen", "").withRow(columns.get(2), "igen", "", "")
+				.withRow(columns.get(3), "igen", "igen", "").withRow(columns.get(4), "nem", "nem", "245-10-a").build();
 
-		ArrayList<Book> bookList = newArrayList(book,
-				new Book.Builder(columns.size()).withValue(0, "Érték2")
-						.withValue(1, "abc").withValue(3, "abc").build(),
-				new Book.Builder(columns.size()).withValue(0, "Érték2")
-						.withValue(1, "abd").withValue(3, "abd").build());
+		ArrayList<Book> bookList = newArrayList(book, new Book.Builder(columns.size()).withValue(0, "Érték2").withValue(1, "abc").withValue(3, "abc").build(),
+				new Book.Builder(columns.size()).withValue(0, "Érték2").withValue(1, "abd").withValue(3, "abd").build());
 
 		bookController = new BookController();
-		BookControllerInput bookControllerInput = new BookControllerInput(book,
-				JavaConversions.asScalaBuffer(columns).toList(), columnConfig,
-				JavaConversions.asScalaBuffer(bookList).toList(), true);
+		BookControllerInput bookControllerInput = new BookControllerInput(book, JavaConversions.asScalaBuffer(columns).toList(), columnConfig, JavaConversions
+				.asScalaBuffer(bookList).toList(), true);
 
-		SwingUtilities.invokeLater(() -> DialogHelper.startModalDialog(null,
-				bookController, bookControllerInput));
+		SwingUtilities.invokeLater(() -> DialogHelper.startModalDialog(null, bookController, bookControllerInput));
 
-		bookEditor = new BookEditorTestHelper(
-				BasicRobot.robotWithCurrentAwtHierarchy());
+		bookEditor = new BookEditorTestHelper(BasicRobot.robotWithCurrentAwtHierarchy());
 
-		VideoRunner.setComponentToRecord(bookEditor
-				.getComponentToRecord());
+		VideoRunner.setComponentToRecord(bookEditor.getComponentToRecord());
 	}
 
 	@After

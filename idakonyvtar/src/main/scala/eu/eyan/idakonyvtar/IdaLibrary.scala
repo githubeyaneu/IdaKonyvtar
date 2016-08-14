@@ -6,6 +6,8 @@ import eu.eyan.idakonyvtar.controller.LibraryController
 import eu.eyan.idakonyvtar.util.DialogHelper
 import java.io.File
 import eu.eyan.log.Log
+import eu.eyan.util.awt.AwtHelper._
+import eu.eyan.log.LogWindow
 
 object IdaLibrary {
 
@@ -23,6 +25,7 @@ object IdaLibrary {
 
     Log.info("Resource -> File: " + fileToOpen);
 
-    DialogHelper.runInFrameFullScreen(new LibraryController(), new LibraryControllerInput(fileToOpen), LibraryController.TITLE);
+    val frame = DialogHelper.runInFrameFullScreen(new LibraryController(), new LibraryControllerInput(fileToOpen), LibraryController.TITLE)
+    frame.addWindowListener(newWindowClosingEvent(e => LogWindow.close()))
   }
 }

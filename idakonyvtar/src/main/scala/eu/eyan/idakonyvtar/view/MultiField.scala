@@ -14,6 +14,8 @@ import java.awt.event.ActionListener
 import scala.collection.mutable.MutableList
 import scala.collection.mutable.ListBuffer
 import eu.eyan.log.Log
+import javax.swing.SwingUtilities
+import eu.eyan.util.awt.AwtHelper
 
 abstract class MultiField[INPUT, EDITOR <: Component](columnName: String) extends JPanel with FieldEditListener[EDITOR] {
 
@@ -75,6 +77,8 @@ abstract class MultiField[INPUT, EDITOR <: Component](columnName: String) extend
     counter = counter + 1
 
     revalidate()
+    //SwingUtilities.windowForComponent(this).pack()
+    AwtHelper.tryToEnlargeWindow(SwingUtilities.windowForComponent(this))
   }
 
   def fieldEdited(source: EDITOR) = {

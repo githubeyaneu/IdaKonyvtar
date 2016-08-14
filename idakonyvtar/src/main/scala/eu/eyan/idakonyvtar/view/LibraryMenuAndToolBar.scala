@@ -34,6 +34,8 @@ class LibraryMenuAndToolBar {
   val MENU_EXCEL_LOAD = new JMenuItem(LOAD_LIBRARY)
   val MENU_EXCEL_SAVE = new JMenuItem(SAVE_LIBRARY)
   val MENU_OPEN_DEBUG_WINDOW = new JMenuItem(OPEN_DEBUG_WINDOW)
+  val TOOLBAR_SAVE = new JButton("Mentés", new ImageIcon(Resources.getResource("icons/save.gif")))
+  val TOOLBAR_LOAD = new JButton("Töltés", new ImageIcon(Resources.getResource("icons/load.gif")))
   val TOOLBAR_NEW_BOOK = new JButton("Új book", new ImageIcon(Resources.getResource("icons/newbook.gif")))
   val TOOLBAR_BOOK_DELETE = new JButton("Törlés", new ImageIcon(Resources.getResource("icons/delete.gif")))
   val TOOLBAR_SEARCH = new JTextField(5)
@@ -54,6 +56,14 @@ class LibraryMenuAndToolBar {
 
   MENU_FILE.add(MENU_OPEN_DEBUG_WINDOW)
   MENU_OPEN_DEBUG_WINDOW.setName(OPEN_DEBUG_WINDOW)
+
+  toolBar.add(TOOLBAR_SAVE)
+  TOOLBAR_SAVE.setName(SAVE_LIBRARY)
+  TOOLBAR_SAVE.setToolTipText(SAVE_LIBRARY)
+
+  toolBar.add(TOOLBAR_LOAD)
+  TOOLBAR_LOAD.setName(LOAD_LIBRARY)
+  TOOLBAR_LOAD.setToolTipText(LOAD_LIBRARY)
 
   toolBar.add(TOOLBAR_NEW_BOOK)
   TOOLBAR_NEW_BOOK.setName(ADD_NEW_BOOK)

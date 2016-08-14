@@ -92,6 +92,7 @@ class BookController extends IDialogController[BookControllerInput, Book] {
   }
 
   private def multiFieldBind(mmc: MultiField[String, _], bookFieldValueModel: BookFieldValueModel) = {
+    Log.debug(mmc.getName + " " + bookFieldValueModel)
     bookFieldValueModel.addValueChangeListener(new PropertyChangeListener {
       override def propertyChange(evt: PropertyChangeEvent) =
         if (evt.getNewValue() != evt.getOldValue()) {
