@@ -147,7 +147,7 @@ class BookController extends IDialogController[BookControllerInput, Book] {
           marcFromOszk <- marcsFromOszk;
           marcFromColumn <- marcCodesFromColumns if (isMarcsApply(marcFromOszk, marcFromColumn))
         ) yield marcFromOszk.value
-        Log.info("BookController.prozessIsbnData")
+        Log.info("BookController.prozessIsbnData " + values.mkString("\r\n    "))
         model.book.setValue(model.columns.indexOf(column), values.mkString(", "))
       } catch {
         case e: Exception =>
@@ -157,6 +157,7 @@ class BookController extends IDialogController[BookControllerInput, Book] {
     })
 
   private def isMarcsApply(marcFromOszk: Marc, marcFromColumn: Marc) = {
+    //Log.debug("marcFromOszk: " + marcFromOszk + " =?= marcFromColumn:" + marcFromColumn)
     if (marcFromOszk == null || marcFromColumn == null || marcFromOszk.marc1 == null || marcFromColumn.marc1 == null)
       false
     else marcFromOszk.marc1.equalsIgnoreCase(marcFromColumn.marc1) &&

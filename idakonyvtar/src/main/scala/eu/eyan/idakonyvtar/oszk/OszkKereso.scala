@@ -97,14 +97,14 @@ object OszkKereso {
         lastMarc3 = marc3
 
         val m = new Marc(lastMarc1, lastMarc2, lastMarc3, value)
-        println()
-        println(m)
+        Log.info(m.toString())
         m
       }
 
       //FIXME java test
       val ret = Lists.newArrayList[Marc]()
       marcs.foreach(ret.add(_))
+      marcs.foreach(m => Log.debug(m.toString()))
       ret
     } catch {
       case e: Throwable => {
