@@ -6,6 +6,7 @@ import java.awt.Component;
 import java.awt.Point;
 import java.io.File;
 
+import eu.eyan.idakonyvtar.text.Texts;
 import org.fest.swing.core.MouseButton;
 import org.fest.swing.core.matcher.JButtonMatcher;
 import org.fest.swing.fixture.DialogFixture;
@@ -20,7 +21,7 @@ public class IdaLibraryTestHelper {
 
 	public void start(String filenév) {
 		IdaLibrary.main(new String[] { filenév });
-		frame = new FrameFixture(LibraryController.TITLE());
+		frame = new FrameFixture(Texts.TITLE());
 		frame.target.toFront();
 	}
 
@@ -84,12 +85,12 @@ public class IdaLibraryTestHelper {
 	}
 
 	public void clickApproveYes() {
-		frame.dialog().button(JButtonMatcher.withText(LibraryController.YES()))
+		frame.dialog().button(JButtonMatcher.withText(Texts.YES()))
 				.click();
 	}
 
 	public void clickApproveNo() {
-		frame.dialog().button(JButtonMatcher.withText(LibraryController.NO()))
+		frame.dialog().button(JButtonMatcher.withText(Texts.NO()))
 				.click();
 	}
 
@@ -114,9 +115,9 @@ public class IdaLibraryTestHelper {
 	}
 
 	public void checkTitleWithNumber(int numberOfBooks) {
-		requireTitle(LibraryController.TITLE()
-				+ LibraryController.TITLE_SEPARATOR() + numberOfBooks
-				+ LibraryController.TITLE_PIECES());
+		requireTitle(Texts.TITLE()
+				+ Texts.TITLE_SEPARATOR() + numberOfBooks
+				+ Texts.TITLE_PIECES());
 
 	}
 
