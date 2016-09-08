@@ -182,6 +182,21 @@ idakonyvtar@eyan.eu</description>
 			<artifactId>eyan_helper</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+
+<!-- 		<dependency> -->
+<!-- 			<groupId>eu.eyan.util</groupId> -->
+<!-- 			<artifactId>eyan_helper</artifactId> -->
+<!-- 			<version>0.0.1-SNAPSHOT</version> -->
+<!-- 			<scope>test</scope> -->
+<!-- 		</dependency> -->
+		
+<!-- 		<dependency> -->
+<!-- 			<groupId>eu.eyan.util</groupId> -->
+<!-- 			<artifactId>eyan_helper</artifactId> -->
+<!-- 			<version>0.0.1-SNAPSHOT</version> -->
+<!-- 			<scope>test</scope> -->
+<!-- 			<type>test-jar</type> -->
+<!-- 		</dependency> -->
 		
 		<dependency>
 			<groupId>net.sourceforge.jexcelapi</groupId>

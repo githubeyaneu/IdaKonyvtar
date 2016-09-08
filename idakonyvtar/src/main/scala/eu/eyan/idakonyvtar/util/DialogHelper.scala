@@ -26,6 +26,8 @@ import javax.swing.JOptionPane
 import javax.swing.JScrollPane
 import javax.swing.JToolBar
 import javax.swing.SwingUtilities
+import eu.eyan.util.swing.OkCancelDialog
+import eu.eyan.util.swing.OkCancelDialog
 
 object DialogHelper {
 

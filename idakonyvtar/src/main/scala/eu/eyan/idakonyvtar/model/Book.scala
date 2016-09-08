@@ -23,7 +23,7 @@ object Book {
     val book = Book(columnCount)
 
     def withValue(columnIndex: Int, value: String): Builder = {
-      Log.debug("Book.Builder.withValue")
+      Log.debug(columnIndex + " " + value)
       book.setValue(columnIndex, value)
       this
     }
@@ -39,7 +39,7 @@ class Book(val values: MutableList[String]) extends Model {
     // FIXME: AutoCompleteDecorator Problem: Disgusting Hack but works...
     if (value != null /* && !value.equals("") */ ) {
       values(columnIndex) = value
-      Log.debug("fire " + value)
+      Log.trace("fire " + value)
       firePropertyChange(new Book.BookPropertyChangeEvent(this, "PROP", oldValue, value, columnIndex))
     }
   }

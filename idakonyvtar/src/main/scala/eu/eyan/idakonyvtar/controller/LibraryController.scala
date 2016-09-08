@@ -18,9 +18,7 @@ import eu.eyan.idakonyvtar.model.Book
 import eu.eyan.idakonyvtar.model.LibraryModel
 import eu.eyan.idakonyvtar.util.DialogHelper
 import eu.eyan.idakonyvtar.util.ExcelHandler
-import eu.eyan.idakonyvtar.util.HighlightRenderer
 import eu.eyan.idakonyvtar.util.LibraryException
-import eu.eyan.idakonyvtar.util.SpecialCharacterRowFilter
 import eu.eyan.idakonyvtar.view.LibraryMenuAndToolBar
 import eu.eyan.idakonyvtar.view.LibraryView
 import javax.swing.JFileChooser
@@ -40,6 +38,8 @@ import eu.eyan.log.LogWindow
 import eu.eyan.log.Log
 import eu.eyan.util.swing.SwingPlus._
 import java.awt.Component
+import eu.eyan.util.swing.HighlightRenderer
+import eu.eyan.util.swing.SpecialCharacterRowFilter
 
 class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void] {
 
@@ -103,8 +103,10 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
         jFileChooser.setDialogTitle("Töltés")
         jFileChooser.setApproveButtonText("Töltés")
         jFileChooser.setFileFilter(new FileNameExtensionFilter("Excel97 fájlok", "xls"))
-        if (jFileChooser.showOpenDialog(menuAndToolBar.MENU_EXCEL_LOAD) == APPROVE_OPTION)
+        if (jFileChooser.showOpenDialog(menuAndToolBar.MENU_EXCEL_LOAD) == APPROVE_OPTION) {
+          Log.info("selected file: " + jFileChooser.getSelectedFile)
           readLibrary(jFileChooser.getSelectedFile)
+        }
       }
     }
 

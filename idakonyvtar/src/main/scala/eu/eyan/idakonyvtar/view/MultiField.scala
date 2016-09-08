@@ -36,7 +36,7 @@ abstract class MultiField[INPUT, EDITOR <: Component](columnName: String) extend
   setLayout(new BoxLayout(this, BoxLayout.Y_AXIS))
 
   def setValues(values: java.util.List[INPUT]) = {
-    Log.debug(values.mkString(", "))
+    Log.debug(getName + ": " + values.mkString(", "))
     removeAll()
     fields.clear()
 
@@ -73,6 +73,7 @@ abstract class MultiField[INPUT, EDITOR <: Component](columnName: String) extend
 
     fieldPanel.setName(columnName + ".panel." + counter)
     editor.setName(columnName + counter)
+    Log.debug(columnName + counter)
     deleteButton.setName(columnName + ".delete." + counter)
     counter = counter + 1
 

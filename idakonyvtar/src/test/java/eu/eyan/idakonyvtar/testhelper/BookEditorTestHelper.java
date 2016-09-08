@@ -16,6 +16,7 @@ import org.fest.swing.fixture.DialogFixture;
 
 import eu.eyan.idakonyvtar.util.DialogHelper;
 import eu.eyan.idakonyvtar.view.BookView;
+import eu.eyan.testutil.swing.fixture.AutocompleteFixture;
 
 public class BookEditorTestHelper {
 
@@ -111,5 +112,9 @@ public class BookEditorTestHelper {
 
 	public Component getComponentToRecord() {
 		return SwingUtilities.getRoot(dialog.target);
+	}
+
+	public AutocompleteFixture autocomplete(String name) {
+		return new AutocompleteFixture(dialog, name);
 	}
 }

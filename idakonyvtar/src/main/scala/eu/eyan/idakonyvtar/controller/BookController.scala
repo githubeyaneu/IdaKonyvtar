@@ -36,6 +36,8 @@ import javax.swing.JOptionPane
 import javax.swing.JTextField
 import javax.swing.SwingUtilities
 import eu.eyan.log.Log
+import eu.eyan.idakonyvtar.view.MultiFieldAutocomplete
+import eu.eyan.util.swing.Autocomplete
 
 class BookController extends IDialogController[BookControllerInput, Book] {
   val view = new BookView()
@@ -71,14 +73,21 @@ class BookController extends IDialogController[BookControllerInput, Book] {
       if (autoComplete) {
         val columnList = BookHelper.getColumnList(model.bookList, columnIndex)
         if (multi) {
-          val mmcombo: MultiFieldJComboBox = view.editors(columnIndex).asInstanceOf[MultiFieldJComboBox]
+          Log.debug("mac " + columnIndex + " " + columnList)
+          //          val mmcombo: MultiFieldJComboBox = view.editors(columnIndex).asInstanceOf[MultiFieldJComboBox]
+          //          mmcombo.setAutoCompleteList(columnList)
+          val mmcombo = view.editors(columnIndex).asInstanceOf[MultiFieldAutocomplete]
           mmcombo.setAutoCompleteList(columnList)
           multiFieldBind(mmcombo, new BookFieldValueModel(columnIndex, model.book))
         } else {
-          val comboBox: JComboBox[_] = view.editors(columnIndex).asInstanceOf[JComboBox[_]]
-          val adapter = new ComboBoxAdapter[String](columnList, new BookFieldValueModel(columnIndex, model.book))
-          Bindings.bind(comboBox, adapter)
-          AutoCompleteDecorator.decorate(comboBox)
+          Log.debug("ac " + columnIndex + " " + columnList)
+          //        	val comboBox: JComboBox[_] = view.editors(columnIndex).asInstanceOf[JComboBox[_]]
+          //        			val adapter = new ComboBoxAdapter[String](columnList, new BookFieldValueModel(columnIndex, model.book))
+          //        			Bindings.bind(comboBox, adapter)
+          //        			AutoCompleteDecorator.decorate(comboBox)
+          val autocomplete = view.editors(columnIndex).asInstanceOf[Autocomplete]
+          autocomplete.setValues(columnList)
+          Bindings.bind(autocomplete, new BookFieldValueModel(columnIndex, model.book))
         }
       } else {
         if (multi) {

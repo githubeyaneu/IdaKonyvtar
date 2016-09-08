@@ -20,9 +20,9 @@ import eu.eyan.idakonyvtar.model.Book;
 import eu.eyan.idakonyvtar.model.ColumnConfigurations;
 import eu.eyan.idakonyvtar.model.ColumnKonfiguration;
 import eu.eyan.idakonyvtar.testhelper.BookEditorTestHelper;
-import eu.eyan.idakonyvtar.testutil.video.VideoRunner;
 import eu.eyan.idakonyvtar.util.DialogHelper;
 import eu.eyan.idakonyvtar.view.BookView;
+import eu.eyan.testutil.video.VideoRunner;
 
 public class BookEditorIsbnTest extends AbstractUiTest {
 	private BookEditorTestHelper bookEditor;

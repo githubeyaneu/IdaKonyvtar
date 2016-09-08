@@ -20,6 +20,7 @@ import jxl.write.Label
 import jxl.write.WritableCellFormat
 import jxl.write.WriteException
 import jxl.write.biff.RowsExceededException
+import eu.eyan.util.backup.BackupHelper
 
 object ExcelHandler {
 

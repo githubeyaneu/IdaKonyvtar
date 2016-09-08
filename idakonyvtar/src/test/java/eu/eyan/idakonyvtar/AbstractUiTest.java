@@ -10,8 +10,9 @@ import org.junit.rules.Timeout;
 import org.junit.runner.RunWith;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import eu.eyan.idakonyvtar.testutil.video.VideoRunner;
+import eu.eyan.testutil.video.VideoRunner;
 
+//FIXME: has to be deleted after migrating to eyan helper
 @RunWith(VideoRunner.class)
 public abstract class AbstractUiTest {
 

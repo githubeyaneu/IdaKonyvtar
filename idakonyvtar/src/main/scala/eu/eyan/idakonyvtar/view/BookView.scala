@@ -13,6 +13,13 @@ import eu.eyan.idakonyvtar.model.ColumnKonfiguration
 import com.jgoodies.forms.layout.RowSpec
 import AbstractView._
 import scala.collection.mutable.MutableList
+import java.awt.event.KeyAdapter
+import java.awt.event.KeyEvent
+import javax.swing.JWindow
+import javax.swing.JList
+import com.jgoodies.forms.debug.FormDebugPanel
+import java.awt.Window.Type
+import eu.eyan.util.swing.Autocomplete
 
 object BookView {
   val ISBN_TEXT = "isbnText";
@@ -64,11 +71,9 @@ class BookView extends AbstractView {
       val editor: Component =
         if (isAutocompleteField) {
           if (isMultiEditorField) {
-            new MultiFieldJComboBox(columnName)
+            new MultiFieldAutocomplete(columnName, "Autocomplete")
           } else {
-            val jComboBox = new JComboBox[String]()
-            jComboBox.setEditable(true)
-            jComboBox
+            new Autocomplete().setHintText("Autocomplete")
           }
         } else {
           if (isMultiEditorField) {

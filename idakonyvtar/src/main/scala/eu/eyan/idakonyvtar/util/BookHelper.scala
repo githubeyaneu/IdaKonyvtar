@@ -22,5 +22,6 @@ object BookHelper {
       .map(_.trim)
       .distinct
       .sortWith((s1: String, s2: String) => COLLATOR.compare(s1, s2) < 0)
+      .toList
   }
 }

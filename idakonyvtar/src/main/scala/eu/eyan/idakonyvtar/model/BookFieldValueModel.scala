@@ -20,7 +20,7 @@ class BookFieldValueModel(columnIndex: Int, model: Book) extends ValueModel with
   def getValue() = model.getValue(columnIndex)
 
   def setValue(newValue: Object) = {
-    Log.debug("BookFieldValueModel.setValue")
+    Log.debug(newValue.toString)
     model.setValue(columnIndex, newValue.asInstanceOf[String])
   }
 

@@ -6,8 +6,8 @@ import org.unix4j.Unix4j
 
 import com.google.common.collect.Lists
 
-import eu.eyan.idakonyvtar.util.HttpHelper
 import eu.eyan.log.Log
+import eu.eyan.util.http.HttpHelper
 
 /*
  * This is the code to acquire the hungarian book data -> that is why it is not translated.

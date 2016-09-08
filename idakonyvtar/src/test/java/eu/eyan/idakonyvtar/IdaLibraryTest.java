@@ -10,13 +10,13 @@ import org.junit.Test;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import eu.eyan.idakonyvtar.model.ColumnConfigurations;
-import eu.eyan.idakonyvtar.testhelper.ExcelAssert;
 import eu.eyan.idakonyvtar.testhelper.IdaLibraryTestHelper;
 import eu.eyan.idakonyvtar.testhelper.LibraryFileBuilder;
-import eu.eyan.idakonyvtar.testutil.video.VideoRunner;
 import eu.eyan.idakonyvtar.util.ExcelHandler;
-import eu.eyan.idakonyvtar.util.HighlightRenderer;
 import eu.eyan.idakonyvtar.view.LibraryMenuAndToolBar;
+import eu.eyan.testutil.ExcelAssert;
+import eu.eyan.testutil.video.VideoRunner;
+import eu.eyan.util.swing.HighlightRenderer;
 
 public class IdaLibraryTest extends AbstractUiTest {
 	private static IdaLibraryTestHelper library = new IdaLibraryTestHelper();
@@ -50,14 +50,10 @@ public class IdaLibraryTest extends AbstractUiTest {
 	@Test
 	@SuppressFBWarnings(value = "RV_RETURN_VALUE_IGNORED_BAD_PRACTICE", justification = "test cleanup")
 	public void testLoadAndSave() {
-		File file = new LibraryFileBuilder()
-				.withSheet(ExcelHandler.BOOKS())
-				.withColumns("column1", "column2")
-				.withRow("árvíztűrő tükörfúrógép", "ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP")
-				.withSheet(ExcelHandler.COLUMN_CONFIGURATION())
-				.withColumns("", ColumnConfigurations.SHOW_IN_TABLE().name(),
-						"ko2").withRow("column1", "igen", "")
-				.withRow("column2 tükörfúrógép", "nem", "").save();
+		File file = new LibraryFileBuilder().withSheet(ExcelHandler.BOOKS()).withColumns("column1", "column2")
+				.withRow("árvíztűrő tükörfúrógép", "ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP").withSheet(ExcelHandler.COLUMN_CONFIGURATION())
+				.withColumns("", ColumnConfigurations.SHOW_IN_TABLE().name(), "ko2").withRow("column1", "igen", "").withRow("column2 tükörfúrógép", "nem", "")
+				.save();
 		try {
 			library.load(file);
 			library.assertTableCell(1, 1, "árvíztűrő tükörfúrógép");
@@ -68,8 +64,7 @@ public class IdaLibraryTest extends AbstractUiTest {
 		File file2 = new File(System.currentTimeMillis() + ".xls");
 		try {
 			library.save(file2);
-			ExcelAssert.assertExcelCell(file2, ExcelHandler.BOOKS(), 1, 2,
-					"árvíztűrő tükörfúrógép");
+			ExcelAssert.assertExcelCell(file2, ExcelHandler.BOOKS(), 1, 2, "árvíztűrő tükörfúrógép");
 			library.checkTitleWithNumber(1);
 		} finally {
 			file2.delete();
@@ -130,24 +125,11 @@ public class IdaLibraryTest extends AbstractUiTest {
 		library.assertTableCell(
 				1,
 				1,
-				new StringBuilder("")
-						.append(HighlightRenderer.HTML_START_TAG())
-						.append("Tamási ")
-						.append(HighlightRenderer.HIGHLIGHT_START_TAG())
-						.append("Áron")
-						.append(HighlightRenderer.HIGHLIGHT_END_TAG())
-						.append(HighlightRenderer.HTML_END_TAG()).toString());
-		library.assertTableCell(
-				2,
-				2,
-				new StringBuilder("")
-						.append(HighlightRenderer.HTML_START_TAG())
-						.append("Kh")
-						.append(HighlightRenderer.HIGHLIGHT_START_TAG())
-						.append("áron")
-						.append(HighlightRenderer.HIGHLIGHT_END_TAG())
-						.append(" ladikján")
-						.append(HighlightRenderer.HTML_END_TAG()).toString());
+				new StringBuilder("").append(HighlightRenderer.HTML_START_TAG()).append("Tamási ").append(HighlightRenderer.HIGHLIGHT_START_TAG())
+						.append("Áron").append(HighlightRenderer.HIGHLIGHT_END_TAG()).append(HighlightRenderer.HTML_END_TAG()).toString());
+		library.assertTableCell(2, 2,
+				new StringBuilder("").append(HighlightRenderer.HTML_START_TAG()).append("Kh").append(HighlightRenderer.HIGHLIGHT_START_TAG()).append("áron")
+						.append(HighlightRenderer.HIGHLIGHT_END_TAG()).append(" ladikján").append(HighlightRenderer.HTML_END_TAG()).toString());
 		library.assertTableCell(1, 2, "Illyés Gyula");
 		library.assertTableRowCount(2);
 	}
