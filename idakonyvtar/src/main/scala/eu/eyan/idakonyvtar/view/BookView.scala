@@ -19,7 +19,7 @@ import javax.swing.JWindow
 import javax.swing.JList
 import com.jgoodies.forms.debug.FormDebugPanel
 import java.awt.Window.Type
-import eu.eyan.util.swing.Autocomplete
+import eu.eyan.util.swing.JTextFieldAutocomplete
 
 object BookView {
   val ISBN_TEXT = "isbnText";
@@ -73,7 +73,7 @@ class BookView extends AbstractView {
           if (isMultiEditorField) {
             new MultiFieldAutocomplete(columnName, "Autocomplete")
           } else {
-            new Autocomplete().setHintText("Autocomplete")
+            new JTextFieldAutocomplete().setHintText("Autocomplete")
           }
         } else {
           if (isMultiEditorField) {

@@ -6,14 +6,13 @@ import java.awt.Component;
 import java.awt.Point;
 import java.io.File;
 
-import eu.eyan.idakonyvtar.text.Texts;
 import org.fest.swing.core.MouseButton;
 import org.fest.swing.core.matcher.JButtonMatcher;
 import org.fest.swing.fixture.DialogFixture;
 import org.fest.swing.fixture.FrameFixture;
 
 import eu.eyan.idakonyvtar.IdaLibrary;
-import eu.eyan.idakonyvtar.controller.LibraryController;
+import eu.eyan.idakonyvtar.text.Texts;
 import eu.eyan.idakonyvtar.view.LibraryMenuAndToolBar;
 
 public class IdaLibraryTestHelper {

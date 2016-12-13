@@ -37,7 +37,7 @@ import javax.swing.JTextField
 import javax.swing.SwingUtilities
 import eu.eyan.log.Log
 import eu.eyan.idakonyvtar.view.MultiFieldAutocomplete
-import eu.eyan.util.swing.Autocomplete
+import eu.eyan.util.swing.JTextFieldAutocomplete
 
 class BookController extends IDialogController[BookControllerInput, Book] {
   val view = new BookView()
@@ -85,7 +85,7 @@ class BookController extends IDialogController[BookControllerInput, Book] {
           //        			val adapter = new ComboBoxAdapter[String](columnList, new BookFieldValueModel(columnIndex, model.book))
           //        			Bindings.bind(comboBox, adapter)
           //        			AutoCompleteDecorator.decorate(comboBox)
-          val autocomplete = view.editors(columnIndex).asInstanceOf[Autocomplete]
+          val autocomplete = view.editors(columnIndex).asInstanceOf[JTextFieldAutocomplete]
           autocomplete.setValues(columnList)
           Bindings.bind(autocomplete, new BookFieldValueModel(columnIndex, model.book))
         }
