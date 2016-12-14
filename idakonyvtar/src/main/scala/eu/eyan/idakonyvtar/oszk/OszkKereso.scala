@@ -41,7 +41,10 @@ object OszkKereso {
     // Keresés aztán Marc rövid formátum keresése
     val marcLink = findTextInUrl(
       "http://nektar1.oszk.hu/LVbin/LibriVision/lv_view_records.html",
-      "SESSION_ID=" + session_id + "&lv_action=LV_Search&QUERY_ID=T_1391112123&ADD_QUERY=-1&SEARCH_TYPE=QUERY_SIMPLE&HTML_SEARCH_TYPE=SIMPLE&USE=BN&_QUERY=" + isbn + "&QUERY=" + isbn + "&sub_button=Keres%C3%A9s",
+      "SESSION_ID=" + session_id
+      + "&lv_action=LV_Search&QUERY_ID=T_1391112123&ADD_QUERY=-1&SEARCH_TYPE=QUERY_SIMPLE&HTML_SEARCH_TYPE=SIMPLE&USE=BN&_QUERY=" + isbn
+      + "&QUERY=" + isbn
+      + "&sub_button=Keres%C3%A9s",
       "A record MARC form",
       "href=\"",
       ".*",
@@ -73,7 +76,7 @@ object OszkKereso {
   }
 
   @throws(classOf[OszkKeresoException])
-  def getMarcsToIsbn(isbn: String): java.util.List[Marc] /*FIXME java because of test*/ = {
+  def getMarcsToIsbn(isbn: String): java.util.List[Marc] /* FIXME java because of test */ = {
     try {
       var source = isbnKeresOszkban(isbn).replaceAll("[\r\n]", "")
       val marcTable = "<table class=\"record\">.*?</table>".r.findFirstIn(source).get
@@ -83,7 +86,7 @@ object OszkKereso {
       var lastMarc3 = ""
 
       val sorok = "<tr.*?</tr".r.findAllIn(marcTable)
-      val marcs = for (sor <- sorok) yield {
+      val marcs = for {sor <- sorok} yield {
         val marc1 = sor.substring(50 - 1, 53 - 1).trim()
         val marc2 = sor.substring(103 - 1, 105 - 1).trim()
         val marc3 = sor.substring(155 - 1, 156 - 1).trim()
@@ -101,7 +104,7 @@ object OszkKereso {
         m
       }
 
-      //FIXME java test
+      // FIXME java test
       val ret = Lists.newArrayList[Marc]()
       marcs.foreach(ret.add(_))
       marcs.foreach(m => Log.debug(m.toString()))

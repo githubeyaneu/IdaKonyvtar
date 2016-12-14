@@ -1,5 +1,6 @@
 package eu.eyan.idakonyvtar.controller
 
+import java.awt.Component
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 import java.awt.event.MouseAdapter
@@ -9,18 +10,33 @@ import java.awt.event.WindowEvent
 import java.io.File
 
 import scala.collection.JavaConversions.asScalaBuffer
+
 import com.jgoodies.binding.adapter.SingleListSelectionAdapter
-import eu.eyan.idakonyvtar.text.Texts._
+
 import eu.eyan.idakonyvtar.controller.adapter.LibraryListTableModel
 import eu.eyan.idakonyvtar.controller.input.BookControllerInput
 import eu.eyan.idakonyvtar.controller.input.LibraryControllerInput
 import eu.eyan.idakonyvtar.model.Book
 import eu.eyan.idakonyvtar.model.LibraryModel
+import eu.eyan.idakonyvtar.text.Texts.ERROR_AT_READING
+import eu.eyan.idakonyvtar.text.Texts.NO
+import eu.eyan.idakonyvtar.text.Texts.NO_BOOK_FOR_THE_FILTER
+import eu.eyan.idakonyvtar.text.Texts.NO_BOOK_IN_THE_LIST
+import eu.eyan.idakonyvtar.text.Texts.TITLE
+import eu.eyan.idakonyvtar.text.Texts.TITLE_PIECES
+import eu.eyan.idakonyvtar.text.Texts.TITLE_SEPARATOR
+import eu.eyan.idakonyvtar.text.Texts.YES
 import eu.eyan.idakonyvtar.util.DialogHelper
 import eu.eyan.idakonyvtar.util.ExcelHandler
 import eu.eyan.idakonyvtar.util.LibraryException
 import eu.eyan.idakonyvtar.view.LibraryMenuAndToolBar
 import eu.eyan.idakonyvtar.view.LibraryView
+import eu.eyan.log.Log
+import eu.eyan.log.LogWindow
+import eu.eyan.util.awt.AwtHelper.newActionListener
+import eu.eyan.util.swing.HighlightRenderer
+import eu.eyan.util.swing.SpecialCharacterRowFilter
+import eu.eyan.util.swing.SwingPlus.showErrorDialog
 import javax.swing.JFileChooser
 import javax.swing.JFileChooser.APPROVE_OPTION
 import javax.swing.JFrame
@@ -33,13 +49,6 @@ import javax.swing.event.ListDataListener
 import javax.swing.event.ListSelectionEvent
 import javax.swing.event.ListSelectionListener
 import javax.swing.filechooser.FileNameExtensionFilter
-import eu.eyan.util.awt.AwtHelper._
-import eu.eyan.log.LogWindow
-import eu.eyan.log.Log
-import eu.eyan.util.swing.SwingPlus._
-import java.awt.Component
-import eu.eyan.util.swing.HighlightRenderer
-import eu.eyan.util.swing.SpecialCharacterRowFilter
 
 class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void] {
 
@@ -131,9 +140,15 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
 
     menuAndToolBar.TOOLBAR_NEW_BOOK.addActionListener(newActionListener(e => {
       val bookController = new BookController()
+
       val editorDialog = DialogHelper.startModalDialog(
         view.getComponent(), bookController, new BookControllerInput(
-          newPreviousBook(model.library.columns.size), model.library.columns /*FIXME*/ .toList, model.library.configuration, model.books.getList /*FIXME*/ .toList, true))
+          newPreviousBook(model.library.columns.size),
+          model.library.columns /* FIXME */ .toList,
+          model.library.configuration,
+          model.books.getList /* FIXME */ .toList,
+          true))
+
       if (editorDialog.isOk()) {
         model.books.getList.add(0, bookController.getOutput)
         savePreviousBook(bookController.getOutput)
@@ -168,7 +183,7 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
     })
 
     menuAndToolBar.TOOLBAR_SEARCH.addKeyListener(new KeyAdapter() {
-      override def keyReleased(e: KeyEvent) {
+      override def keyReleased(e: KeyEvent) = {
         view.getBookTable().setRowFilter(new SpecialCharacterRowFilter(menuAndToolBar.TOOLBAR_SEARCH.getText()))
         highlightRenderer.setHighlightText(menuAndToolBar.TOOLBAR_SEARCH.getText())
       }
@@ -195,7 +210,10 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
       view.getComponent(),
       bookController,
       new BookControllerInput(
-        Book(model.books.getList.get(selectedBookIndex)), model.library.columns /*FIXME*/ .toList, model.library.configuration, model.library.books /*FIXME*/ .toList))
+        Book(model.books.getList.get(selectedBookIndex)),
+        model.library.columns /* FIXME */ .toList,
+        model.library.configuration,
+        model.library.books /* FIXME */ .toList))
 
     if (editorDialog.isOk()) {
       model.books.getList.set(selectedBookIndex, bookController.getOutput)

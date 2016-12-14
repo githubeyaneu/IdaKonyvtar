@@ -1,13 +1,16 @@
 package eu.eyan.idakonyvtar
 
+import java.io.File
+
 import com.google.common.io.Resources
-import eu.eyan.idakonyvtar.controller.input.LibraryControllerInput
+
 import eu.eyan.idakonyvtar.controller.LibraryController
+import eu.eyan.idakonyvtar.controller.input.LibraryControllerInput
 import eu.eyan.idakonyvtar.text.Texts
 import eu.eyan.idakonyvtar.util.DialogHelper
-import java.io.File
-import eu.eyan.log.{ Log, LogWindow }
-import eu.eyan.util.awt.AwtHelper._
+import eu.eyan.log.Log
+import eu.eyan.log.LogWindow
+import eu.eyan.util.awt.AwtHelper.newWindowClosingEvent
 
 object IdaLibrary {
 

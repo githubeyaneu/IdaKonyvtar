@@ -26,6 +26,7 @@ object ExcelHandler {
 
   val COLUMN_CONFIGURATION = "OszlopKonfiguráció"
   val BOOKS = "Könyvek"
+  val ERROR_TEXT = "Nem sikerült a mentés."
 
   @throws(classOf[LibraryException])
   def readLibrary(file: File): Library = {
@@ -35,12 +36,16 @@ object ExcelHandler {
       val booksSheet = getSheet(getWorkbookSettings(), libraryWorkbook, BOOKS)
       val columnConfigSheet = getSheet(getWorkbookSettings(), libraryWorkbook, COLUMN_CONFIGURATION)
 
-      val configTable = (for (col <- 0 until columnConfigSheet.getColumns()) yield (for (row <- 0 until columnConfigSheet.getRows()) yield columnConfigSheet.getCell(col, row).getContents()).toArray).toArray
+      val configTable = (
+        for { col <- 0 until columnConfigSheet.getColumns() }
+          yield (
+          for { row <- 0 until columnConfigSheet.getRows() }
+            yield columnConfigSheet.getCell(col, row).getContents()).toArray).toArray
       val colConfig = new ColumnKonfiguration(configTable)
 
-      val columns = for (actualColumn <- 0 until booksSheet.getColumns()) yield booksSheet.getCell(actualColumn, 0).getContents()
+      val columns = for {actualColumn <- 0 until booksSheet.getColumns()} yield booksSheet.getCell(actualColumn, 0).getContents()
 
-      val books = for (actualRow <- 1 until booksSheet.getRows()) yield {
+      val books = for {actualRow <- 1 until booksSheet.getRows()} yield {
         val book = Book(booksSheet.getColumns())
         for (actualColumn <- 0 until booksSheet.getColumns()) {
           val contents = booksSheet.getCell(actualColumn, actualRow).getContents()
@@ -50,10 +55,11 @@ object ExcelHandler {
       }
 
       val library = new Library(colConfig, columns)
-      for (book <- books) library.books.add(book)
+      for {book <- books} library.books.add(book)
 
       library
-    } catch {
+    }
+    catch {
       case e: BiffException => throw new LibraryException("Biff Hiba a beolvasásnál " + e.getLocalizedMessage());
       case e: IOException   => throw new LibraryException("Hiba a beolvasásnál " + e.getLocalizedMessage());
       case e: Exception     => throw new LibraryException(e.getLocalizedMessage());
@@ -79,7 +85,8 @@ object ExcelHandler {
         try {
           backup(targetFile);
           FileUtils.forceDelete(targetFile)
-        } catch {
+        }
+        catch {
           case e: IOException => e.printStackTrace()
         }
       else
@@ -88,7 +95,7 @@ object ExcelHandler {
     try {
       val workbook = Workbook.createWorkbook(targetFile, getWorkbookSettings())
       val booksSheet = workbook.createSheet(BOOKS, 0)
-      for (columnIndex <- 0 until library.columns.size) {
+      for {columnIndex <- 0 until library.columns.size} {
         booksSheet.addCell(new Label(columnIndex, 0, library.columns(columnIndex)))
         for (bookIndex <- 0 until library.books.size()) {
           val cellFormat = new WritableCellFormat()
@@ -98,17 +105,18 @@ object ExcelHandler {
       }
       val columnConfigurationSheet = workbook.createSheet(COLUMN_CONFIGURATION, 1)
       val table = library.configuration.getTable()
-      for (column <- 0 until table.length; sor <- 0 until table(0).length)
+      for {column <- 0 until table.length; sor <- 0 until table(0).length}
         columnConfigurationSheet.addCell(new Label(column, sor, table(column)(sor)))
 
       // FIXME: save konfiguration... question: is it possible to change
       // any konfiguration from the application?
       workbook.write();
       workbook.close();
-    } catch {
-      case e: IOException           => throw new LibraryException("Nem sikerült a mentés.", e)
-      case e: RowsExceededException => throw new LibraryException("Nem sikerült a mentés.", e)
-      case e: WriteException        => throw new LibraryException("Nem sikerült a mentés.", e)
+    }
+    catch {
+      case e: IOException           => throw new LibraryException(ERROR_TEXT, e)
+      case e: RowsExceededException => throw new LibraryException(ERROR_TEXT, e)
+      case e: WriteException        => throw new LibraryException(ERROR_TEXT, e)
     }
   }
 

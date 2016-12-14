@@ -4,7 +4,6 @@ import com.google.common.collect.Sets.newHashSet
 
 import java.beans.PropertyChangeEvent
 import java.beans.PropertyChangeListener
-import scala.collection.JavaConverters._
 
 import com.jgoodies.binding.value.ValueModel
 

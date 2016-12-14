@@ -1,15 +1,22 @@
 package eu.eyan.idakonyvtar.view;
 
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JTextField;
-import javax.swing.JToolBar;
+import com.google.common.io.Resources
 
-import com.google.common.io.Resources;
+import LibraryMenuAndToolBar.ADD_NEW_BOOK
+import LibraryMenuAndToolBar.DELETE_BOOK
+import LibraryMenuAndToolBar.FILE
+import LibraryMenuAndToolBar.FILTER
+import LibraryMenuAndToolBar.LOAD_LIBRARY
+import LibraryMenuAndToolBar.OPEN_DEBUG_WINDOW
+import LibraryMenuAndToolBar.SAVE_LIBRARY
+import javax.swing.ImageIcon
+import javax.swing.JButton
+import javax.swing.JLabel
+import javax.swing.JMenu
+import javax.swing.JMenuBar
+import javax.swing.JMenuItem
+import javax.swing.JTextField
+import javax.swing.JToolBar
 
 object LibraryMenuAndToolBar {
   val DELETE_BOOK = "Book törlése"
@@ -23,8 +30,8 @@ object LibraryMenuAndToolBar {
 }
 
 class LibraryMenuAndToolBar {
-  import LibraryMenuAndToolBar._
-
+  val SEARCH_TEXTFIELD_SIZE = 5
+  val SEARCH_TOOLBAR_SIZE = 200
   private val toolBar = new JToolBar("Alapfunkciók")
   private val menuBar = new JMenuBar()
 
@@ -38,7 +45,7 @@ class LibraryMenuAndToolBar {
   val TOOLBAR_LOAD = new JButton("Töltés", new ImageIcon(Resources.getResource("icons/load.gif")))
   val TOOLBAR_NEW_BOOK = new JButton("Új book", new ImageIcon(Resources.getResource("icons/newbook.gif")))
   val TOOLBAR_BOOK_DELETE = new JButton("Törlés", new ImageIcon(Resources.getResource("icons/delete.gif")))
-  val TOOLBAR_SEARCH = new JTextField(5)
+  val TOOLBAR_SEARCH = new JTextField(SEARCH_TEXTFIELD_SIZE)
 
   private val MENU_FILE = new JMenu(FILE)
   private val TOOLBAR_SEARCH_LABEL = new JLabel(FILTER)
@@ -77,5 +84,5 @@ class LibraryMenuAndToolBar {
   toolBar.add(TOOLBAR_SEARCH_LABEL)
   toolBar.add(TOOLBAR_SEARCH)
   TOOLBAR_SEARCH.setName(FILTER)
-  TOOLBAR_SEARCH.setSize(200, TOOLBAR_SEARCH.getHeight())
+  TOOLBAR_SEARCH.setSize(SEARCH_TOOLBAR_SIZE, TOOLBAR_SEARCH.getHeight())
 }
