@@ -8,11 +8,8 @@ import java.awt.event.MouseEvent
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import java.io.File
-
 import scala.collection.JavaConversions.asScalaBuffer
-
 import com.jgoodies.binding.adapter.SingleListSelectionAdapter
-
 import eu.eyan.idakonyvtar.controller.adapter.LibraryListTableModel
 import eu.eyan.idakonyvtar.controller.input.BookControllerInput
 import eu.eyan.idakonyvtar.controller.input.LibraryControllerInput
@@ -49,6 +46,7 @@ import javax.swing.event.ListDataListener
 import javax.swing.event.ListSelectionEvent
 import javax.swing.event.ListSelectionListener
 import javax.swing.filechooser.FileNameExtensionFilter
+import eu.eyan.util.swing.JFileChooserPlus.JFileChooserImplicit
 
 class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void] {
 
@@ -108,14 +106,15 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
   def initBindings(): Unit = {
     val loadLibraryAction = newActionListener { () =>
       {
-        val jFileChooser = new JFileChooser(".")
-        jFileChooser.setDialogTitle("Töltés")
-        jFileChooser.setApproveButtonText("Töltés")
-        jFileChooser.setFileFilter(new FileNameExtensionFilter("Excel97 fájlok", "xls"))
-        if (jFileChooser.showOpenDialog(menuAndToolBar.MENU_EXCEL_LOAD) == APPROVE_OPTION) {
-          Log.info("selected file: " + jFileChooser.getSelectedFile)
-          readLibrary(jFileChooser.getSelectedFile)
-        }
+        val jFileChooser = new JFileChooser()
+          .withCurrentDirectory(".")
+          .withDialogTitle("Töltés")
+          .withApproveButtonText("Töltés")
+          .withFileFilter("xls", "Excel97 fájlok")
+          .showAndHandleResult(menuAndToolBar.MENU_EXCEL_LOAD, selectedFile => {
+            Log.info("selected file: " + selectedFile)
+            readLibrary(selectedFile)
+          })
       }
     }
 
