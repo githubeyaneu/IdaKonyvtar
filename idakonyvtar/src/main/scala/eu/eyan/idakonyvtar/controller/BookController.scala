@@ -87,7 +87,7 @@ class BookController extends IDialogController[BookControllerInput, Book] {
           //        Bindings.bind(comboBox, adapter)
           //        AutoCompleteDecorator.decorate(comboBox)
           val autocomplete = view.editors(columnIndex).asInstanceOf[JTextFieldAutocomplete]
-          autocomplete.setValues(columnList)
+          autocomplete.setAutocompleteList(columnList)
           Bindings.bind(autocomplete, new BookFieldValueModel(columnIndex, model.book))
         }
       } else {

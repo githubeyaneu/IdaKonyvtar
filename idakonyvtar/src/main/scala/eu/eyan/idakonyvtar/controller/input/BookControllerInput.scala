@@ -8,4 +8,4 @@ class BookControllerInput(
   val columns: List[String],
   val columnConfiguration: ColumnKonfiguration,
   val bookList: List[Book],
-  val isbnEnabled: Boolean = false)
+  val isbnEnabled: Boolean)
