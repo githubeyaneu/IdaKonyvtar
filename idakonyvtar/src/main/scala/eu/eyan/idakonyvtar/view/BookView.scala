@@ -1,19 +1,18 @@
 package eu.eyan.idakonyvtar.view;
 
 import java.awt.Component
-
 import scala.collection.mutable.MutableList
-
 import com.jgoodies.forms.builder.PanelBuilder
 import com.jgoodies.forms.factories.CC
 import com.jgoodies.forms.layout.FormLayout
-
 import AbstractView.addRow
 import eu.eyan.idakonyvtar.model.ColumnConfigurations
 import eu.eyan.idakonyvtar.model.ColumnKonfiguration
 import eu.eyan.util.swing.JTextFieldAutocomplete
 import javax.swing.JLabel
 import javax.swing.JTextField
+import eu.eyan.util.swing.JPanelWithFrameLayout
+import eu.eyan.util.awt.ComponentPlus.ComponentPlusImplicit
 
 object BookView {
   val ISBN_TEXT = "isbnText";
@@ -38,53 +37,39 @@ class BookView extends AbstractView {
   def setColumnConfiguration(columnConfiguration: ColumnKonfiguration) = this.columnConfiguration = columnConfiguration
 
   protected override def createViewComponent(): Component = {
-    val layout = new FormLayout("pref, 3dlu, pref:grow")
-    val panelBuilder = new PanelBuilder(layout)
-
-    var row = 0
+    val panel = new JPanelWithFrameLayout()
+    panel.newColumn.newColumn("pref:grow")
 
     if (isbnEnabled) {
-      row += addRow(layout, "pref")
-      panelBuilder.addSeparator("Isbn", CC.xyw(1, row, 3))
-
-      row += addRow(layout, SEPARATOR_PREF)
-      panelBuilder.add(isbnSearchLabel, CC.xyw(1, row, 1))
-      isbnSearchLabel.setName(BookView.ISBN_LABEL)
-      panelBuilder.add(isbnText, CC.xyw(3, row, 1))
-      isbnText.setName(BookView.ISBN_TEXT)
+      panel.newRow.span.addSeparatorWithTitle("Isbn")
+      panel.newRow
+      panel.add(isbnSearchLabel.withName(BookView.ISBN_LABEL))
+      panel.nextColumn.add(isbnText.withName(BookView.ISBN_TEXT))
     }
 
-    row += addRow(layout, SEPARATOR_PREF)
-    panelBuilder.addSeparator("Adatok", CC.xyw(1, row, 3))
+    panel.newRow.span.addSeparatorWithTitle("Adatok")
 
-    for {i <- 0 until columns.size} {
-      row += addRow(layout, SEPARATOR_PREF)
+    for { i <- 0 until columns.size } {
       val columnName = columns(i)
-      panelBuilder.addLabel(columnName, CC.xy(1, row))
+      panel.newRow.addLabel(columnName)
 
       val isMultiEditorField = columnConfiguration.isTrue(columnName, ColumnConfigurations.MULTIFIELD)
       val isAutocompleteField = columnConfiguration.isTrue(columnName, ColumnConfigurations.AUTOCOMPLETE)
       val editor: Component =
         if (isAutocompleteField) {
-          if (isMultiEditorField) {
-            new MultiFieldAutocomplete(columnName, "Autocomplete")
-          }
-          else {
-            new JTextFieldAutocomplete().setHintText("Autocomplete")
-          }
+          if (isMultiEditorField) new MultiFieldAutocomplete(columnName, "Autocomplete")
+          else new JTextFieldAutocomplete().setHintText("Autocomplete")
         }
         else {
-          if (isMultiEditorField) {
-            new MultiFieldJTextField(columnName)
-          }
-          else {
-            new JTextField(TEXTFIELD_DEFAULT_SIZE)
-          }
+          if (isMultiEditorField) new MultiFieldJTextField(columnName)
+          else new JTextField(TEXTFIELD_DEFAULT_SIZE)
         }
+
       editor.setName(columnName)
+      panel.nextColumn.add(editor)
       editors += editor
-      panelBuilder.add(editor, CC.xy(3, row))
     }
-    panelBuilder.build()
+
+    panel
   }
 }

@@ -7,17 +7,13 @@ import java.awt.event.ActionListener
 import java.beans.PropertyChangeEvent
 import java.beans.PropertyChangeListener
 import java.util.List
-
 import scala.collection.JavaConversions.asScalaBuffer
 import scala.collection.JavaConversions.seqAsJavaList
-
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator
-
 import com.google.common.collect.Lists.newArrayList
 import com.google.common.io.Resources
 import com.jgoodies.binding.adapter.Bindings
 import com.jgoodies.binding.adapter.ComboBoxAdapter
-
 import eu.eyan.idakonyvtar.controller.input.BookControllerInput
 import eu.eyan.idakonyvtar.model.Book
 import eu.eyan.idakonyvtar.model.BookFieldValueModel
@@ -38,6 +34,8 @@ import javax.swing.SwingUtilities
 import eu.eyan.log.Log
 import eu.eyan.idakonyvtar.view.MultiFieldAutocomplete
 import eu.eyan.util.swing.JTextFieldAutocomplete
+import eu.eyan.util.awt.AwtHelper
+import eu.eyan.util.swing.SwingPlus
 
 class BookController extends IDialogController[BookControllerInput, Book] {
   val SPACE = " "
@@ -66,7 +64,7 @@ class BookController extends IDialogController[BookControllerInput, Book] {
   }
 
   private def initFieldsActionBindings = {
-    for {columnIndex <- 0 until model.columns.size()} {
+    for { columnIndex <- 0 until model.columns.size() } {
       val columnName = model.columns.get(columnIndex)
       val autoComplete = model.columnConfiguration.isTrue(columnName, ColumnConfigurations.AUTOCOMPLETE)
       val multi = model.columnConfiguration.isTrue(columnName, ColumnConfigurations.MULTIFIELD)
@@ -80,7 +78,8 @@ class BookController extends IDialogController[BookControllerInput, Book] {
           val mmcombo = view.editors(columnIndex).asInstanceOf[MultiFieldAutocomplete]
           mmcombo.setAutoCompleteList(columnList)
           multiFieldBind(mmcombo, new BookFieldValueModel(columnIndex, model.book))
-        } else {
+        }
+        else {
           Log.debug("ac " + columnIndex + SPACE + columnList)
           //        val comboBox: JComboBox[_] = view.editors(columnIndex).asInstanceOf[JComboBox[_]]
           //        val adapter = new ComboBoxAdapter[String](columnList, new BookFieldValueModel(columnIndex, model.book))
@@ -90,11 +89,13 @@ class BookController extends IDialogController[BookControllerInput, Book] {
           autocomplete.setAutocompleteList(columnList)
           Bindings.bind(autocomplete, new BookFieldValueModel(columnIndex, model.book))
         }
-      } else {
+      }
+      else {
         if (multi) {
           val mmc: MultiFieldJTextField = view.editors(columnIndex).asInstanceOf[MultiFieldJTextField]
           multiFieldBind(mmc, new BookFieldValueModel(columnIndex, model.book))
-        } else {
+        }
+        else {
           Bindings.bind(view.editors(columnIndex).asInstanceOf[JTextField], new BookFieldValueModel(columnIndex, model.book))
         }
       }
@@ -119,32 +120,33 @@ class BookController extends IDialogController[BookControllerInput, Book] {
     })
   }
 
-  private def isbnSearch(): ActionListener = new ActionListener() {
-    override def actionPerformed(e: ActionEvent) = {
+  private def isbnSearch(): ActionListener = AwtHelper.newActionListener { e =>
+    {
       if (e.getSource() == view.isbnText) {
         view.isbnText.selectAll()
         view.isbnSearchLabel.setText("Keresés")
         view.isbnSearchLabel.setIcon(new ImageIcon(Resources.getResource("icons/search.gif")))
         view.editors.foreach(_.setEnabled(false))
 
-        // TODO Asynchron
-        SwingUtilities.invokeLater(new Runnable() {
-          override def run() = {
+        SwingPlus.invokeLater { () =>
+          {
             try {
               val marcsToIsbn = OszkKereso.getMarcsToIsbn(view.isbnText.getText().replaceAll("ö", "0"))
               prozessIsbnData(marcsToIsbn)
-            } catch {
+            }
+            catch {
               case e: OszkKeresoException =>
-                // FIXME: itt fontos a naplózás
+                Log.error(e)
                 view.isbnSearchLabel.setText("Nincs találat")
                 view.isbnSearchLabel.setIcon(new ImageIcon(Resources.getResource("icons/error.gif")))
-            } finally {
+            }
+            finally {
               view.editors.foreach(_.setEnabled(true))
-              fireResizeEvent()
+              fireResizeEvent
             }
           }
-        })
-        fireResizeEvent()
+        }
+        fireResizeEvent
       }
     }
   }
@@ -159,7 +161,8 @@ class BookController extends IDialogController[BookControllerInput, Book] {
         } yield marcFromOszk.value
         Log.info("BookController.prozessIsbnData " + values.mkString("\r\n    "))
         model.book.setValue(model.columns.indexOf(column), values.mkString(", "))
-      } catch {
+      }
+      catch {
         case e: Exception =>
           e.printStackTrace()
           JOptionPane.showMessageDialog(null, e.getLocalizedMessage())

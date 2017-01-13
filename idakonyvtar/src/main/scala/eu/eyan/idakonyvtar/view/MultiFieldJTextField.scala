@@ -7,7 +7,7 @@ import javax.swing.JTextField;
 
 class MultiFieldJTextField(columnName: String) extends MultiField[String, JTextField](columnName) {
 
-  protected def getEditor() = new JTextField()
+  protected def createEditor() = new JTextField()
 
   protected def getValue(editor: JTextField) =
     {

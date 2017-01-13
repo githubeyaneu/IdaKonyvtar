@@ -7,7 +7,8 @@ import eu.eyan.idakonyvtar.model.Book
 
 @RunWith(classOf[JUnitRunner])
 class BookHelperTest extends Specification /* with Mockito */ {
-  val bookA = new Book.Builder(2).withValue(0, "A0").withValue(1, "A1").build()
+  val TWO = 2
+  val bookA = new Book.Builder(TWO).withValue(0, "A0").withValue(1, "A1").build()
   def is = s2"""
 
  BookHelper getColumnList

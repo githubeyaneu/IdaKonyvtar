@@ -8,8 +8,11 @@ import java.awt.event.MouseEvent
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import java.io.File
+
 import scala.collection.JavaConversions.asScalaBuffer
+
 import com.jgoodies.binding.adapter.SingleListSelectionAdapter
+
 import eu.eyan.idakonyvtar.controller.adapter.LibraryListTableModel
 import eu.eyan.idakonyvtar.controller.input.BookControllerInput
 import eu.eyan.idakonyvtar.controller.input.LibraryControllerInput
@@ -30,12 +33,12 @@ import eu.eyan.idakonyvtar.view.LibraryMenuAndToolBar
 import eu.eyan.idakonyvtar.view.LibraryView
 import eu.eyan.log.Log
 import eu.eyan.log.LogWindow
-import eu.eyan.util.awt.AwtHelper.newActionListener
 import eu.eyan.util.swing.HighlightRenderer
+import eu.eyan.util.swing.JButtonPlus.JButtonImplicit
+import eu.eyan.util.swing.JFileChooserPlus.JFileChooserImplicit
 import eu.eyan.util.swing.SpecialCharacterRowFilter
 import eu.eyan.util.swing.SwingPlus.showErrorDialog
 import javax.swing.JFileChooser
-import javax.swing.JFileChooser.APPROVE_OPTION
 import javax.swing.JFrame
 import javax.swing.JOptionPane
 import javax.swing.ListSelectionModel
@@ -45,9 +48,6 @@ import javax.swing.event.ListDataEvent
 import javax.swing.event.ListDataListener
 import javax.swing.event.ListSelectionEvent
 import javax.swing.event.ListSelectionListener
-import javax.swing.filechooser.FileNameExtensionFilter
-import eu.eyan.util.swing.JFileChooserPlus.JFileChooserImplicit
-import eu.eyan.util.swing.JButtonPlus.JButtonImplicit
 
 class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void] {
 
@@ -126,15 +126,14 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
     val editorDialog = DialogHelper.startModalDialog(
       view.getComponent(), bookController, new BookControllerInput(
         newPreviousBook(model.library.columns.size),
-        model.library.columns /* FIXME */ .toList,
+        model.library.columns.toList,
         model.library.configuration,
-        model.books.getList /* FIXME */ .toList,
+        model.books.getList.toList,
         true))
 
     if (editorDialog.isOk()) {
       model.books.getList.add(0, bookController.getOutput)
       savePreviousBook(bookController.getOutput)
-      // TODO: ugly: use selectioninlist...
       model.books.fireIntervalAdded(0, 0)
     }
   }
@@ -148,9 +147,9 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
       bookController,
       new BookControllerInput(
         Book(model.books.getList.get(selectedBookIndex)),
-        model.library.columns /* FIXME */ .toList,
+        model.library.columns.toList,
         model.library.configuration,
-        model.library.books /* FIXME */ .toList,
+        model.library.books.toList,
         false))
 
     if (editorDialog.isOk()) {
@@ -171,7 +170,6 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
       NO)) {
       val selectionIndex = model.books.getSelectionIndex
       model.books.getList.remove(selectionIndex)
-      // TODO: ugly: use selectioninlist...
       model.books.fireIntervalRemoved(selectionIndex, selectionIndex)
     }
   }

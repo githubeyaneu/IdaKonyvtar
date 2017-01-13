@@ -49,7 +49,10 @@ class ColumnKonfiguration(val table: Array[Array[String]]) {
       val marcCodeTexts = getValue(columnName, ColumnConfigurations.MARC_CODE).split(",")
       for {string <- marcCodeTexts if string.split("-").length > 2} yield {
         val codes = string.split("-")
-        new Marc(codes(0), codes(1), codes(2), null)
+        val MARC_CODE_0 = 0
+        val MARC_CODE_1 = 1
+        val MARC_CODE_2 = 2
+        new Marc(codes(MARC_CODE_0), codes(MARC_CODE_1), codes(MARC_CODE_2), null)
       }
     } catch {
       case e: Exception =>
@@ -61,7 +64,4 @@ class ColumnKonfiguration(val table: Array[Array[String]]) {
     for {columnIndex <- 1 until table(0).length if isTrue(table(0)(columnIndex), ColumnConfigurations.REMEMBERING)} yield table(0)(columnIndex)
 
   def getTable() = table
-
-  // def setTable(table: ColumnKonfigurationTable) = this.table = table
-
 }
