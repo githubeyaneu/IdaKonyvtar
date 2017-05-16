@@ -8,28 +8,32 @@ import scala.collection.JavaConversions.asScalaBuffer
 import scala.collection.JavaConversions.bufferAsJavaList
 import scala.collection.mutable.ListBuffer
 
+import scala.collection.JavaConversions.asScalaBuffer
+import scala.collection.JavaConversions.bufferAsJavaList
+import scala.collection.mutable.ListBuffer
 import com.jgoodies.forms.builder.PanelBuilder
 import com.jgoodies.forms.factories.CC
 import com.jgoodies.forms.layout.FormLayout
-
 import eu.eyan.log.Log
 import eu.eyan.util.awt.AwtHelper
 import javax.swing.BoxLayout
 import javax.swing.JButton
 import javax.swing.JPanel
 import javax.swing.SwingUtilities
+import eu.eyan.util.swing.JPanelWithFrameLayout
+import eu.eyan.util.awt.ComponentPlus.ComponentPlusImplicit
 
 abstract class MultiField[INPUT, EDITOR <: Component](columnName: String) extends JPanel with FieldEditListener[EDITOR] {
 
-  protected def addFieldEditListener(editor: EDITOR, listener: FieldEditListener[EDITOR])
-  protected def getEditor(): EDITOR
+  protected def addFieldEditListener(editor: EDITOR, listener: FieldEditListener[EDITOR]): Unit
+  protected def createEditor(): EDITOR
 
   /**
    * @return null if empty!
    */
   protected def getValue(editor: EDITOR): INPUT
 
-  protected def setValueInEditor(editor: EDITOR, value: INPUT)
+  protected def setValueInEditor(editor: EDITOR, value: INPUT): Unit
 
   class Field[EDITOR](val editor: EDITOR, val delete: JButton, val panel: JPanel)
 
@@ -42,45 +46,34 @@ abstract class MultiField[INPUT, EDITOR <: Component](columnName: String) extend
     removeAll()
     fields.clear()
 
-    for (input <- values) addEditor(input, false)
+    for { input <- values } addEditor(input, false)
 
     addEditor(null.asInstanceOf[INPUT], true)
   }
 
   private def addEditor(input: INPUT, last: Boolean) = {
-    val editor = getEditor()
+    val editor = createEditor().withName(columnName + counter)
     addFieldEditListener(editor, this)
-    val deleteButton = new JButton("x")
+    if (!last) setValueInEditor(editor, input)
 
-    val panelBuilder = new PanelBuilder(new FormLayout("f:p:g, 3dlu, 30dlu", "f:p:g, 3dlu"))
-    panelBuilder.add(editor, CC.xy(1, 1))
-    panelBuilder.add(deleteButton, CC.xy(3, 1))
-    val fieldPanel = panelBuilder.build()
+    val fieldPanel = new JPanelWithFrameLayout("f:p:g").withName(columnName + ".panel." + counter)
+    fieldPanel.newColumn("f:p:g")
+    fieldPanel.add(editor)
 
-    if (last)
-      deleteButton.setEnabled(false)
-    else
-      setValueInEditor(editor, input)
+    fieldPanel.newColumn("30dlu")
+    val deleteButton = fieldPanel.addButton("x").withName(columnName + ".delete." + counter).withEnabled(!last)
+
+    fieldPanel.newRowSeparator()
 
     val field = new Field[EDITOR](editor, deleteButton, fieldPanel)
-    deleteButton.addActionListener(new ActionListener {
-      override def actionPerformed(actionEvent: ActionEvent) = {
-        fields -= field
-        remove(field.panel)
-        revalidate()
-      }
-    })
+    deleteButton.onAction { () => { fields -= field; remove(field.panel); revalidate } }
     fields += field
     add(fieldPanel)
 
-    fieldPanel.setName(columnName + ".panel." + counter)
-    editor.setName(columnName + counter)
     Log.debug(columnName + counter)
-    deleteButton.setName(columnName + ".delete." + counter)
     counter = counter + 1
 
-    revalidate()
-    //SwingUtilities.windowForComponent(this).pack()
+    revalidate
     AwtHelper.tryToEnlargeWindow(SwingUtilities.windowForComponent(this))
   }
 

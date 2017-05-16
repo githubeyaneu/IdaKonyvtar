@@ -2,7 +2,6 @@ package eu.eyan.idakonyvtar.model
 
 import java.beans.PropertyChangeEvent
 import java.beans.PropertyChangeListener
-
 import scala.collection.mutable.Set
 
 import com.jgoodies.binding.value.ValueModel

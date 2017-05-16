@@ -1,5 +1,6 @@
 package eu.eyan.idakonyvtar.view
 
+import eu.eyan.util.swing.JTextFieldAutocomplete
 import eu.eyan.log.Log
 import eu.eyan.util.swing.JTextFieldAutocomplete
 import eu.eyan.util.swing.JTextFieldPlus.JTextFieldPlusImplicit
