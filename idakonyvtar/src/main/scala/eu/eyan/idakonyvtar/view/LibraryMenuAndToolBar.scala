@@ -1,15 +1,22 @@
 package eu.eyan.idakonyvtar.view;
 
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JTextField;
-import javax.swing.JToolBar;
+import com.google.common.io.Resources
 
-import com.google.common.io.Resources;
+import LibraryMenuAndToolBar.ADD_NEW_BOOK
+import LibraryMenuAndToolBar.DELETE_BOOK
+import LibraryMenuAndToolBar.FILE
+import LibraryMenuAndToolBar.FILTER
+import LibraryMenuAndToolBar.LOAD_LIBRARY
+import LibraryMenuAndToolBar.OPEN_DEBUG_WINDOW
+import LibraryMenuAndToolBar.SAVE_LIBRARY
+import javax.swing.ImageIcon
+import javax.swing.JButton
+import javax.swing.JLabel
+import javax.swing.JMenu
+import javax.swing.JMenuBar
+import javax.swing.JMenuItem
+import javax.swing.JTextField
+import javax.swing.JToolBar
 
 object LibraryMenuAndToolBar {
   val DELETE_BOOK = "Book törlése"
@@ -23,7 +30,6 @@ object LibraryMenuAndToolBar {
 }
 
 class LibraryMenuAndToolBar {
-  import LibraryMenuAndToolBar._
 
   private val toolBar = new JToolBar("Alapfunkciók")
   private val menuBar = new JMenuBar()

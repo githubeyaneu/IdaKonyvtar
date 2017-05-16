@@ -35,7 +35,9 @@ object ExcelHandler {
       val booksSheet = getSheet(getWorkbookSettings(), libraryWorkbook, BOOKS)
       val columnConfigSheet = getSheet(getWorkbookSettings(), libraryWorkbook, COLUMN_CONFIGURATION)
 
-      val configTable = (for (col <- 0 until columnConfigSheet.getColumns()) yield (for (row <- 0 until columnConfigSheet.getRows()) yield columnConfigSheet.getCell(col, row).getContents()).toArray).toArray
+      val configTable =
+        (for (col <- 0 until columnConfigSheet.getColumns()) yield (for (row <- 0 until columnConfigSheet.getRows()) yield columnConfigSheet.getCell(col, row).getContents()).toArray).toArray
+
       val colConfig = new ColumnKonfiguration(configTable)
 
       val columns = for (actualColumn <- 0 until booksSheet.getColumns()) yield booksSheet.getCell(actualColumn, 0).getContents()

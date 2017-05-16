@@ -2,20 +2,22 @@ package eu.eyan.idakonyvtar.view;
 
 import java.awt.Component
 import java.awt.event.ActionEvent
-import java.util.stream.Collectors
-import javax.swing.BoxLayout
-import javax.swing.JButton
-import javax.swing.JPanel
+import java.awt.event.ActionListener
+
+import scala.collection.JavaConversions.asScalaBuffer
+import scala.collection.JavaConversions.bufferAsJavaList
+import scala.collection.mutable.ListBuffer
+
 import com.jgoodies.forms.builder.PanelBuilder
 import com.jgoodies.forms.factories.CC
 import com.jgoodies.forms.layout.FormLayout
-import scala.collection.JavaConversions._
-import java.awt.event.ActionListener
-import scala.collection.mutable.MutableList
-import scala.collection.mutable.ListBuffer
+
 import eu.eyan.log.Log
-import javax.swing.SwingUtilities
 import eu.eyan.util.awt.AwtHelper
+import javax.swing.BoxLayout
+import javax.swing.JButton
+import javax.swing.JPanel
+import javax.swing.SwingUtilities
 
 abstract class MultiField[INPUT, EDITOR <: Component](columnName: String) extends JPanel with FieldEditListener[EDITOR] {
 

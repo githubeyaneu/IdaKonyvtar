@@ -11,12 +11,9 @@ import java.util.List
 import scala.collection.JavaConversions.asScalaBuffer
 import scala.collection.JavaConversions.seqAsJavaList
 
-import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator
-
 import com.google.common.collect.Lists.newArrayList
 import com.google.common.io.Resources
 import com.jgoodies.binding.adapter.Bindings
-import com.jgoodies.binding.adapter.ComboBoxAdapter
 
 import eu.eyan.idakonyvtar.controller.input.BookControllerInput
 import eu.eyan.idakonyvtar.model.Book
@@ -26,18 +23,17 @@ import eu.eyan.idakonyvtar.oszk.Marc
 import eu.eyan.idakonyvtar.oszk.OszkKereso
 import eu.eyan.idakonyvtar.oszk.OszkKeresoException
 import eu.eyan.idakonyvtar.util.BookHelper
+import eu.eyan.idakonyvtar.util.LibraryException
 import eu.eyan.idakonyvtar.view.BookView
 import eu.eyan.idakonyvtar.view.MultiField
-import eu.eyan.idakonyvtar.view.MultiFieldJComboBox
+import eu.eyan.idakonyvtar.view.MultiFieldAutocomplete
 import eu.eyan.idakonyvtar.view.MultiFieldJTextField
+import eu.eyan.log.Log
+import eu.eyan.util.swing.JTextFieldAutocomplete
 import javax.swing.ImageIcon
-import javax.swing.JComboBox
 import javax.swing.JOptionPane
 import javax.swing.JTextField
 import javax.swing.SwingUtilities
-import eu.eyan.log.Log
-import eu.eyan.idakonyvtar.view.MultiFieldAutocomplete
-import eu.eyan.util.swing.Autocomplete
 
 class BookController extends IDialogController[BookControllerInput, Book] {
   val view = new BookView()
@@ -85,8 +81,8 @@ class BookController extends IDialogController[BookControllerInput, Book] {
           //        			val adapter = new ComboBoxAdapter[String](columnList, new BookFieldValueModel(columnIndex, model.book))
           //        			Bindings.bind(comboBox, adapter)
           //        			AutoCompleteDecorator.decorate(comboBox)
-          val autocomplete = view.editors(columnIndex).asInstanceOf[Autocomplete]
-          autocomplete.setValues(columnList)
+          val autocomplete = view.editors(columnIndex).asInstanceOf[JTextFieldAutocomplete]
+          autocomplete.setAutocompleteList(columnList)
           Bindings.bind(autocomplete, new BookFieldValueModel(columnIndex, model.book))
         }
       } else {

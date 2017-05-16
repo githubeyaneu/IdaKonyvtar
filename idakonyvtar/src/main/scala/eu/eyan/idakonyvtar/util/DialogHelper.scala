@@ -79,24 +79,32 @@ object DialogHelper {
     scrollPane
   }
 
-  def runInFrame[INPUT](parent: Component, controller: IController[INPUT, _], input: INPUT, jMenuBar: JMenuBar, toolBar: JToolBar, fullScreen: Boolean, name: String) = {
-    controller.initData(input)
-    val frame = new JXFrame()
-    frame.add(toolBar, BorderLayout.NORTH)
-    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
-    frame.add(controller.getView())
-    frame.setTitle(controller.getTitle())
-    frame.setName(name)
-    frame.setJMenuBar(jMenuBar)
-    controller.initBindings()
-    frame.setVisible(true)
-    frame.pack()
-    positionToCenter(frame)
-    if (fullScreen) frame.setExtendedState(Frame.MAXIMIZED_BOTH)
-    val initFocusComponent = controller.getComponentForFocus()
-    if (initFocusComponent != null) initFocusComponent.requestFocusInWindow()
-    frame
-  }
+  def runInFrame[INPUT](
+    parent: Component,
+    controller: IController[INPUT, _],
+    input: INPUT,
+    jMenuBar: JMenuBar,
+    toolBar: JToolBar,
+    fullScreen: Boolean,
+    name: String) =
+    {
+      controller.initData(input)
+      val frame = new JXFrame()
+      frame.add(toolBar, BorderLayout.NORTH)
+      frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
+      frame.add(controller.getView())
+      frame.setTitle(controller.getTitle())
+      frame.setName(name)
+      frame.setJMenuBar(jMenuBar)
+      controller.initBindings()
+      frame.setVisible(true)
+      frame.pack()
+      positionToCenter(frame)
+      if (fullScreen) frame.setExtendedState(Frame.MAXIMIZED_BOTH)
+      val initFocusComponent = controller.getComponentForFocus()
+      if (initFocusComponent != null) initFocusComponent.requestFocusInWindow()
+      frame
+    }
 
   def positionToCenter(component: Component) = {
     val screenSize = Toolkit.getDefaultToolkit().getScreenSize()

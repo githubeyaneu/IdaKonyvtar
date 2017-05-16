@@ -57,7 +57,7 @@ class BookView extends AbstractView {
     row += addRow(layout, SEPARATOR_PREF)
     panelBuilder.addSeparator("Adatok", CC.xyw(1, row, 3))
 
-    for {i <- 0 until columns.size} {
+    for { i <- 0 until columns.size } {
       row += addRow(layout, SEPARATOR_PREF)
       val columnName = columns(i)
       panelBuilder.addLabel(columnName, CC.xy(1, row))
@@ -66,27 +66,21 @@ class BookView extends AbstractView {
       val isAutocompleteField = columnConfiguration.isTrue(columnName, ColumnConfigurations.AUTOCOMPLETE)
       val editor: Component =
         if (isAutocompleteField) {
-        	if (isMultiEditorField) {
-                new MultiFieldAutocomplete(columnName, "Autocomplete", "Nincs találat")
-              }
-              else {
-                new JTextFieldAutocomplete().setHintText("Autocomplete").setNoItemsFoundText("Nincs találat")
-              }
-        	
           if (isMultiEditorField) {
             new MultiFieldAutocomplete(columnName, "Autocomplete", "Nincs találat")
           } else {
-            new Autocomplete().setHintText("Autocomplete").setNoItemsFoundText("Nincs találat")
+            new JTextFieldAutocomplete().setHintText("Autocomplete").setNoItemsFoundText("Nincs találat")
           }
-          else {
-            new JTextFieldAutocomplete().setHintText("Autocomplete")
+
+          if (isMultiEditorField) {
+            new MultiFieldAutocomplete(columnName, "Autocomplete", "Nincs találat")
+          } else {
+            new JTextFieldAutocomplete().setHintText("Autocomplete").setNoItemsFoundText("Nincs találat")
           }
-        }
-        else {
+        } else {
           if (isMultiEditorField) {
             new MultiFieldJTextField(columnName)
-          }
-          else {
+          } else {
             new JTextField(TEXTFIELD_DEFAULT_SIZE)
           }
         }

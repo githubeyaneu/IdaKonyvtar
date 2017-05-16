@@ -1,5 +1,6 @@
 package eu.eyan.idakonyvtar.controller
 
+import java.awt.Component
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 import java.awt.event.MouseAdapter
@@ -9,18 +10,33 @@ import java.awt.event.WindowEvent
 import java.io.File
 
 import scala.collection.JavaConversions.asScalaBuffer
+
 import com.jgoodies.binding.adapter.SingleListSelectionAdapter
-import eu.eyan.idakonyvtar.text.Texts._
+
 import eu.eyan.idakonyvtar.controller.adapter.LibraryListTableModel
 import eu.eyan.idakonyvtar.controller.input.BookControllerInput
 import eu.eyan.idakonyvtar.controller.input.LibraryControllerInput
 import eu.eyan.idakonyvtar.model.Book
 import eu.eyan.idakonyvtar.model.LibraryModel
+import eu.eyan.idakonyvtar.text.Texts.ERROR_AT_READING
+import eu.eyan.idakonyvtar.text.Texts.NO
+import eu.eyan.idakonyvtar.text.Texts.NO_BOOK_FOR_THE_FILTER
+import eu.eyan.idakonyvtar.text.Texts.NO_BOOK_IN_THE_LIST
+import eu.eyan.idakonyvtar.text.Texts.TITLE
+import eu.eyan.idakonyvtar.text.Texts.TITLE_PIECES
+import eu.eyan.idakonyvtar.text.Texts.TITLE_SEPARATOR
+import eu.eyan.idakonyvtar.text.Texts.YES
 import eu.eyan.idakonyvtar.util.DialogHelper
 import eu.eyan.idakonyvtar.util.ExcelHandler
 import eu.eyan.idakonyvtar.util.LibraryException
 import eu.eyan.idakonyvtar.view.LibraryMenuAndToolBar
 import eu.eyan.idakonyvtar.view.LibraryView
+import eu.eyan.log.Log
+import eu.eyan.log.LogWindow
+import eu.eyan.util.awt.AwtHelper.newActionListener
+import eu.eyan.util.swing.HighlightRenderer
+import eu.eyan.util.swing.SpecialCharacterRowFilter
+import eu.eyan.util.swing.SwingPlus.showErrorDialog
 import javax.swing.JFileChooser
 import javax.swing.JFileChooser.APPROVE_OPTION
 import javax.swing.JFrame
@@ -33,13 +49,6 @@ import javax.swing.event.ListDataListener
 import javax.swing.event.ListSelectionEvent
 import javax.swing.event.ListSelectionListener
 import javax.swing.filechooser.FileNameExtensionFilter
-import eu.eyan.util.awt.AwtHelper._
-import eu.eyan.log.LogWindow
-import eu.eyan.log.Log
-import eu.eyan.util.swing.SwingPlus._
-import java.awt.Component
-import eu.eyan.util.swing.HighlightRenderer
-import eu.eyan.util.swing.SpecialCharacterRowFilter
 
 class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void] {
 

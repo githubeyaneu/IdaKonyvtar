@@ -1,9 +1,7 @@
 package eu.eyan.idakonyvtar.view
 
-import eu.eyan.util.swing.Autocomplete
 import eu.eyan.log.Log
 import eu.eyan.util.swing.JTextFieldAutocomplete
-import eu.eyan.log.Log
 import eu.eyan.util.swing.JTextFieldPlus.JTextFieldPlusImplicit
 
 class MultiFieldAutocomplete(columnName: String, hintText: String, noItemsFoundText: String) extends MultiField[String, JTextFieldAutocomplete](columnName) {
@@ -16,7 +14,7 @@ class MultiFieldAutocomplete(columnName: String, hintText: String, noItemsFoundT
     editor.addKeyReleasedListener(x => if (editor.getText.nonEmpty) listener.fieldEdited(editor))
 
   protected def getEditor(): JTextFieldAutocomplete =
-    new JTextFieldAutocomplete().setValues(autocompleteList).setHintText(hintText).setNoItemsFoundText(noItemsFoundText)
+    new JTextFieldAutocomplete().setAutocompleteList(autocompleteList).setHintText(hintText).setNoItemsFoundText(noItemsFoundText)
 
   protected def getValue(editor: JTextFieldAutocomplete): String = if (editor.getText.equals("")) null else editor.getText
 
