@@ -60,7 +60,7 @@ class BookView extends AbstractView {
       val isAutocompleteField = columnConfiguration.isTrue(columnName, ColumnConfigurations.AUTOCOMPLETE)
       val editor: Component =
         if (isAutocompleteField) {
-          if (isMultiEditorField) new MultiFieldAutocomplete(columnName, "Autocomplete")
+          if (isMultiEditorField) new MultiFieldAutocomplete(columnName, "Autocomplete", "Nincs találat")
           else new JTextFieldAutocomplete().setHintText("Autocomplete")
         } else {
           if (isMultiEditorField) new MultiFieldJTextField(columnName)

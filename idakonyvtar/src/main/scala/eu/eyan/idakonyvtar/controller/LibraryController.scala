@@ -237,5 +237,4 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
     })
     newBook
   }
-
 }
