@@ -33,7 +33,7 @@ class BookHelperTest {
     def allBooks(r: Int) = (books(r).++(books2(r))).toList
     def shuffledBooks(r: Int) = Random.shuffle(allBooks(r)).toList
     var sum = 0L
-    for (i <- 1 to 10) {
+    for {i <- 1 to 10} {
       val b = shuffledBooks(i)
       val start = System.currentTimeMillis
       BookHelper.getColumnList(b, 0)

@@ -42,9 +42,9 @@ object OszkKereso {
     val marcLink = findTextInUrl(
       "http://nektar1.oszk.hu/LVbin/LibriVision/lv_view_records.html",
       "SESSION_ID=" + session_id
-      + "&lv_action=LV_Search&QUERY_ID=T_1391112123&ADD_QUERY=-1&SEARCH_TYPE=QUERY_SIMPLE&HTML_SEARCH_TYPE=SIMPLE&USE=BN&_QUERY=" + isbn
-      + "&QUERY=" + isbn
-      + "&sub_button=Keres%C3%A9s",
+        + "&lv_action=LV_Search&QUERY_ID=T_1391112123&ADD_QUERY=-1&SEARCH_TYPE=QUERY_SIMPLE&HTML_SEARCH_TYPE=SIMPLE&USE=BN&_QUERY=" + isbn
+        + "&QUERY=" + isbn
+        + "&sub_button=Keres%C3%A9s",
       "A record MARC form",
       "href=\"",
       ".*",
@@ -62,11 +62,11 @@ object OszkKereso {
 
   @throws(classOf[IOException])
   def findTextInUrl(host: String,
-                    postParameter: String,
-                    lineGrep: String,
-                    regex_prefix: String,
-                    regex: String,
-                    regexPost: String): String = {
+    postParameter: String,
+    lineGrep: String,
+    regex_prefix: String,
+    regex: String,
+    regexPost: String): String = {
 
     val postUrl = HttpHelper.postUrl(host, postParameter)
     val line = Unix4j.fromString(postUrl).grep(lineGrep).toStringResult()
@@ -86,7 +86,7 @@ object OszkKereso {
       var lastMarc3 = ""
 
       val sorok = "<tr.*?</tr".r.findAllIn(marcTable)
-      val marcs = (for {sor <- sorok} yield {
+      val marcs = (for { sor <- sorok } yield {
         val marc1 = sor.substring(50 - 1, 53 - 1).trim()
         val marc2 = sor.substring(103 - 1, 105 - 1).trim()
         val marc3 = sor.substring(155 - 1, 156 - 1).trim()
@@ -94,7 +94,8 @@ object OszkKereso {
         if (marc1 != lastMarc1 && marc1 != "") {
           lastMarc1 = marc1
           lastMarc2 = marc2
-        } else if (marc2 != lastMarc2 && marc2 != "") {
+        }
+        else if (marc2 != lastMarc2 && marc2 != "") {
           lastMarc2 = marc2
         }
         lastMarc3 = marc3
@@ -106,7 +107,8 @@ object OszkKereso {
 
       marcs.foreach(m => Log.debug(m.toString()))
       marcs
-    } catch {
+    }
+    catch {
       case e: Throwable => {
         e.printStackTrace();
         throw new OszkKeresoException("Sikertelen.", e)
