@@ -1,13 +1,11 @@
 package eu.eyan.idakonyvtar.model
 
-import com.google.common.collect.Sets.newHashSet
-
 import java.beans.PropertyChangeEvent
 import java.beans.PropertyChangeListener
+import scala.collection.mutable.Set
 
 import com.jgoodies.binding.value.ValueModel
 
-import scala.collection.mutable.Set
 import eu.eyan.log.Log
 
 class BookFieldValueModel(columnIndex: Int, model: Book) extends ValueModel with PropertyChangeListener {

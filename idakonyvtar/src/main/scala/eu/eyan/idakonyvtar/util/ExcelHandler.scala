@@ -58,8 +58,7 @@ object ExcelHandler {
       for { book <- books } library.books.add(book)
 
       library
-    }
-    catch {
+    } catch {
       case e: BiffException => throw new LibraryException("Biff Hiba a beolvasásnál " + e.getLocalizedMessage());
       case e: IOException   => throw new LibraryException("Hiba a beolvasásnál " + e.getLocalizedMessage());
       case e: Exception     => throw new LibraryException(e.getLocalizedMessage());
@@ -85,8 +84,7 @@ object ExcelHandler {
         try {
           backup(targetFile);
           FileUtils.forceDelete(targetFile)
-        }
-        catch {
+        } catch {
           case e: IOException => e.printStackTrace()
         }
       else
@@ -110,8 +108,7 @@ object ExcelHandler {
 
       workbook.write();
       workbook.close();
-    }
-    catch {
+    } catch {
       case e: IOException           => throw new LibraryException(ERROR_TEXT, e)
       case e: RowsExceededException => throw new LibraryException(ERROR_TEXT, e)
       case e: WriteException        => throw new LibraryException(ERROR_TEXT, e)

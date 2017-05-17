@@ -22,12 +22,14 @@ import eu.eyan.idakonyvtar.oszk.Marc
 import eu.eyan.idakonyvtar.oszk.OszkKereso
 import eu.eyan.idakonyvtar.oszk.OszkKeresoException
 import eu.eyan.idakonyvtar.util.BookHelper
+import eu.eyan.idakonyvtar.util.LibraryException
 import eu.eyan.idakonyvtar.view.BookView
 import eu.eyan.idakonyvtar.view.MultiField
-import eu.eyan.idakonyvtar.view.MultiFieldJComboBox
+import eu.eyan.idakonyvtar.view.MultiFieldAutocomplete
 import eu.eyan.idakonyvtar.view.MultiFieldJTextField
+import eu.eyan.log.Log
+import eu.eyan.util.swing.JTextFieldAutocomplete
 import javax.swing.ImageIcon
-import javax.swing.JComboBox
 import javax.swing.JOptionPane
 import javax.swing.JTextField
 import javax.swing.SwingUtilities
@@ -78,8 +80,7 @@ class BookController extends IDialogController[BookControllerInput, Book] {
           val mmcombo = view.editors(columnIndex).asInstanceOf[MultiFieldAutocomplete]
           mmcombo.setAutoCompleteList(columnList)
           multiFieldBind(mmcombo, new BookFieldValueModel(columnIndex, model.book))
-        }
-        else {
+        } else {
           Log.debug("ac " + columnIndex + SPACE + columnList)
           //        val comboBox: JComboBox[_] = view.editors(columnIndex).asInstanceOf[JComboBox[_]]
           //        val adapter = new ComboBoxAdapter[String](columnList, new BookFieldValueModel(columnIndex, model.book))
@@ -89,13 +90,11 @@ class BookController extends IDialogController[BookControllerInput, Book] {
           autocomplete.setAutocompleteList(columnList)
           Bindings.bind(autocomplete, new BookFieldValueModel(columnIndex, model.book))
         }
-      }
-      else {
+      } else {
         if (multi) {
           val mmc: MultiFieldJTextField = view.editors(columnIndex).asInstanceOf[MultiFieldJTextField]
           multiFieldBind(mmc, new BookFieldValueModel(columnIndex, model.book))
-        }
-        else {
+        } else {
           Bindings.bind(view.editors(columnIndex).asInstanceOf[JTextField], new BookFieldValueModel(columnIndex, model.book))
         }
       }
@@ -133,14 +132,12 @@ class BookController extends IDialogController[BookControllerInput, Book] {
             try {
               val marcsToIsbn = OszkKereso.getMarcsToIsbn(view.isbnText.getText().replaceAll("ö", "0"))
               prozessIsbnData(marcsToIsbn)
-            }
-            catch {
+            } catch {
               case e: OszkKeresoException =>
                 Log.error(e)
                 view.isbnSearchLabel.setText("Nincs találat")
                 view.isbnSearchLabel.setIcon(new ImageIcon(Resources.getResource("icons/error.gif")))
-            }
-            finally {
+            } finally {
               view.editors.foreach(_.setEnabled(true))
               fireResizeEvent
             }
@@ -161,8 +158,7 @@ class BookController extends IDialogController[BookControllerInput, Book] {
         } yield marcFromOszk.value
         Log.info("BookController.prozessIsbnData " + values.mkString("\r\n    "))
         model.book.setValue(model.columns.indexOf(column), values.mkString(", "))
-      }
-      catch {
+      } catch {
         case e: Exception =>
           e.printStackTrace()
           JOptionPane.showMessageDialog(null, e.getLocalizedMessage())

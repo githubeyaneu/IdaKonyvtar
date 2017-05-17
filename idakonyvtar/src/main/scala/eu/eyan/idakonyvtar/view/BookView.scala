@@ -1,6 +1,9 @@
 package eu.eyan.idakonyvtar.view;
 
 import java.awt.Component
+
+import scala.collection.mutable.MutableList
+
 import scala.collection.mutable.MutableList
 import com.jgoodies.forms.builder.PanelBuilder
 import com.jgoodies.forms.factories.CC
@@ -59,8 +62,7 @@ class BookView extends AbstractView {
         if (isAutocompleteField) {
           if (isMultiEditorField) new MultiFieldAutocomplete(columnName, "Autocomplete")
           else new JTextFieldAutocomplete().setHintText("Autocomplete")
-        }
-        else {
+        } else {
           if (isMultiEditorField) new MultiFieldJTextField(columnName)
           else new JTextField(TEXTFIELD_DEFAULT_SIZE)
         }

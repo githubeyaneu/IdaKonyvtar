@@ -3,6 +3,11 @@ package eu.eyan.idakonyvtar.view;
 import java.awt.Component
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
+
+import scala.collection.JavaConversions.asScalaBuffer
+import scala.collection.JavaConversions.bufferAsJavaList
+import scala.collection.mutable.ListBuffer
+
 import scala.collection.JavaConversions.asScalaBuffer
 import scala.collection.JavaConversions.bufferAsJavaList
 import scala.collection.mutable.ListBuffer

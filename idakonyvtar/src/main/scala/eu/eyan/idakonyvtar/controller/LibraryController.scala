@@ -33,6 +33,8 @@ import eu.eyan.idakonyvtar.view.LibraryMenuAndToolBar
 import eu.eyan.idakonyvtar.view.LibraryView
 import eu.eyan.log.Log
 import eu.eyan.log.LogWindow
+import eu.eyan.util.awt.AwtHelper.newActionListener
+import eu.eyan.util.swing.HighlightRenderer
 import eu.eyan.util.swing.HighlightRenderer
 import eu.eyan.util.swing.JButtonPlus.JButtonImplicit
 import eu.eyan.util.swing.JFileChooserPlus.JFileChooserImplicit
@@ -48,6 +50,7 @@ import javax.swing.event.ListDataEvent
 import javax.swing.event.ListDataListener
 import javax.swing.event.ListSelectionEvent
 import javax.swing.event.ListSelectionListener
+import javax.swing.filechooser.FileNameExtensionFilter
 
 class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void] {
 
