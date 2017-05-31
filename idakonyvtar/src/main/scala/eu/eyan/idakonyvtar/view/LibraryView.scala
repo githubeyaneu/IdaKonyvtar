@@ -12,9 +12,12 @@ class LibraryView extends AbstractView {
   def getBookTable() = bookTable
 
   override def createViewComponent(): Component = {
-    val panel = new JPanelWithFrameLayout("pref") // why is it neccesary to have man empty row?
-    panel.newColumn("pref:grow")
-    panel.newRow("pref:grow")
+    val panel = new JPanelWithFrameLayout()
+      .withBorders
+      .withSeparators
+      .newColumn("pref:grow")
+      .newRow("pref:grow")
+      
     val scrollPane = new JScrollPane(getBookTable())
     panel.add(scrollPane)
     scrollPane

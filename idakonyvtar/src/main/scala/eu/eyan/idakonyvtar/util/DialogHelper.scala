@@ -121,9 +121,9 @@ object DialogHelper {
 
   def getButtons(dialog: OkCancelDialog, dialogController: IDialogController[_, _]) = {
     val panel = new JPanelWithFrameLayout().newColumn("pref:grow").newColumn
-    panel.addButton(SAVE, e => {dialogController.onOk(); dialog.setOk(true); dialog.dispose()}).withName(SAVE)
+    panel.addButton(SAVE).onAction(() => {dialogController.onOk(); dialog.setOk(true); dialog.dispose()}).withName(SAVE)
     panel.newColumn
-    panel.addButton(CANCEL, e => {dialogController.onCancel(); dialog.dispose()}).withName(CANCEL)
+    panel.addButton(CANCEL).onAction(() => {dialogController.onCancel(); dialog.dispose()}).withName(CANCEL)
     panel
   }
 
