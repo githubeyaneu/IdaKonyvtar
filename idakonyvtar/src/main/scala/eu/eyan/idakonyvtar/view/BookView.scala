@@ -40,7 +40,7 @@ class BookView extends AbstractView {
   def setColumnConfiguration(columnConfiguration: ColumnKonfiguration) = this.columnConfiguration = columnConfiguration
 
   protected override def createViewComponent(): Component = {
-    val panel = new JPanelWithFrameLayout()
+    val panel = new JPanelWithFrameLayout().withSeparators
     panel.newColumn.newColumn("pref:grow")
 
     if (isbnEnabled) {

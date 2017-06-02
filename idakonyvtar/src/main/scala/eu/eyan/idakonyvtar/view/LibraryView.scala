@@ -15,11 +15,11 @@ class LibraryView extends AbstractView {
     val panel = new JPanelWithFrameLayout()
       .withBorders
       .withSeparators
-      .newColumn("pref:grow")
-      .newRow("pref:grow")
+      .newColumnFPG
+      .newRowFPG
       
     val scrollPane = new JScrollPane(getBookTable())
     panel.add(scrollPane)
-    scrollPane
+    panel
   }
 }

@@ -51,7 +51,7 @@ object DialogHelper {
     dialog.setLocationRelativeTo(parent)
     dialog.setModal(true)
 
-    val panel = new JPanelWithFrameLayout().newColumn("pref:grow")
+    val panel = new JPanelWithFrameLayout().withBorders.withSeparators.newColumn("pref:grow")
     panel.add(getButtons(dialog, controller))
     panel.newRow("top:pref:grow").add(controller.getView())
 
@@ -120,10 +120,13 @@ object DialogHelper {
   }
 
   def getButtons(dialog: OkCancelDialog, dialogController: IDialogController[_, _]) = {
-    val panel = new JPanelWithFrameLayout().newColumn("pref:grow").newColumn
-    panel.addButton(SAVE).onAction(() => {dialogController.onOk(); dialog.setOk(true); dialog.dispose()}).withName(SAVE)
+    val panel = new JPanelWithFrameLayout().withSeparators.newColumn("pref:grow")
+    
     panel.newColumn
-    panel.addButton(CANCEL).onAction(() => {dialogController.onCancel(); dialog.dispose()}).withName(CANCEL)
+    panel.addButton(SAVE).withName(SAVE).onAction(() => {dialogController.onOk(); dialog.setOk(true); dialog.dispose()})
+    
+    panel.newColumn
+    panel.addButton(CANCEL).withName(CANCEL).onAction(() => {dialogController.onCancel(); dialog.dispose()})
     panel
   }
 
