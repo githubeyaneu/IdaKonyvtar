@@ -7,7 +7,8 @@ import org.unix4j.Unix4j
 import com.google.common.collect.Lists
 
 import eu.eyan.log.Log
-import eu.eyan.util.http.HttpHelper
+import eu.eyan.util.http.HttpPlus
+import eu.eyan.util.string.StringPlus.StringPlusImplicit
 
 /*
  * This is the code to acquire the hungarian book data -> that is why it is not translated.
@@ -31,8 +32,7 @@ object OszkKereso {
     Log.debug("Session Id:" + session_id);
 
     // Login2
-    HttpHelper
-      .postUrl(
+    HttpPlus.sendPost(
         "http://nektar1.oszk.hu/LVbin/LibriVision/lv_search_form.html?SESSION_ID="
           + session_id
           + "&lv_action=LV_Search_Form&HTML_SEARCH_TYPE=SIMPLE&DB_ID=2",
@@ -57,7 +57,7 @@ object OszkKereso {
     Log.debug("fullMarcLink:" + fullMarcLink);
 
     // Marc hosszú
-    HttpHelper.postUrl("http://nektar1.oszk.hu/LVbin/LibriVision/" + fullMarcLink, "")
+    s"http://nektar1.oszk.hu/LVbin/LibriVision/$fullMarcLink".asUrlPost("").mkString
   }
 
   @throws(classOf[IOException])
@@ -68,7 +68,7 @@ object OszkKereso {
     regex: String,
     regexPost: String): String = {
 
-    val postUrl = HttpHelper.postUrl(host, postParameter)
+    val postUrl = host.asUrlPost(postParameter).mkString
     val line = Unix4j.fromString(postUrl).grep(lineGrep).toStringResult()
     val firstMatch = (regex_prefix + regex + regexPost).r.findFirstIn(line).get
 

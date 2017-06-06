@@ -119,7 +119,7 @@ class BookController extends IDialogController[BookControllerInput, Book] {
     })
   }
 
-  private def isbnSearch(): ActionListener = AwtHelper.newActionListener { e =>
+  private def isbnSearch(): ActionListener = AwtHelper.onActionPerformed { e =>
     {
       if (e.getSource() == view.isbnText) {
         view.isbnText.selectAll()
