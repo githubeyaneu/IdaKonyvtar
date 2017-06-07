@@ -10,7 +10,7 @@ import eu.eyan.idakonyvtar.text.Texts
 import eu.eyan.idakonyvtar.util.DialogHelper
 import eu.eyan.log.Log
 import eu.eyan.log.LogWindow
-import eu.eyan.util.awt.AwtHelper.newWindowClosingEvent
+import eu.eyan.util.awt.AwtHelper.onWindowClosing
 
 object IdaLibrary {
 
@@ -30,6 +30,6 @@ object IdaLibrary {
     Log.info("Resource -> File: " + fileToOpen)
 
     val frame = DialogHelper.runInFrameFullScreen(new LibraryController(), new LibraryControllerInput(fileToOpen), Texts.TITLE)
-    frame.addWindowListener(newWindowClosingEvent(e => LogWindow.close()))
+    frame.addWindowListener(onWindowClosing(e => LogWindow.close))
   }
 }
