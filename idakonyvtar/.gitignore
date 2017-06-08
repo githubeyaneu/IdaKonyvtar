@@ -15,3 +15,4 @@
 /FailedTestVideos
 release.properties
 ${data}
+/.scalastyle
