@@ -1,18 +1,19 @@
 package eu.eyan.idakonyvtar.view;
 
-import com.google.common.collect.Lists.newArrayList
 import java.awt.Component
-import javax.swing.JComboBox
-import javax.swing.JLabel
-import javax.swing.JTextField
+
+import scala.collection.mutable.MutableList
+
 import com.jgoodies.forms.builder.PanelBuilder
 import com.jgoodies.forms.factories.CC
 import com.jgoodies.forms.layout.FormLayout
+
+import AbstractView.addRow
 import eu.eyan.idakonyvtar.model.ColumnConfigurations
 import eu.eyan.idakonyvtar.model.ColumnKonfiguration
-import com.jgoodies.forms.layout.RowSpec
-import AbstractView._
-import scala.collection.mutable.MutableList
+import eu.eyan.util.swing.JTextFieldAutocomplete
+import javax.swing.JLabel
+import javax.swing.JTextField
 
 object BookView {
   val ISBN_TEXT = "isbnText";
@@ -20,6 +21,8 @@ object BookView {
 }
 
 class BookView extends AbstractView {
+  val TEXTFIELD_DEFAULT_SIZE = 20
+  val SEPARATOR_PREF = "3dlu, pref"
 
   val editors: MutableList[Component] = MutableList()
   val isbnSearchLabel = new JLabel()
@@ -44,18 +47,18 @@ class BookView extends AbstractView {
       row += addRow(layout, "pref")
       panelBuilder.addSeparator("Isbn", CC.xyw(1, row, 3))
 
-      row += addRow(layout, "3dlu, pref")
+      row += addRow(layout, SEPARATOR_PREF)
       panelBuilder.add(isbnSearchLabel, CC.xyw(1, row, 1))
       isbnSearchLabel.setName(BookView.ISBN_LABEL)
       panelBuilder.add(isbnText, CC.xyw(3, row, 1))
       isbnText.setName(BookView.ISBN_TEXT)
     }
 
-    row += addRow(layout, "3dlu, pref")
+    row += addRow(layout, SEPARATOR_PREF)
     panelBuilder.addSeparator("Adatok", CC.xyw(1, row, 3))
 
-    for (i <- 0 until columns.size) {
-      row += addRow(layout, "3dlu, pref")
+    for {i <- 0 until columns.size} {
+      row += addRow(layout, SEPARATOR_PREF)
       val columnName = columns(i)
       panelBuilder.addLabel(columnName, CC.xy(1, row))
 
@@ -64,17 +67,18 @@ class BookView extends AbstractView {
       val editor: Component =
         if (isAutocompleteField) {
           if (isMultiEditorField) {
-            new MultiFieldJComboBox(columnName)
-          } else {
-            val jComboBox = new JComboBox[String]()
-            jComboBox.setEditable(true)
-            jComboBox
+            new MultiFieldAutocomplete(columnName, "Autocomplete")
           }
-        } else {
+          else {
+            new JTextFieldAutocomplete().setHintText("Autocomplete")
+          }
+        }
+        else {
           if (isMultiEditorField) {
             new MultiFieldJTextField(columnName)
-          } else {
-            new JTextField(20)
+          }
+          else {
+            new JTextField(TEXTFIELD_DEFAULT_SIZE)
           }
         }
       editor.setName(columnName)

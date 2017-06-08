@@ -7,6 +7,7 @@ import javax.swing.JTextField
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator
 import org.jdesktop.swingx.combobox.ListComboBoxModel;
 import javax.swing.ComboBoxModel
+import eu.eyan.log.Log
 
 class MultiFieldJComboBox(columnName: String) extends MultiField[String, JComboBox[String]](columnName) {
   var columnList: java.util.List[String] = com.google.common.collect.Lists.newArrayList() // java.util because of dependencies
@@ -37,5 +38,8 @@ class MultiFieldJComboBox(columnName: String) extends MultiField[String, JComboB
   def setValueInEditor(editor: JComboBox[String], value: String) =
     editor.getEditor().getEditorComponent().asInstanceOf[JTextField].setText(value)
 
-  def setAutoCompleteList(columnList: java.util.List[String]) = this.columnList = columnList
+  def setAutoCompleteList(autocompleteList: java.util.List[String]) = {
+    Log.debug(" " + autocompleteList)
+    this.columnList = autocompleteList
+  }
 }

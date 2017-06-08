@@ -18,8 +18,10 @@ object BookHelper {
       .map(_.getValue(columnIndex)) // get the values of the column
       .map(_.split(LISTA_SEPARATOR_REGEX)) // get all values if multifield
       .flatten // take the whole list
+      .++:(List("")) // empty is always the default option
       .map(_.trim)
       .distinct
       .sortWith((s1: String, s2: String) => COLLATOR.compare(s1, s2) < 0)
+      .toList
   }
 }

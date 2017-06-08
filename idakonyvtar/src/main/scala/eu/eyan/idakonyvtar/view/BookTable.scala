@@ -14,7 +14,9 @@ class BookTable extends JXTable {
     if (getRowCount() == 0) {
       val g2d = g.asInstanceOf[Graphics2D]
       g2d.setColor(Color.BLACK)
-      g2d.drawString(emptyText, 10, 20)
+      val TEXT_X = 10
+      val TEXT_Y = 20
+      g2d.drawString(emptyText, TEXT_X, TEXT_Y)
     }
   }
 

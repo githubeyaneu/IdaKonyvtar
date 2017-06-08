@@ -21,8 +21,9 @@ import eu.eyan.idakonyvtar.model.Book;
 import eu.eyan.idakonyvtar.model.ColumnConfigurations;
 import eu.eyan.idakonyvtar.model.ColumnKonfiguration;
 import eu.eyan.idakonyvtar.testhelper.BookEditorTestHelper;
-import eu.eyan.idakonyvtar.testutil.video.VideoRunner;
 import eu.eyan.idakonyvtar.util.DialogHelper;
+import eu.eyan.log.Log;
+import eu.eyan.testutil.video.VideoRunner;
 
 public class BookEditorTest extends AbstractUiTest {
 	private BookEditorTestHelper bookEditor;
@@ -30,39 +31,28 @@ public class BookEditorTest extends AbstractUiTest {
 
 	@Before
 	public void setUp() {
+		Log.activate();
+
 		List<String> columns = newArrayList("szimpla", "ac", "mm", "mmac");
-		Book book = new Book.Builder(columns.size()).withValue(0, "Érték1")
-				.build();
+		Book book = new Book.Builder(columns.size()).withValue(0, "Érték1").build();
 
-		ColumnKonfiguration columnConfiguration = new ColumnKonfiguration.Builder(
-				3, columns.size() + 1)
-				.withRow("", ColumnConfigurations.MULTIFIELD().name(),
-						ColumnConfigurations.AUTOCOMPLETE().name())
-				.withRow(columns.get(0), "", "")
-				.withRow(columns.get(1), "", "igen")
-				.withRow(columns.get(2), "igen", "")
-				.withRow(columns.get(3), "igen", "igen").build();
+		ColumnKonfiguration columnConfiguration = new ColumnKonfiguration.Builder(3, columns.size() + 1)
+				.withRow("", ColumnConfigurations.MULTIFIELD().name(), ColumnConfigurations.AUTOCOMPLETE().name()).withRow(columns.get(0), "", "")
+				.withRow(columns.get(1), "", "igen").withRow(columns.get(2), "igen", "").withRow(columns.get(3), "igen", "igen").build();
 
-		ArrayList<Book> bookList = newArrayList(book,
-				new Book.Builder(columns.size()).withValue(0, "Érték2")
-						.withValue(1, "abc").withValue(3, "abc").build(),
-				new Book.Builder(columns.size()).withValue(0, "Érték2")
-						.withValue(1, "abd").withValue(3, "abd").build());
+		ArrayList<Book> bookList = newArrayList(book, new Book.Builder(columns.size()).withValue(0, "Érték2").withValue(1, "abc").withValue(3, "abc").build(),
+				new Book.Builder(columns.size()).withValue(0, "Érték2").withValue(1, "abd").withValue(3, "abd").build());
 
 		bookController = new BookController();
-		BookControllerInput bookControllerInput = new BookControllerInput(book,
-				JavaConversions.asScalaBuffer(columns).toList(),
-				columnConfiguration, JavaConversions.asScalaBuffer(bookList)
-						.toList(), false);
+		BookControllerInput bookControllerInput = new BookControllerInput(book, JavaConversions.asScalaBuffer(columns).toList(), columnConfiguration,
+				JavaConversions.asScalaBuffer(bookList).toList(), false);
 
-		SwingUtilities.invokeLater(() -> DialogHelper.startModalDialog(null,
-				bookController, bookControllerInput));
+		SwingUtilities.invokeLater(() -> DialogHelper.startModalDialog(null, bookController, bookControllerInput));
 
-		bookEditor = new BookEditorTestHelper(
-				BasicRobot.robotWithCurrentAwtHierarchy());
+		bookEditor = new BookEditorTestHelper(BasicRobot.robotWithCurrentAwtHierarchy());
 
-		VideoRunner.setComponentToRecord(bookEditor
-				.getComponentToRecord());
+		VideoRunner.setComponentToRecord(bookEditor.getComponentToRecord());
+
 	}
 
 	@After
@@ -79,15 +69,15 @@ public class BookEditorTest extends AbstractUiTest {
 
 	@Test
 	public void testAutocompleteDefault() {
-		bookEditor.setComboBoxText("ac", "a");
+		bookEditor.setNormalText("ac", "a");
 		bookEditor.keyboard(KeyEvent.VK_ESCAPE);
 		bookEditor.clickSave();
-		assertThat(bookController.getOutput().getValue(1)).isEqualTo("abc");
+		assertThat(bookController.getOutput().getValue(1)).isEqualTo("a");
 	}
 
 	@Test
 	public void testAutocompleteNew() {
-		bookEditor.setComboBoxText("ac", "a");
+		bookEditor.enterNormalText("ac", "a");
 		bookEditor.keyboard(KeyEvent.VK_DELETE);
 		bookEditor.keyboard(KeyEvent.VK_ESCAPE);
 		bookEditor.clickSave();
@@ -109,17 +99,21 @@ public class BookEditorTest extends AbstractUiTest {
 
 	@Test
 	public void testMultiFieldAutoComplete() {
-		bookEditor.setComboBoxText("mmac1", "");
-		bookEditor.enterComboBoxText("mmac1", "a");
-		bookEditor.enterComboBoxText("mmac2", "b");
-		bookEditor.enterComboBoxText("mmac1", "b");
-		bookEditor.enterComboBoxText("mmac3", "c");
+		bookEditor.setNormalText("mmac1", "");
+		bookEditor.enterNormalText("mmac1", "a");
+		bookEditor.autocomplete("mmac1").pressEscape();
+		bookEditor.enterNormalText("mmac2", "b");
+		bookEditor.autocomplete("mmac2").pressEscape();
+		bookEditor.enterNormalText("mmac1", "b");
+		bookEditor.autocomplete("mmac1").pressEscape();
+		bookEditor.enterNormalText("mmac3", "c");
+		bookEditor.autocomplete("mmac3").pressEscape();
 		bookEditor.multifieldDelete("mmac", 2);
 		bookEditor.requireDeleteDisabled("mmac", 4);
-		bookEditor.enterComboBoxText("mmac4", "a");
+		bookEditor.enterNormalText("mmac4", "a");
+		bookEditor.autocomplete("mmac4").pressEscape();
 		bookEditor.clickSave();
-		assertThat(bookController.getOutput().getValue(3)).isEqualTo(
-				"b + c + abc");
+		assertThat(bookController.getOutput().getValue(3)).isEqualTo("ab + c + a");
 	}
 
 	@Test

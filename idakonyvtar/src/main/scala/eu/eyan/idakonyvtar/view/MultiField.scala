@@ -2,21 +2,26 @@ package eu.eyan.idakonyvtar.view;
 
 import java.awt.Component
 import java.awt.event.ActionEvent
-import java.util.stream.Collectors
-import javax.swing.BoxLayout
-import javax.swing.JButton
-import javax.swing.JPanel
+import java.awt.event.ActionListener
+
+import scala.collection.JavaConversions.asScalaBuffer
+import scala.collection.JavaConversions.bufferAsJavaList
+import scala.collection.mutable.ListBuffer
+
 import com.jgoodies.forms.builder.PanelBuilder
 import com.jgoodies.forms.factories.CC
 import com.jgoodies.forms.layout.FormLayout
-import scala.collection.JavaConversions._
-import java.awt.event.ActionListener
-import scala.collection.mutable.MutableList
-import scala.collection.mutable.ListBuffer
+
+import eu.eyan.log.Log
+import eu.eyan.util.awt.AwtHelper
+import javax.swing.BoxLayout
+import javax.swing.JButton
+import javax.swing.JPanel
+import javax.swing.SwingUtilities
 
 abstract class MultiField[INPUT, EDITOR <: Component](columnName: String) extends JPanel with FieldEditListener[EDITOR] {
 
-  protected def addFieldEditListener(editor: EDITOR, listener: FieldEditListener[EDITOR])
+  protected def addFieldEditListener(editor: EDITOR, listener: FieldEditListener[EDITOR]): Unit
   protected def getEditor(): EDITOR
 
   /**
@@ -24,7 +29,7 @@ abstract class MultiField[INPUT, EDITOR <: Component](columnName: String) extend
    */
   protected def getValue(editor: EDITOR): INPUT
 
-  protected def setValueInEditor(editor: EDITOR, value: INPUT)
+  protected def setValueInEditor(editor: EDITOR, value: INPUT): Unit
 
   class Field[EDITOR](val editor: EDITOR, val delete: JButton, val panel: JPanel)
 
@@ -33,10 +38,11 @@ abstract class MultiField[INPUT, EDITOR <: Component](columnName: String) extend
   setLayout(new BoxLayout(this, BoxLayout.Y_AXIS))
 
   def setValues(values: java.util.List[INPUT]) = {
+    Log.debug(getName + ": " + values.mkString(", "))
     removeAll()
     fields.clear()
 
-    for (input <- values) addEditor(input, false)
+    for {input <- values} addEditor(input, false)
 
     addEditor(null.asInstanceOf[INPUT], true)
   }
@@ -69,10 +75,13 @@ abstract class MultiField[INPUT, EDITOR <: Component](columnName: String) extend
 
     fieldPanel.setName(columnName + ".panel." + counter)
     editor.setName(columnName + counter)
+    Log.debug(columnName + counter)
     deleteButton.setName(columnName + ".delete." + counter)
     counter = counter + 1
 
     revalidate()
+    // SwingUtilities.windowForComponent(this).pack()
+    AwtHelper.tryToEnlargeWindow(SwingUtilities.windowForComponent(this))
   }
 
   def fieldEdited(source: EDITOR) = {

@@ -8,9 +8,9 @@ trait IController[INPUT, OUTPUT] {
 
   def getTitle(): String
 
-  def initData(input: INPUT)
+  def initData(input: INPUT): Unit
 
-  def initBindings()
+  def initBindings(): Unit
 
   def getOutput(): OUTPUT
 

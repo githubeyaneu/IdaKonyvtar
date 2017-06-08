@@ -35,8 +35,12 @@ import javax.swing.JComboBox
 import javax.swing.JOptionPane
 import javax.swing.JTextField
 import javax.swing.SwingUtilities
+import eu.eyan.log.Log
+import eu.eyan.idakonyvtar.view.MultiFieldAutocomplete
+import eu.eyan.util.swing.JTextFieldAutocomplete
 
 class BookController extends IDialogController[BookControllerInput, Book] {
+  val SPACE = " "
   val view = new BookView()
   var model: BookControllerInput = null
   val resizeListeners: java.util.List[Window] = newArrayList()
@@ -45,9 +49,9 @@ class BookController extends IDialogController[BookControllerInput, Book] {
 
   def getTitle =
     if (model.columns.indexOf("Szerző") >= 0)
-      "Book adatainak szerkesztése - " + model.book.getValue(model.columns.indexOf("Szerző"))
+      "Könyv adatainak szerkesztése - " + model.book.getValue(model.columns.indexOf("Cím"))
     else
-      "Book adatainak szerkesztése"
+      "Könyv adatainak szerkesztése"
 
   def initData(model: BookControllerInput) = {
     this.model = model
@@ -62,7 +66,7 @@ class BookController extends IDialogController[BookControllerInput, Book] {
   }
 
   private def initFieldsActionBindings = {
-    for (columnIndex <- 0 until model.columns.size()) {
+    for {columnIndex <- 0 until model.columns.size()} {
       val columnName = model.columns.get(columnIndex)
       val autoComplete = model.columnConfiguration.isTrue(columnName, ColumnConfigurations.AUTOCOMPLETE)
       val multi = model.columnConfiguration.isTrue(columnName, ColumnConfigurations.MULTIFIELD)
@@ -70,14 +74,21 @@ class BookController extends IDialogController[BookControllerInput, Book] {
       if (autoComplete) {
         val columnList = BookHelper.getColumnList(model.bookList, columnIndex)
         if (multi) {
-          val mmcombo: MultiFieldJComboBox = view.editors(columnIndex).asInstanceOf[MultiFieldJComboBox]
+          Log.debug("mac " + columnIndex + SPACE + columnList)
+          //          val mmcombo: MultiFieldJComboBox = view.editors(columnIndex).asInstanceOf[MultiFieldJComboBox]
+          //          mmcombo.setAutoCompleteList(columnList)
+          val mmcombo = view.editors(columnIndex).asInstanceOf[MultiFieldAutocomplete]
           mmcombo.setAutoCompleteList(columnList)
           multiFieldBind(mmcombo, new BookFieldValueModel(columnIndex, model.book))
         } else {
-          val comboBox: JComboBox[_] = view.editors(columnIndex).asInstanceOf[JComboBox[_]]
-          val adapter = new ComboBoxAdapter[String](columnList, new BookFieldValueModel(columnIndex, model.book))
-          Bindings.bind(comboBox, adapter)
-          AutoCompleteDecorator.decorate(comboBox)
+          Log.debug("ac " + columnIndex + SPACE + columnList)
+          //        val comboBox: JComboBox[_] = view.editors(columnIndex).asInstanceOf[JComboBox[_]]
+          //        val adapter = new ComboBoxAdapter[String](columnList, new BookFieldValueModel(columnIndex, model.book))
+          //        Bindings.bind(comboBox, adapter)
+          //        AutoCompleteDecorator.decorate(comboBox)
+          val autocomplete = view.editors(columnIndex).asInstanceOf[JTextFieldAutocomplete]
+          autocomplete.setValues(columnList)
+          Bindings.bind(autocomplete, new BookFieldValueModel(columnIndex, model.book))
         }
       } else {
         if (multi) {
@@ -91,10 +102,13 @@ class BookController extends IDialogController[BookControllerInput, Book] {
   }
 
   private def multiFieldBind(mmc: MultiField[String, _], bookFieldValueModel: BookFieldValueModel) = {
+    Log.debug(mmc.getName + SPACE + bookFieldValueModel)
     bookFieldValueModel.addValueChangeListener(new PropertyChangeListener {
       override def propertyChange(evt: PropertyChangeEvent) =
-        if (evt.getNewValue() != evt.getOldValue())
+        if (evt.getNewValue() != evt.getOldValue()) {
+          Log.debug("Listener: " + evt.getOldValue + " -> " + evt.getNewValue)
           mmc.setValues(getMultiFieldList(evt.getNewValue().asInstanceOf[String]))
+        }
     })
 
     mmc.setValues(getMultiFieldList(bookFieldValueModel.getValue()))
@@ -113,9 +127,9 @@ class BookController extends IDialogController[BookControllerInput, Book] {
         view.isbnSearchLabel.setIcon(new ImageIcon(Resources.getResource("icons/search.gif")))
         view.editors.foreach(_.setEnabled(false))
 
-        //TODO Asynchron
+        // TODO Asynchron
         SwingUtilities.invokeLater(new Runnable() {
-          override def run() {
+          override def run() = {
             try {
               val marcsToIsbn = OszkKereso.getMarcsToIsbn(view.isbnText.getText().replaceAll("ö", "0"))
               prozessIsbnData(marcsToIsbn)
@@ -139,10 +153,11 @@ class BookController extends IDialogController[BookControllerInput, Book] {
     model.columns.foreach(column => {
       try {
         val marcCodesFromColumns = model.columnConfiguration.getMarcCodes(column)
-        val values = for (
-          marcFromOszk <- marcsFromOszk;
+        val values = for {
+          marcFromOszk <- marcsFromOszk
           marcFromColumn <- marcCodesFromColumns if (isMarcsApply(marcFromOszk, marcFromColumn))
-        ) yield marcFromOszk.value
+        } yield marcFromOszk.value
+        Log.info("BookController.prozessIsbnData " + values.mkString("\r\n    "))
         model.book.setValue(model.columns.indexOf(column), values.mkString(", "))
       } catch {
         case e: Exception =>
@@ -152,6 +167,7 @@ class BookController extends IDialogController[BookControllerInput, Book] {
     })
 
   private def isMarcsApply(marcFromOszk: Marc, marcFromColumn: Marc) = {
+    // Log.debug("marcFromOszk: " + marcFromOszk + " =?= marcFromColumn:" + marcFromColumn)
     if (marcFromOszk == null || marcFromColumn == null || marcFromOszk.marc1 == null || marcFromColumn.marc1 == null)
       false
     else marcFromOszk.marc1.equalsIgnoreCase(marcFromColumn.marc1) &&

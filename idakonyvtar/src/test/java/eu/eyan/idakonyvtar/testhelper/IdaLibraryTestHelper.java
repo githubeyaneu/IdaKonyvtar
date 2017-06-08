@@ -12,7 +12,7 @@ import org.fest.swing.fixture.DialogFixture;
 import org.fest.swing.fixture.FrameFixture;
 
 import eu.eyan.idakonyvtar.IdaLibrary;
-import eu.eyan.idakonyvtar.controller.LibraryController;
+import eu.eyan.idakonyvtar.text.Texts;
 import eu.eyan.idakonyvtar.view.LibraryMenuAndToolBar;
 
 public class IdaLibraryTestHelper {
@@ -20,7 +20,7 @@ public class IdaLibraryTestHelper {
 
 	public void start(String filenév) {
 		IdaLibrary.main(new String[] { filenév });
-		frame = new FrameFixture(LibraryController.TITLE());
+		frame = new FrameFixture(Texts.TITLE());
 		frame.target.toFront();
 	}
 
@@ -84,12 +84,12 @@ public class IdaLibraryTestHelper {
 	}
 
 	public void clickApproveYes() {
-		frame.dialog().button(JButtonMatcher.withText(LibraryController.YES()))
+		frame.dialog().button(JButtonMatcher.withText(Texts.YES()))
 				.click();
 	}
 
 	public void clickApproveNo() {
-		frame.dialog().button(JButtonMatcher.withText(LibraryController.NO()))
+		frame.dialog().button(JButtonMatcher.withText(Texts.NO()))
 				.click();
 	}
 
@@ -114,9 +114,9 @@ public class IdaLibraryTestHelper {
 	}
 
 	public void checkTitleWithNumber(int numberOfBooks) {
-		requireTitle(LibraryController.TITLE()
-				+ LibraryController.TITLE_SEPARATOR() + numberOfBooks
-				+ LibraryController.TITLE_PIECES());
+		requireTitle(Texts.TITLE()
+				+ Texts.TITLE_SEPARATOR() + numberOfBooks
+				+ Texts.TITLE_PIECES());
 
 	}
 

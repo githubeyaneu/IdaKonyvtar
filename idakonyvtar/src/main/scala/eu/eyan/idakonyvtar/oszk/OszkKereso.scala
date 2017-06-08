@@ -6,7 +6,8 @@ import org.unix4j.Unix4j
 
 import com.google.common.collect.Lists
 
-import eu.eyan.idakonyvtar.util.HttpHelper
+import eu.eyan.log.Log
+import eu.eyan.util.http.HttpHelper
 
 /*
  * This is the code to acquire the hungarian book data -> that is why it is not translated.
@@ -27,7 +28,7 @@ object OszkKereso {
       "http://nektar1.oszk.hu/LVbin/LibriVision/lv_login.html",
       "USER_LOGIN=Nektar_LV_user&USER_PASSWORD=Nektar&LanguageCode=hu&CountryCode=hu&HtmlSetCode=default&lv_action=LV_Login&image3.x=17&image3.y=9",
       "SESSIO", "SESSION_ID=", "([0-9]*_[0-9]*)", "&")
-    // System.out.println("Session Id:" + session_id);
+    Log.debug("Session Id:" + session_id);
 
     // Login2
     HttpHelper
@@ -40,17 +41,20 @@ object OszkKereso {
     // Keresés aztán Marc rövid formátum keresése
     val marcLink = findTextInUrl(
       "http://nektar1.oszk.hu/LVbin/LibriVision/lv_view_records.html",
-      "SESSION_ID=" + session_id + "&lv_action=LV_Search&QUERY_ID=T_1391112123&ADD_QUERY=-1&SEARCH_TYPE=QUERY_SIMPLE&HTML_SEARCH_TYPE=SIMPLE&USE=BN&_QUERY=" + isbn + "&QUERY=" + isbn + "&sub_button=Keres%C3%A9s",
+      "SESSION_ID=" + session_id
+      + "&lv_action=LV_Search&QUERY_ID=T_1391112123&ADD_QUERY=-1&SEARCH_TYPE=QUERY_SIMPLE&HTML_SEARCH_TYPE=SIMPLE&USE=BN&_QUERY=" + isbn
+      + "&QUERY=" + isbn
+      + "&sub_button=Keres%C3%A9s",
       "A record MARC form",
       "href=\"",
       ".*",
       "\">MARC form")
-    // System.out.println("marcLink:" + marcLink);
+    Log.debug("marcLink:" + marcLink);
 
     // Marc rövid, marc hosszú keresése
     val fullMarcLink = findTextInUrl(
       "http://nektar1.oszk.hu/LVbin/LibriVision/" + marcLink, "", "Teljes megjelenítés", "href=\"", ".*", "\">Teljes")
-    // System.out.println("fullMarcLink:" + fullMarcLink);
+    Log.debug("fullMarcLink:" + fullMarcLink);
 
     // Marc hosszú
     HttpHelper.postUrl("http://nektar1.oszk.hu/LVbin/LibriVision/" + fullMarcLink, "")
@@ -72,7 +76,7 @@ object OszkKereso {
   }
 
   @throws(classOf[OszkKeresoException])
-  def getMarcsToIsbn(isbn: String): java.util.List[Marc] /*FIXME java because of test*/ = {
+  def getMarcsToIsbn(isbn: String): java.util.List[Marc] /* FIXME java because of test */ = {
     try {
       var source = isbnKeresOszkban(isbn).replaceAll("[\r\n]", "")
       val marcTable = "<table class=\"record\">.*?</table>".r.findFirstIn(source).get
@@ -82,7 +86,7 @@ object OszkKereso {
       var lastMarc3 = ""
 
       val sorok = "<tr.*?</tr".r.findAllIn(marcTable)
-      val marcs = for (sor <- sorok) yield {
+      val marcs = for {sor <- sorok} yield {
         val marc1 = sor.substring(50 - 1, 53 - 1).trim()
         val marc2 = sor.substring(103 - 1, 105 - 1).trim()
         val marc3 = sor.substring(155 - 1, 156 - 1).trim()
@@ -96,14 +100,14 @@ object OszkKereso {
         lastMarc3 = marc3
 
         val m = new Marc(lastMarc1, lastMarc2, lastMarc3, value)
-        println()
-        println(m)
+        Log.info(m.toString())
         m
       }
 
-      //FIXME java test
+      // FIXME java test
       val ret = Lists.newArrayList[Marc]()
       marcs.foreach(ret.add(_))
+      marcs.foreach(m => Log.debug(m.toString()))
       ret
     } catch {
       case e: Throwable => {

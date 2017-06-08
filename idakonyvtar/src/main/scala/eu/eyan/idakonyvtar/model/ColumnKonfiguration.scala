@@ -10,10 +10,10 @@ object ColumnKonfiguration {
   class Builder(columns: Int, rows: Int) {
     val columnConfiguration = new ColumnKonfiguration(Array.ofDim[String](columns, rows))
     var actualRow: Int = 0
-    //columnConfiguration.setTable()
+    // columnConfiguration.setTable()
 
     @varargs def withRow(values: String*): Builder = {
-      for (i <- 0 until values.length) this.columnConfiguration.getTable()(i)(actualRow) = values(i)
+      for {i <- 0 until values.length} this.columnConfiguration.getTable()(i)(actualRow) = values(i)
       actualRow = actualRow + 1
       this
     }
@@ -22,7 +22,7 @@ object ColumnKonfiguration {
   }
 }
 
-//FIXME: Refactor, because it cannot be understood, constant pain i t a
+// FIXME: Refactor, because it cannot be understood, constant pain i t a
 class ColumnKonfiguration(val table: Array[Array[String]]) {
 
   def isTrue(columnName: String, columnConfiguration: ColumnConfigurationsValue) =
@@ -47,7 +47,7 @@ class ColumnKonfiguration(val table: Array[Array[String]]) {
   def getMarcCodes(columnName: String) = {
     try {
       val marcCodeTexts = getValue(columnName, ColumnConfigurations.MARC_CODE).split(",")
-      for (string <- marcCodeTexts if string.split("-").length > 2) yield {
+      for {string <- marcCodeTexts if string.split("-").length > 2} yield {
         val codes = string.split("-")
         new Marc(codes(0), codes(1), codes(2), null)
       }
@@ -58,10 +58,10 @@ class ColumnKonfiguration(val table: Array[Array[String]]) {
   }
 
   def getRememberingColumns() =
-    for (columnIndex <- 1 until table(0).length if isTrue(table(0)(columnIndex), ColumnConfigurations.REMEMBERING)) yield table(0)(columnIndex)
+    for {columnIndex <- 1 until table(0).length if isTrue(table(0)(columnIndex), ColumnConfigurations.REMEMBERING)} yield table(0)(columnIndex)
 
   def getTable() = table
 
-  //def setTable(table: ColumnKonfigurationTable) = this.table = table
+  // def setTable(table: ColumnKonfigurationTable) = this.table = table
 
 }
