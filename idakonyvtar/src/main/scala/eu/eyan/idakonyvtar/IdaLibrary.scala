@@ -10,7 +10,11 @@ import eu.eyan.idakonyvtar.text.Texts
 import eu.eyan.idakonyvtar.util.DialogHelper
 import eu.eyan.log.Log
 import eu.eyan.log.LogWindow
+<<<<<<< HEAD
 import eu.eyan.util.awt.AwtHelper.newWindowClosingEvent
+=======
+import eu.eyan.util.awt.AwtHelper.onWindowClosing
+>>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
 
 object IdaLibrary {
 
@@ -26,10 +30,18 @@ object IdaLibrary {
       if (file.exists()) file
       else new File(Resources.getResource(path).getFile)
 
+<<<<<<< HEAD
     Log.activate()
+=======
+    Log.activate
+>>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
     Log.info("Resource -> File: " + fileToOpen)
 
     val frame = DialogHelper.runInFrameFullScreen(new LibraryController(), new LibraryControllerInput(fileToOpen), Texts.TITLE)
+<<<<<<< HEAD
     frame.addWindowListener(newWindowClosingEvent(e => LogWindow.close()))
+=======
+    frame.addWindowListener(onWindowClosing(e => LogWindow.close))
+>>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
   }
 }

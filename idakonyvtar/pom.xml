@@ -168,14 +168,14 @@ idakonyvtar@eyan.eu</description>
 		<dependency>
 			<groupId>org.scala-lang</groupId>
 			<artifactId>scala-library</artifactId>
-			<version>2.11.7</version>
+			<version>2.12.2</version>
 		</dependency>
 
-		<!-- <dependency> -->
-		<!-- <groupId>org.scalatest</groupId> -->
-		<!-- <artifactId>scalatest_2.11</artifactId> -->
-		<!-- <version>3.0.0-SNAP2</version> -->
-		<!-- </dependency> -->
+		<dependency>
+			<groupId>eu.eyan.util</groupId>
+			<artifactId>eyan_helper</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 
 		<dependency>
 			<groupId>eu.eyan.util</groupId>
@@ -207,9 +207,9 @@ idakonyvtar@eyan.eu</description>
 		<dependency>
 			<groupId>com.jgoodies</groupId>
 			<artifactId>jgoodies-forms</artifactId>
-			<version>1.7.2</version>
+			<version>1.9.0</version>
 		</dependency>
-
+		
 		<dependency>
 			<groupId>com.jgoodies</groupId>
 			<artifactId>jgoodies-binding</artifactId>
@@ -259,13 +259,6 @@ idakonyvtar@eyan.eu</description>
 			<version>r03</version>
 		</dependency>
 
-		<!-- <dependency> -->
-		<!-- <groupId>org.projectlombok</groupId> -->
-		<!-- <artifactId>lombok</artifactId> -->
-		<!-- <version>1.12.4</version> -->
-		<!-- <scope>provided</scope> -->
-		<!-- </dependency> -->
-
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-compress</artifactId>
@@ -287,6 +280,7 @@ idakonyvtar@eyan.eu</description>
 
 		<!-- TEST DEPENDENCIES -->
 
+<<<<<<< HEAD
 		<!-- https://mvnrepository.com/artifact/org.specs2/specs2_2.11 -->
 		<dependency>
 			<groupId>org.specs2</groupId>
@@ -295,15 +289,14 @@ idakonyvtar@eyan.eu</description>
 			<type>pom</type>
 		</dependency>
 
+=======
+>>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
-
-		<!-- <dependency> <groupId>org.easytesting</groupId> <artifactId>fest-assert</artifactId> 
-			<version>1.4</version> </dependency> -->
 
 		<dependency>
 			<groupId>org.easytesting</groupId>

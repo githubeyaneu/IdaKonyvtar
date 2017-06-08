@@ -11,7 +11,7 @@
 			</arguments>
 		</buildCommand>
 		<buildCommand>
-			<name>net.sourceforge.pmd.eclipse.plugin.pmdBuilder</name>
+			<name>org.scalastyle.scalastyleplugin.core.ScalastyleBuilder</name>
 			<arguments>
 			</arguments>
 		</buildCommand>
@@ -25,6 +25,6 @@
 		<nature>org.scala-ide.sdt.core.scalanature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>org.eclipse.m2e.core.maven2Nature</nature>
-		<nature>net.sourceforge.pmd.eclipse.plugin.pmdNature</nature>
+		<nature>org.scalastyle.scalastyleplugin.core.ScalastyleNature</nature>
 	</natures>
 </projectDescription>

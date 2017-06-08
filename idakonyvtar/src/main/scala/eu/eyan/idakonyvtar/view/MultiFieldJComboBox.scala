@@ -18,7 +18,7 @@ class MultiFieldJComboBox(columnName: String) extends MultiField[String, JComboB
     })
   }
 
-  protected def getEditor() = {
+  protected def createEditor() = {
     val jComboBox = new JComboBox[String]()
     jComboBox.setModel(new ListComboBoxModel[String](columnList).asInstanceOf[ComboBoxModel[String]])
 

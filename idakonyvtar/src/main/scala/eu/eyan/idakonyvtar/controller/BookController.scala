@@ -7,17 +7,13 @@ import java.awt.event.ActionListener
 import java.beans.PropertyChangeEvent
 import java.beans.PropertyChangeListener
 import java.util.List
-
 import scala.collection.JavaConversions.asScalaBuffer
 import scala.collection.JavaConversions.seqAsJavaList
-
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator
-
 import com.google.common.collect.Lists.newArrayList
 import com.google.common.io.Resources
 import com.jgoodies.binding.adapter.Bindings
 import com.jgoodies.binding.adapter.ComboBoxAdapter
-
 import eu.eyan.idakonyvtar.controller.input.BookControllerInput
 import eu.eyan.idakonyvtar.model.Book
 import eu.eyan.idakonyvtar.model.BookFieldValueModel
@@ -26,18 +22,25 @@ import eu.eyan.idakonyvtar.oszk.Marc
 import eu.eyan.idakonyvtar.oszk.OszkKereso
 import eu.eyan.idakonyvtar.oszk.OszkKeresoException
 import eu.eyan.idakonyvtar.util.BookHelper
+import eu.eyan.idakonyvtar.util.LibraryException
 import eu.eyan.idakonyvtar.view.BookView
 import eu.eyan.idakonyvtar.view.MultiField
-import eu.eyan.idakonyvtar.view.MultiFieldJComboBox
+import eu.eyan.idakonyvtar.view.MultiFieldAutocomplete
 import eu.eyan.idakonyvtar.view.MultiFieldJTextField
+import eu.eyan.log.Log
+import eu.eyan.util.swing.JTextFieldAutocomplete
 import javax.swing.ImageIcon
-import javax.swing.JComboBox
 import javax.swing.JOptionPane
 import javax.swing.JTextField
 import javax.swing.SwingUtilities
 import eu.eyan.log.Log
 import eu.eyan.idakonyvtar.view.MultiFieldAutocomplete
 import eu.eyan.util.swing.JTextFieldAutocomplete
+<<<<<<< HEAD
+=======
+import eu.eyan.util.awt.AwtHelper
+import eu.eyan.util.swing.SwingPlus
+>>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
 
 class BookController extends IDialogController[BookControllerInput, Book] {
   val SPACE = " "
@@ -66,7 +69,11 @@ class BookController extends IDialogController[BookControllerInput, Book] {
   }
 
   private def initFieldsActionBindings = {
+<<<<<<< HEAD
     for {columnIndex <- 0 until model.columns.size()} {
+=======
+    for { columnIndex <- 0 until model.columns.size() } {
+>>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
       val columnName = model.columns.get(columnIndex)
       val autoComplete = model.columnConfiguration.isTrue(columnName, ColumnConfigurations.AUTOCOMPLETE)
       val multi = model.columnConfiguration.isTrue(columnName, ColumnConfigurations.MULTIFIELD)
@@ -87,7 +94,11 @@ class BookController extends IDialogController[BookControllerInput, Book] {
           //        Bindings.bind(comboBox, adapter)
           //        AutoCompleteDecorator.decorate(comboBox)
           val autocomplete = view.editors(columnIndex).asInstanceOf[JTextFieldAutocomplete]
+<<<<<<< HEAD
           autocomplete.setValues(columnList)
+=======
+          autocomplete.setAutocompleteList(columnList)
+>>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
           Bindings.bind(autocomplete, new BookFieldValueModel(columnIndex, model.book))
         }
       } else {
@@ -119,32 +130,37 @@ class BookController extends IDialogController[BookControllerInput, Book] {
     })
   }
 
-  private def isbnSearch(): ActionListener = new ActionListener() {
-    override def actionPerformed(e: ActionEvent) = {
+  private def isbnSearch(): ActionListener = AwtHelper.onActionPerformed { e =>
+    {
       if (e.getSource() == view.isbnText) {
         view.isbnText.selectAll()
         view.isbnSearchLabel.setText("Keresés")
         view.isbnSearchLabel.setIcon(new ImageIcon(Resources.getResource("icons/search.gif")))
         view.editors.foreach(_.setEnabled(false))
 
+<<<<<<< HEAD
         // TODO Asynchron
         SwingUtilities.invokeLater(new Runnable() {
           override def run() = {
+=======
+        SwingPlus.invokeLater { () =>
+          {
+>>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
             try {
               val marcsToIsbn = OszkKereso.getMarcsToIsbn(view.isbnText.getText().replaceAll("ö", "0"))
               prozessIsbnData(marcsToIsbn)
             } catch {
               case e: OszkKeresoException =>
-                // FIXME: itt fontos a naplózás
+                Log.error(e)
                 view.isbnSearchLabel.setText("Nincs találat")
                 view.isbnSearchLabel.setIcon(new ImageIcon(Resources.getResource("icons/error.gif")))
             } finally {
               view.editors.foreach(_.setEnabled(true))
-              fireResizeEvent()
+              fireResizeEvent
             }
           }
-        })
-        fireResizeEvent()
+        }
+        fireResizeEvent
       }
     }
   }

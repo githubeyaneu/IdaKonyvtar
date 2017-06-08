@@ -7,7 +7,12 @@ import org.unix4j.Unix4j
 import com.google.common.collect.Lists
 
 import eu.eyan.log.Log
+<<<<<<< HEAD
 import eu.eyan.util.http.HttpHelper
+=======
+import eu.eyan.util.http.HttpPlus
+import eu.eyan.util.string.StringPlus.StringPlusImplicit
+>>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
 
 /*
  * This is the code to acquire the hungarian book data -> that is why it is not translated.
@@ -31,8 +36,7 @@ object OszkKereso {
     Log.debug("Session Id:" + session_id);
 
     // Login2
-    HttpHelper
-      .postUrl(
+    HttpPlus.sendPost(
         "http://nektar1.oszk.hu/LVbin/LibriVision/lv_search_form.html?SESSION_ID="
           + session_id
           + "&lv_action=LV_Search_Form&HTML_SEARCH_TYPE=SIMPLE&DB_ID=2",
@@ -42,9 +46,15 @@ object OszkKereso {
     val marcLink = findTextInUrl(
       "http://nektar1.oszk.hu/LVbin/LibriVision/lv_view_records.html",
       "SESSION_ID=" + session_id
+<<<<<<< HEAD
       + "&lv_action=LV_Search&QUERY_ID=T_1391112123&ADD_QUERY=-1&SEARCH_TYPE=QUERY_SIMPLE&HTML_SEARCH_TYPE=SIMPLE&USE=BN&_QUERY=" + isbn
       + "&QUERY=" + isbn
       + "&sub_button=Keres%C3%A9s",
+=======
+        + "&lv_action=LV_Search&QUERY_ID=T_1391112123&ADD_QUERY=-1&SEARCH_TYPE=QUERY_SIMPLE&HTML_SEARCH_TYPE=SIMPLE&USE=BN&_QUERY=" + isbn
+        + "&QUERY=" + isbn
+        + "&sub_button=Keres%C3%A9s",
+>>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
       "A record MARC form",
       "href=\"",
       ".*",
@@ -57,18 +67,18 @@ object OszkKereso {
     Log.debug("fullMarcLink:" + fullMarcLink);
 
     // Marc hosszú
-    HttpHelper.postUrl("http://nektar1.oszk.hu/LVbin/LibriVision/" + fullMarcLink, "")
+    s"http://nektar1.oszk.hu/LVbin/LibriVision/$fullMarcLink".asUrlPost("").mkString
   }
 
   @throws(classOf[IOException])
   def findTextInUrl(host: String,
-                    postParameter: String,
-                    lineGrep: String,
-                    regex_prefix: String,
-                    regex: String,
-                    regexPost: String): String = {
+    postParameter: String,
+    lineGrep: String,
+    regex_prefix: String,
+    regex: String,
+    regexPost: String): String = {
 
-    val postUrl = HttpHelper.postUrl(host, postParameter)
+    val postUrl = host.asUrlPost(postParameter).mkString
     val line = Unix4j.fromString(postUrl).grep(lineGrep).toStringResult()
     val firstMatch = (regex_prefix + regex + regexPost).r.findFirstIn(line).get
 
@@ -76,7 +86,11 @@ object OszkKereso {
   }
 
   @throws(classOf[OszkKeresoException])
+<<<<<<< HEAD
   def getMarcsToIsbn(isbn: String): java.util.List[Marc] /* FIXME java because of test */ = {
+=======
+  def getMarcsToIsbn(isbn: String): List[Marc] = {
+>>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
     try {
       var source = isbnKeresOszkban(isbn).replaceAll("[\r\n]", "")
       val marcTable = "<table class=\"record\">.*?</table>".r.findFirstIn(source).get
@@ -86,7 +100,11 @@ object OszkKereso {
       var lastMarc3 = ""
 
       val sorok = "<tr.*?</tr".r.findAllIn(marcTable)
+<<<<<<< HEAD
       val marcs = for {sor <- sorok} yield {
+=======
+      val marcs = (for { sor <- sorok } yield {
+>>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
         val marc1 = sor.substring(50 - 1, 53 - 1).trim()
         val marc2 = sor.substring(103 - 1, 105 - 1).trim()
         val marc3 = sor.substring(155 - 1, 156 - 1).trim()
@@ -94,7 +112,8 @@ object OszkKereso {
         if (marc1 != lastMarc1 && marc1 != "") {
           lastMarc1 = marc1
           lastMarc2 = marc2
-        } else if (marc2 != lastMarc2 && marc2 != "") {
+        }
+        else if (marc2 != lastMarc2 && marc2 != "") {
           lastMarc2 = marc2
         }
         lastMarc3 = marc3
@@ -102,14 +121,21 @@ object OszkKereso {
         val m = new Marc(lastMarc1, lastMarc2, lastMarc3, value)
         Log.info(m.toString())
         m
-      }
+      }).toList
 
+<<<<<<< HEAD
       // FIXME java test
       val ret = Lists.newArrayList[Marc]()
       marcs.foreach(ret.add(_))
       marcs.foreach(m => Log.debug(m.toString()))
       ret
     } catch {
+=======
+      marcs.foreach(m => Log.debug(m.toString()))
+      marcs
+    }
+    catch {
+>>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
       case e: Throwable => {
         e.printStackTrace();
         throw new OszkKeresoException("Sikertelen.", e)

@@ -8,8 +8,14 @@ import java.awt.event.MouseEvent
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import java.io.File
+
 import scala.collection.JavaConversions.asScalaBuffer
+
 import com.jgoodies.binding.adapter.SingleListSelectionAdapter
+<<<<<<< HEAD
+=======
+
+>>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
 import eu.eyan.idakonyvtar.controller.adapter.LibraryListTableModel
 import eu.eyan.idakonyvtar.controller.input.BookControllerInput
 import eu.eyan.idakonyvtar.controller.input.LibraryControllerInput
@@ -30,12 +36,17 @@ import eu.eyan.idakonyvtar.view.LibraryMenuAndToolBar
 import eu.eyan.idakonyvtar.view.LibraryView
 import eu.eyan.log.Log
 import eu.eyan.log.LogWindow
+<<<<<<< HEAD
 import eu.eyan.util.awt.AwtHelper.newActionListener
 import eu.eyan.util.swing.HighlightRenderer
+=======
+import eu.eyan.util.swing.HighlightRenderer
+import eu.eyan.util.swing.JButtonPlus.JButtonImplicit
+import eu.eyan.util.swing.JFileChooserPlus.JFileChooserImplicit
+>>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
 import eu.eyan.util.swing.SpecialCharacterRowFilter
 import eu.eyan.util.swing.SwingPlus.showErrorDialog
 import javax.swing.JFileChooser
-import javax.swing.JFileChooser.APPROVE_OPTION
 import javax.swing.JFrame
 import javax.swing.JOptionPane
 import javax.swing.ListSelectionModel
@@ -45,8 +56,11 @@ import javax.swing.event.ListDataEvent
 import javax.swing.event.ListDataListener
 import javax.swing.event.ListSelectionEvent
 import javax.swing.event.ListSelectionListener
+<<<<<<< HEAD
 import javax.swing.filechooser.FileNameExtensionFilter
 import eu.eyan.util.swing.JFileChooserPlus.JFileChooserImplicit
+=======
+>>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
 
 class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void] {
 
@@ -63,10 +77,13 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
   override def getTitle() = TITLE + TITLE_SEPARATOR + model.books.getList.size() + TITLE_PIECES
   def refreshTitle() = SwingUtilities.getWindowAncestor(view.getComponent()).asInstanceOf[JFrame].setTitle(getTitle())
   override def getMenuBar() = menuAndToolBar.getMenuBar()
+<<<<<<< HEAD
 
   def saveLibrary(file: File) =
     try ExcelHandler.saveLibrary(file, model.library)
     catch { case le: LibraryException => Log.error(le) }
+=======
+>>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
 
   override def getView() = {
     view.getComponent()
@@ -103,7 +120,85 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
     resetTableModel()
   }
 
+<<<<<<< HEAD
+=======
+  val loadLibrary = () => new JFileChooser()
+    .withCurrentDirectory(".")
+    .withDialogTitle("Töltés")
+    .withApproveButtonText("Töltés")
+    .withFileFilter("xls", "Excel97 fájlok")
+    .showAndHandleResult(menuAndToolBar.MENU_EXCEL_LOAD, selectedFile => {
+      Log.info("selected file: " + selectedFile)
+      readLibrary(selectedFile)
+    })
+
+  val saveLibrary = () => new JFileChooser(new File("."))
+    .withDialogTitle("Mentés")
+    .withApproveButtonText("Mentés")
+    .withFileFilter("xls", "Excel97 fájlok")
+    .showAndHandleResult(menuAndToolBar.MENU_EXCEL_LOAD, selectedFile => {
+      Log.info("Save " + selectedFile)
+      try ExcelHandler.saveLibrary(selectedFile, model.library)
+      catch { case le: LibraryException => Log.error(le) }
+    })
+
+  val createNewBook = () => {
+    val bookController = new BookController
+
+    val editorDialog = DialogHelper.startModalDialog(
+      view.getComponent(), bookController, new BookControllerInput(
+        newPreviousBook(model.library.columns.size),
+        model.library.columns.toList,
+        model.library.configuration,
+        model.books.getList.toList,
+        true))
+
+    if (editorDialog.isOk()) {
+      model.books.getList.add(0, bookController.getOutput)
+      savePreviousBook(bookController.getOutput)
+      model.books.fireIntervalAdded(0, 0)
+    }
+  }
+
+  def editBook = {
+    val selectedBookIndex = view.getBookTable().convertRowIndexToModel(view.getBookTable().getSelectedRow)
+
+    val bookController = new BookController
+    val editorDialog = DialogHelper.startModalDialog(
+      view.getComponent(),
+      bookController,
+      new BookControllerInput(
+        Book(model.books.getList.get(selectedBookIndex)),
+        model.library.columns.toList,
+        model.library.configuration,
+        model.library.books.toList,
+        false))
+
+    if (editorDialog.isOk()) {
+      model.books.getList.set(selectedBookIndex, bookController.getOutput)
+      model.books.fireSelectedContentsChanged()
+    }
+  }
+
+  val deleteBook = () => {
+    if (JOptionPane.OK_OPTION == JOptionPane.showOptionDialog(
+      menuAndToolBar.TOOLBAR_BOOK_DELETE,
+      "Biztosan törölni akarod?",
+      "Törlés megerősítése",
+      JOptionPane.YES_NO_OPTION,
+      JOptionPane.QUESTION_MESSAGE,
+      null,
+      Array(YES, NO),
+      NO)) {
+      val selectionIndex = model.books.getSelectionIndex
+      model.books.getList.remove(selectionIndex)
+      model.books.fireIntervalRemoved(selectionIndex, selectionIndex)
+    }
+  }
+
+>>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
   def initBindings(): Unit = {
+<<<<<<< HEAD
     val loadLibraryAction = newActionListener { () =>
       {
         val jFileChooser = new JFileChooser()
@@ -117,10 +212,18 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
           })
       }
     }
+=======
+>>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
 
+<<<<<<< HEAD
     menuAndToolBar.TOOLBAR_LOAD.addActionListener(loadLibraryAction)
     menuAndToolBar.MENU_EXCEL_LOAD.addActionListener(loadLibraryAction)
+=======
+    menuAndToolBar.TOOLBAR_LOAD.onAction(loadLibrary)
+    menuAndToolBar.MENU_EXCEL_LOAD.onAction(loadLibrary)
+>>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
 
+<<<<<<< HEAD
     val saveLibraryAction = newActionListener(e => {
       val jFileChooser = new JFileChooser(new File("."))
       jFileChooser.setDialogTitle("Mentés")
@@ -174,11 +277,27 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
     }))
 
     view.getBookTable().getSelectionModel.addListSelectionListener(new ListSelectionListener() {
+=======
+    menuAndToolBar.TOOLBAR_SAVE.onAction(saveLibrary)
+    menuAndToolBar.MENU_EXCEL_SAVE.onAction(saveLibrary)
+
+    menuAndToolBar.TOOLBAR_NEW_BOOK.onAction(createNewBook)
+
+    menuAndToolBar.TOOLBAR_BOOK_DELETE.onAction(deleteBook)
+
+    menuAndToolBar.MENU_OPEN_DEBUG_WINDOW.onAction(() => LogWindow.show(SwingUtilities.windowForComponent(getView)))
+
+    view.getBookTable.getSelectionModel.addListSelectionListener(new ListSelectionListener() {
+>>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
       def valueChanged(e: ListSelectionEvent) = menuAndToolBar.TOOLBAR_BOOK_DELETE.setEnabled(view.getBookTable().getSelectedRow >= 0)
     })
 
     view.getBookTable().addMouseListener(new MouseAdapter() {
+<<<<<<< HEAD
       override def mouseClicked(e: MouseEvent) = if (e.getClickCount == 2) editBook()
+=======
+      override def mouseClicked(e: MouseEvent) = if (e.getClickCount == 2) editBook
+>>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
     })
 
     menuAndToolBar.TOOLBAR_SEARCH.addKeyListener(new KeyAdapter() {
@@ -202,6 +321,7 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
     })
   }
 
+<<<<<<< HEAD
   def editBook() = {
     val bookController = new BookController()
     val selectedBookIndex = view.getBookTable().convertRowIndexToModel(view.getBookTable().getSelectedRow)
@@ -220,6 +340,8 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
     }
   }
 
+=======
+>>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
   private def savePreviousBook(book: Book) = {
     model.library.configuration.getRememberingColumns().foreach(colName => {
       val columnIndex = model.library.columns.indexOf(colName)
@@ -237,5 +359,4 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
     })
     newBook
   }
-
 }
