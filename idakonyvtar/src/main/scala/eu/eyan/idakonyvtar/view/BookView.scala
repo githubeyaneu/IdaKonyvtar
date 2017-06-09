@@ -46,8 +46,8 @@ class BookView extends AbstractView {
     if (isbnEnabled) {
       panel.newRow.span.addSeparatorWithTitle("Isbn")
       panel.newRow
-      panel.add(isbnSearchLabel.withName(BookView.ISBN_LABEL))
-      panel.nextColumn.add(isbnText.withName(BookView.ISBN_TEXT))
+      panel.add(isbnSearchLabel.name(BookView.ISBN_LABEL))
+      panel.nextColumn.add(isbnText.name(BookView.ISBN_TEXT))
     }
 
     panel.newRow.span.addSeparatorWithTitle("Adatok")

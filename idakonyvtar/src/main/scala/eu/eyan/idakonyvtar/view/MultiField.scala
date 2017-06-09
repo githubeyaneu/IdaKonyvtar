@@ -52,15 +52,15 @@ abstract class MultiField[INPUT, EDITOR <: Component](columnName: String) extend
   }
 
   private def addEditor(input: INPUT, last: Boolean) = {
-    val editor = createEditor().withName(columnName + counter)
+    val editor = createEditor().name(columnName + counter)
     addFieldEditListener(editor, this)
     if (!last) setValueInEditor(editor, input)
 
-    val fieldPanel = new JPanelWithFrameLayout().withSeparators.newColumn("f:p:g").newRow("f:p:g").withName(columnName + ".panel." + counter)
+    val fieldPanel = new JPanelWithFrameLayout().withSeparators.newColumn("f:p:g").newRow("f:p:g").name(columnName + ".panel." + counter)
     fieldPanel.add(editor)
 
     fieldPanel.newColumn("30dlu")
-    val deleteButton = fieldPanel.addButton("x").withName(columnName + ".delete." + counter).enabled(!last)
+    val deleteButton = fieldPanel.addButton("x").name(columnName + ".delete." + counter).enabled(!last)
 
     val field = new Field[EDITOR](editor, deleteButton, fieldPanel)
     deleteButton.onAction { () => { fields -= field; remove(field.panel); revalidate } }

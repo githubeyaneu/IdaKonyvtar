@@ -123,10 +123,10 @@ object DialogHelper {
     val panel = new JPanelWithFrameLayout().withSeparators.newColumn("pref:grow")
     
     panel.newColumn
-    panel.addButton(SAVE).withName(SAVE).onAction(() => {dialogController.onOk(); dialog.setOk(true); dialog.dispose()})
+    panel.addButton(SAVE).name(SAVE).onAction(() => {dialogController.onOk(); dialog.setOk(true); dialog.dispose()})
     
     panel.newColumn
-    panel.addButton(CANCEL).withName(CANCEL).onAction(() => {dialogController.onCancel(); dialog.dispose()})
+    panel.addButton(CANCEL).name(CANCEL).onAction(() => {dialogController.onCancel(); dialog.dispose()})
     panel
   }
 
