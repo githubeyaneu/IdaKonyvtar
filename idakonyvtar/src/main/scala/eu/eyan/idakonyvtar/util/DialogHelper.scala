@@ -25,12 +25,9 @@ import javax.swing.JToolBar
 import javax.swing.SwingUtilities
 import eu.eyan.util.swing.OkCancelDialog
 import eu.eyan.util.swing.OkCancelDialog
-<<<<<<< HEAD
-=======
 import eu.eyan.util.swing.JPanelWithFrameLayout
 import javax.swing.JPanel
 import eu.eyan.util.awt.ComponentPlus.ComponentPlusImplicit
->>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
 
 object DialogHelper {
 
@@ -53,19 +50,12 @@ object DialogHelper {
     val dialog = new OkCancelDialog(parentWindow)
     dialog.setLocationRelativeTo(parent)
     dialog.setModal(true)
-<<<<<<< HEAD
-    val panelBuilder = new PanelBuilder(new FormLayout("pref:grow", "pref, 3dlu, top:pref:grow"))
-    panelBuilder.add(getButtons(dialog, controller), CC.xy(1, 1))
-    panelBuilder.add(controller.getView(), CC.xy(1, 3))
-    dialog.add(addScrollableInBorders(panelBuilder.build()))
-=======
 
     val panel = new JPanelWithFrameLayout().withBorders.withSeparators.newColumn("pref:grow")
     panel.add(getButtons(dialog, controller))
     panel.newRow("top:pref:grow").add(controller.getView())
 
     dialog.add(addScrollableInBorders(panel))
->>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
     dialog.setTitle(controller.getTitle())
     dialog.setResizable(true)
     dialog.addWindowListener(new WindowAdapter() {
@@ -133,10 +123,10 @@ object DialogHelper {
     val panel = new JPanelWithFrameLayout().withSeparators.newColumn("pref:grow")
     
     panel.newColumn
-    panel.addButton(SAVE).withName(SAVE).onAction(() => {dialogController.onOk(); dialog.setOk(true); dialog.dispose()})
+    panel.addButton(SAVE).name(SAVE).onAction(() => {dialogController.onOk(); dialog.setOk(true); dialog.dispose()})
     
     panel.newColumn
-    panel.addButton(CANCEL).withName(CANCEL).onAction(() => {dialogController.onCancel(); dialog.dispose()})
+    panel.addButton(CANCEL).name(CANCEL).onAction(() => {dialogController.onCancel(); dialog.dispose()})
     panel
   }
 

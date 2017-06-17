@@ -20,15 +20,9 @@ object BookHelper {
       .flatten // take the whole list
       .++:(List("")) // empty is always the default option
       .map(_.trim)
-<<<<<<< HEAD
-      .distinct
-      .sortWith((s1: String, s2: String) => COLLATOR.compare(s1, s2) < 0)
-      .toList
-=======
       // .distinct //do distinct in ac
       //      .sortWith((s1: String, s2: String) => COLLATOR.compare(s1, s2) < 0) //autocomplete does sorting
       .toList
     columnList
->>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
   }
 }

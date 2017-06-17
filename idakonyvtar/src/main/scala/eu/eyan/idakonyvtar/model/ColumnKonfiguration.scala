@@ -64,10 +64,4 @@ class ColumnKonfiguration(val table: Array[Array[String]]) {
     for {columnIndex <- 1 until table(0).length if isTrue(table(0)(columnIndex), ColumnConfigurations.REMEMBERING)} yield table(0)(columnIndex)
 
   def getTable() = table
-<<<<<<< HEAD
-
-  // def setTable(table: ColumnKonfigurationTable) = this.table = table
-
-=======
->>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
 }

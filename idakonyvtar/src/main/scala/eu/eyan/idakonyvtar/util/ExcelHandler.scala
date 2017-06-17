@@ -43,17 +43,9 @@ object ExcelHandler {
             yield columnConfigSheet.getCell(col, row).getContents()).toArray).toArray
       val colConfig = new ColumnKonfiguration(configTable)
 
-<<<<<<< HEAD
-      val columns = for {actualColumn <- 0 until booksSheet.getColumns()} yield booksSheet.getCell(actualColumn, 0).getContents()
-=======
       val columns = for { actualColumn <- 0 until booksSheet.getColumns() } yield booksSheet.getCell(actualColumn, 0).getContents()
->>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
 
-<<<<<<< HEAD
-      val books = for {actualRow <- 1 until booksSheet.getRows()} yield {
-=======
       val books = for { actualRow <- 1 until booksSheet.getRows() } yield {
->>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
         val book = Book(booksSheet.getColumns())
         for (actualColumn <- 0 until booksSheet.getColumns()) {
           val contents = booksSheet.getCell(actualColumn, actualRow).getContents()
@@ -63,11 +55,7 @@ object ExcelHandler {
       }
 
       val library = new Library(colConfig, columns)
-<<<<<<< HEAD
-      for {book <- books} library.books.add(book)
-=======
       for { book <- books } library.books.add(book)
->>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
 
       library
     }
@@ -107,11 +95,7 @@ object ExcelHandler {
     try {
       val workbook = Workbook.createWorkbook(targetFile, getWorkbookSettings())
       val booksSheet = workbook.createSheet(BOOKS, 0)
-<<<<<<< HEAD
-      for {columnIndex <- 0 until library.columns.size} {
-=======
       for { columnIndex <- 0 until library.columns.size } {
->>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
         booksSheet.addCell(new Label(columnIndex, 0, library.columns(columnIndex)))
         for (bookIndex <- 0 until library.books.size()) {
           val cellFormat = new WritableCellFormat()
@@ -121,21 +105,12 @@ object ExcelHandler {
       }
       val columnConfigurationSheet = workbook.createSheet(COLUMN_CONFIGURATION, 1)
       val table = library.configuration.getTable()
-<<<<<<< HEAD
-      for {column <- 0 until table.length; sor <- 0 until table(0).length}
-=======
       for { column <- 0 until table.length; sor <- 0 until table(0).length }
->>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
         columnConfigurationSheet.addCell(new Label(column, sor, table(column)(sor)))
 
       workbook.write();
       workbook.close();
-<<<<<<< HEAD
-    }
-    catch {
-=======
     } catch {
->>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
       case e: IOException           => throw new LibraryException(ERROR_TEXT, e)
       case e: RowsExceededException => throw new LibraryException(ERROR_TEXT, e)
       case e: WriteException        => throw new LibraryException(ERROR_TEXT, e)

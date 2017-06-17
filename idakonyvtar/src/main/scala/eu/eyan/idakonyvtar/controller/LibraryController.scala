@@ -12,10 +12,6 @@ import java.io.File
 import scala.collection.JavaConversions.asScalaBuffer
 
 import com.jgoodies.binding.adapter.SingleListSelectionAdapter
-<<<<<<< HEAD
-=======
-
->>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
 import eu.eyan.idakonyvtar.controller.adapter.LibraryListTableModel
 import eu.eyan.idakonyvtar.controller.input.BookControllerInput
 import eu.eyan.idakonyvtar.controller.input.LibraryControllerInput
@@ -36,14 +32,9 @@ import eu.eyan.idakonyvtar.view.LibraryMenuAndToolBar
 import eu.eyan.idakonyvtar.view.LibraryView
 import eu.eyan.log.Log
 import eu.eyan.log.LogWindow
-<<<<<<< HEAD
-import eu.eyan.util.awt.AwtHelper.newActionListener
-import eu.eyan.util.swing.HighlightRenderer
-=======
 import eu.eyan.util.swing.HighlightRenderer
 import eu.eyan.util.swing.JButtonPlus.JButtonImplicit
 import eu.eyan.util.swing.JFileChooserPlus.JFileChooserImplicit
->>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
 import eu.eyan.util.swing.SpecialCharacterRowFilter
 import eu.eyan.util.swing.SwingPlus.showErrorDialog
 import javax.swing.JFileChooser
@@ -56,11 +47,7 @@ import javax.swing.event.ListDataEvent
 import javax.swing.event.ListDataListener
 import javax.swing.event.ListSelectionEvent
 import javax.swing.event.ListSelectionListener
-<<<<<<< HEAD
-import javax.swing.filechooser.FileNameExtensionFilter
-import eu.eyan.util.swing.JFileChooserPlus.JFileChooserImplicit
-=======
->>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
+import eu.eyan.util.swing.JMenuItemPlus.JMenuItemImplicit
 
 class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void] {
 
@@ -77,13 +64,6 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
   override def getTitle() = TITLE + TITLE_SEPARATOR + model.books.getList.size() + TITLE_PIECES
   def refreshTitle() = SwingUtilities.getWindowAncestor(view.getComponent()).asInstanceOf[JFrame].setTitle(getTitle())
   override def getMenuBar() = menuAndToolBar.getMenuBar()
-<<<<<<< HEAD
-
-  def saveLibrary(file: File) =
-    try ExcelHandler.saveLibrary(file, model.library)
-    catch { case le: LibraryException => Log.error(le) }
-=======
->>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
 
   override def getView() = {
     view.getComponent()
@@ -120,8 +100,6 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
     resetTableModel()
   }
 
-<<<<<<< HEAD
-=======
   val loadLibrary = () => new JFileChooser()
     .withCurrentDirectory(".")
     .withDialogTitle("Töltés")
@@ -196,88 +174,11 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
     }
   }
 
->>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
   def initBindings(): Unit = {
-<<<<<<< HEAD
-    val loadLibraryAction = newActionListener { () =>
-      {
-        val jFileChooser = new JFileChooser()
-          .withCurrentDirectory(".")
-          .withDialogTitle("Töltés")
-          .withApproveButtonText("Töltés")
-          .withFileFilter("xls", "Excel97 fájlok")
-          .showAndHandleResult(menuAndToolBar.MENU_EXCEL_LOAD, selectedFile => {
-            Log.info("selected file: " + selectedFile)
-            readLibrary(selectedFile)
-          })
-      }
-    }
-=======
->>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
 
-<<<<<<< HEAD
-    menuAndToolBar.TOOLBAR_LOAD.addActionListener(loadLibraryAction)
-    menuAndToolBar.MENU_EXCEL_LOAD.addActionListener(loadLibraryAction)
-=======
     menuAndToolBar.TOOLBAR_LOAD.onAction(loadLibrary)
     menuAndToolBar.MENU_EXCEL_LOAD.onAction(loadLibrary)
->>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
 
-<<<<<<< HEAD
-    val saveLibraryAction = newActionListener(e => {
-      val jFileChooser = new JFileChooser(new File("."))
-      jFileChooser.setDialogTitle("Mentés")
-      jFileChooser.setApproveButtonText("Mentés")
-      jFileChooser.setFileFilter(new FileNameExtensionFilter("Excel97 fájlok", "xls"))
-      if (jFileChooser.showOpenDialog(menuAndToolBar.MENU_EXCEL_SAVE) == APPROVE_OPTION) {
-        Log.info("Save " + jFileChooser.getSelectedFile)
-        saveLibrary(jFileChooser.getSelectedFile)
-      }
-    })
-
-    menuAndToolBar.TOOLBAR_SAVE.addActionListener(saveLibraryAction)
-    menuAndToolBar.MENU_EXCEL_SAVE.addActionListener(saveLibraryAction)
-
-    menuAndToolBar.MENU_OPEN_DEBUG_WINDOW.addActionListener(newActionListener(e => { LogWindow.show(SwingUtilities.windowForComponent(getView())) }))
-
-    menuAndToolBar.TOOLBAR_NEW_BOOK.addActionListener(newActionListener(e => {
-      val bookController = new BookController()
-
-      val editorDialog = DialogHelper.startModalDialog(
-        view.getComponent(), bookController, new BookControllerInput(
-          newPreviousBook(model.library.columns.size),
-          model.library.columns /* FIXME */ .toList,
-          model.library.configuration,
-          model.books.getList /* FIXME */ .toList,
-          true))
-
-      if (editorDialog.isOk()) {
-        model.books.getList.add(0, bookController.getOutput)
-        savePreviousBook(bookController.getOutput)
-        // TODO: ugly: use selectioninlist...
-        model.books.fireIntervalAdded(0, 0)
-      }
-    }))
-
-    menuAndToolBar.TOOLBAR_BOOK_DELETE.addActionListener(newActionListener(e => {
-      if (JOptionPane.OK_OPTION == JOptionPane.showOptionDialog(
-        menuAndToolBar.TOOLBAR_BOOK_DELETE,
-        "Biztosan törölni akarod?",
-        "Törlés megerősítése",
-        JOptionPane.YES_NO_OPTION,
-        JOptionPane.QUESTION_MESSAGE,
-        null,
-        Array(YES, NO),
-        NO)) {
-        val selectionIndex = model.books.getSelectionIndex
-        model.books.getList.remove(selectionIndex)
-        // TODO: ugly: use selectioninlist...
-        model.books.fireIntervalRemoved(selectionIndex, selectionIndex)
-      }
-    }))
-
-    view.getBookTable().getSelectionModel.addListSelectionListener(new ListSelectionListener() {
-=======
     menuAndToolBar.TOOLBAR_SAVE.onAction(saveLibrary)
     menuAndToolBar.MENU_EXCEL_SAVE.onAction(saveLibrary)
 
@@ -288,16 +189,11 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
     menuAndToolBar.MENU_OPEN_DEBUG_WINDOW.onAction(() => LogWindow.show(SwingUtilities.windowForComponent(getView)))
 
     view.getBookTable.getSelectionModel.addListSelectionListener(new ListSelectionListener() {
->>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
       def valueChanged(e: ListSelectionEvent) = menuAndToolBar.TOOLBAR_BOOK_DELETE.setEnabled(view.getBookTable().getSelectedRow >= 0)
     })
 
     view.getBookTable().addMouseListener(new MouseAdapter() {
-<<<<<<< HEAD
-      override def mouseClicked(e: MouseEvent) = if (e.getClickCount == 2) editBook()
-=======
       override def mouseClicked(e: MouseEvent) = if (e.getClickCount == 2) editBook
->>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
     })
 
     menuAndToolBar.TOOLBAR_SEARCH.addKeyListener(new KeyAdapter() {
@@ -321,27 +217,6 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
     })
   }
 
-<<<<<<< HEAD
-  def editBook() = {
-    val bookController = new BookController()
-    val selectedBookIndex = view.getBookTable().convertRowIndexToModel(view.getBookTable().getSelectedRow)
-    val editorDialog = DialogHelper.startModalDialog(
-      view.getComponent(),
-      bookController,
-      new BookControllerInput(
-        Book(model.books.getList.get(selectedBookIndex)),
-        model.library.columns /* FIXME */ .toList,
-        model.library.configuration,
-        model.library.books /* FIXME */ .toList))
-
-    if (editorDialog.isOk()) {
-      model.books.getList.set(selectedBookIndex, bookController.getOutput)
-      model.books.fireSelectedContentsChanged()
-    }
-  }
-
-=======
->>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
   private def savePreviousBook(book: Book) = {
     model.library.configuration.getRememberingColumns().foreach(colName => {
       val columnIndex = model.library.columns.indexOf(colName)

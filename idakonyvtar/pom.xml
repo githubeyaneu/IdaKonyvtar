@@ -280,17 +280,6 @@ idakonyvtar@eyan.eu</description>
 
 		<!-- TEST DEPENDENCIES -->
 
-<<<<<<< HEAD
-		<!-- https://mvnrepository.com/artifact/org.specs2/specs2_2.11 -->
-		<dependency>
-			<groupId>org.specs2</groupId>
-			<artifactId>specs2_2.11</artifactId>
-			<version>3.7</version>
-			<type>pom</type>
-		</dependency>
-
-=======
->>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
