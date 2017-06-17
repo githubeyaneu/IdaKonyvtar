@@ -14,9 +14,5 @@
 *.xls
 /FailedTestVideos
 release.properties
-<<<<<<< HEAD
-${data}
-=======
 ${data}
 /.scalastyle
->>>>>>> branch 'master' of https://github.com/githubeyaneu/IdaKonyvtar.git
