@@ -176,15 +176,15 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
 
   def initBindings(): Unit = {
 
-    menuAndToolBar.TOOLBAR_LOAD.onAction(loadLibrary)
-    menuAndToolBar.MENU_EXCEL_LOAD.onAction(loadLibrary)
+    menuAndToolBar.TOOLBAR_LOAD.onAction(loadLibrary())
+    menuAndToolBar.MENU_EXCEL_LOAD.onAction(loadLibrary())
 
-    menuAndToolBar.TOOLBAR_SAVE.onAction(saveLibrary)
-    menuAndToolBar.MENU_EXCEL_SAVE.onAction(saveLibrary)
+    menuAndToolBar.TOOLBAR_SAVE.onAction(saveLibrary())
+    menuAndToolBar.MENU_EXCEL_SAVE.onAction(saveLibrary())
 
-    menuAndToolBar.TOOLBAR_NEW_BOOK.onAction(createNewBook)
+    menuAndToolBar.TOOLBAR_NEW_BOOK.onAction(createNewBook())
 
-    menuAndToolBar.TOOLBAR_BOOK_DELETE.onAction(deleteBook)
+    menuAndToolBar.TOOLBAR_BOOK_DELETE.onAction(deleteBook())
 
     menuAndToolBar.MENU_OPEN_DEBUG_WINDOW.onAction(() => LogWindow.show(SwingUtilities.windowForComponent(getView)))
 
