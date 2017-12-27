@@ -53,7 +53,7 @@ object OszkKereso {
 
     // Marc rövid, marc hosszú keresése
     val fullMarcLink = findTextInUrl(
-      "http://nektar1.oszk.hu/LVbin/LibriVision/" + marcLink, "", "Teljes megjelenítés", "href=\"", ".*", "\">Teljes")
+      "http://nektar1.oszk.hu/LVbin/LibriVision/" + marcLink, "", "Teljes megjelen", "href=\"", ".*", "\">Teljes")
     Log.debug("fullMarcLink:" + fullMarcLink);
 
     // Marc hosszú
@@ -69,7 +69,10 @@ object OszkKereso {
     regexPost: String): String = {
 
     val postUrl = host.asUrlPost(postParameter).mkString
-    val line = Unix4j.fromString(postUrl).grep(lineGrep).toStringResult()
+		println("postUrl: ", postUrl)
+//    val line = Unix4j.fromString(postUrl).grep(lineGrep).toStringResult()
+    val line = postUrl.lines.filter(_.contains(lineGrep)).toList(0)
+    println("Line: ", line)
     val firstMatch = (regex_prefix + regex + regexPost).r.findFirstIn(line).get
 
     firstMatch.substring(regex_prefix.length(), firstMatch.length() - regexPost.length()).replaceAll("&amp;", "&")
