@@ -16,6 +16,7 @@ import javax.swing.JLabel
 import javax.swing.JTextField
 import eu.eyan.util.swing.JPanelWithFrameLayout
 import eu.eyan.util.awt.ComponentPlus.ComponentPlusImplicit
+import eu.eyan.log.Log
 
 object BookView {
   val ISBN_TEXT = "isbnText";
@@ -54,12 +55,16 @@ class BookView extends AbstractView {
 
     for { i <- 0 until columns.size } {
       val columnName = columns(i)
+		  Log.debug(s"column $columnName")
       panel.newRow.addLabel(columnName)
 
       val isMultiEditorField = columnConfiguration.isTrue(columnName, ColumnConfigurations.MULTIFIELD)
       val isAutocompleteField = columnConfiguration.isTrue(columnName, ColumnConfigurations.AUTOCOMPLETE)
+      val isPictureField = columnConfiguration.isTrue(columnName, ColumnConfigurations.PICTURE)
+
       val editor: Component =
-        if (isAutocompleteField) {
+        if (isPictureField) { new JTextField(TEXTFIELD_DEFAULT_SIZE) }
+        else if (isAutocompleteField) {
           if (isMultiEditorField) new MultiFieldAutocomplete(columnName, "Autocomplete", "Nincs találat")
           else new JTextFieldAutocomplete().setHintText("Autocomplete")
         } else {

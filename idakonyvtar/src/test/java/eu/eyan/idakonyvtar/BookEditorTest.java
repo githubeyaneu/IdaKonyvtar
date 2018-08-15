@@ -31,7 +31,7 @@ public class BookEditorTest extends AbstractUiTest {
 
 	@Before
 	public void setUp() {
-		Log.activate();
+		Log.activateInfoLevel();
 
 		List<String> columns = newArrayList("szimpla", "ac", "mm", "mmac");
 		Book book = new Book.Builder(columns.size()).withValue(0, "Érték1").build();

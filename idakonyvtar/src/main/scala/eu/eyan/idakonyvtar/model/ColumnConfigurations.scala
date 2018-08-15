@@ -11,6 +11,7 @@ object ColumnConfigurations extends Enumeration {
   val MARC_CODE = columnConfigurationsInternalValue("MarcKód")
   val REMEMBERING = columnConfigurationsInternalValue("Emlékező")
   val SHOW_IN_TABLE = columnConfigurationsInternalValue("Táblázatban")
+  val PICTURE = columnConfigurationsInternalValue("Kép")
 
   protected final def columnConfigurationsInternalValue(name: String): ColumnConfigurationsValue = ColumnConfigurationsValue(name)
 }

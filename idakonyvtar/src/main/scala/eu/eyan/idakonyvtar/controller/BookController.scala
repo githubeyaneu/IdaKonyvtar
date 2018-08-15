@@ -70,8 +70,12 @@ class BookController extends IDialogController[BookControllerInput, Book] {
       val columnName = model.columns.get(columnIndex)
       val autoComplete = model.columnConfiguration.isTrue(columnName, ColumnConfigurations.AUTOCOMPLETE)
       val multi = model.columnConfiguration.isTrue(columnName, ColumnConfigurations.MULTIFIELD)
-
-      if (autoComplete) {
+      val picture = model.columnConfiguration.isTrue(columnName, ColumnConfigurations.PICTURE)
+      
+      if(picture) {
+        Bindings.bind(view.editors(columnIndex).asInstanceOf[JTextField], new BookFieldValueModel(columnIndex, model.book))
+      }
+      else if (autoComplete) {
         val columnList = BookHelper.getColumnList(model.bookList, columnIndex)
         if (multi) {
           Log.debug("mac " + columnIndex + SPACE + columnList)

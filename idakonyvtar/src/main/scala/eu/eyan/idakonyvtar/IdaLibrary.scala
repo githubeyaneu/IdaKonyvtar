@@ -26,7 +26,7 @@ object IdaLibrary {
       if (file.exists()) file
       else new File(Resources.getResource(path).getFile)
 
-    Log.activate
+    Log.activateInfoLevel
     Log.info("Resource -> File: " + fileToOpen)
 
     val frame = DialogHelper.runInFrameFullScreen(new LibraryController(), new LibraryControllerInput(fileToOpen), Texts.TITLE)
