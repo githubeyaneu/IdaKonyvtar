@@ -104,14 +104,14 @@ idakonyvtar@eyan.eu</description>
 				</executions>
 			</plugin>
 
-<plugin>
-      <groupId>org.apache.maven.plugins</groupId>
-      <artifactId>maven-surefire-plugin</artifactId>
-      <version>2.20</version>
-      <configuration>
-        <argLine>-Dfile.encoding=UTF-8</argLine>
-      </configuration>
-</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.20</version>
+				<configuration>
+					<argLine>-Dfile.encoding=UTF-8</argLine>
+				</configuration>
+			</plugin>
 
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
@@ -192,21 +192,21 @@ idakonyvtar@eyan.eu</description>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 
-<!-- 		<dependency> -->
-<!-- 			<groupId>eu.eyan.util</groupId> -->
-<!-- 			<artifactId>eyan_helper</artifactId> -->
-<!-- 			<version>0.0.1-SNAPSHOT</version> -->
-<!-- 			<scope>test</scope> -->
-<!-- 		</dependency> -->
-		
-<!-- 		<dependency> -->
-<!-- 			<groupId>eu.eyan.util</groupId> -->
-<!-- 			<artifactId>eyan_helper</artifactId> -->
-<!-- 			<version>0.0.1-SNAPSHOT</version> -->
-<!-- 			<scope>test</scope> -->
-<!-- 			<type>test-jar</type> -->
-<!-- 		</dependency> -->
-		
+		<!-- <dependency> -->
+		<!-- <groupId>eu.eyan.util</groupId> -->
+		<!-- <artifactId>eyan_helper</artifactId> -->
+		<!-- <version>0.0.1-SNAPSHOT</version> -->
+		<!-- <scope>test</scope> -->
+		<!-- </dependency> -->
+
+		<!-- <dependency> -->
+		<!-- <groupId>eu.eyan.util</groupId> -->
+		<!-- <artifactId>eyan_helper</artifactId> -->
+		<!-- <version>0.0.1-SNAPSHOT</version> -->
+		<!-- <scope>test</scope> -->
+		<!-- <type>test-jar</type> -->
+		<!-- </dependency> -->
+
 		<dependency>
 			<groupId>net.sourceforge.jexcelapi</groupId>
 			<artifactId>jxl</artifactId>
@@ -218,7 +218,7 @@ idakonyvtar@eyan.eu</description>
 			<artifactId>jgoodies-forms</artifactId>
 			<version>1.9.0</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>com.jgoodies</groupId>
 			<artifactId>jgoodies-binding</artifactId>
@@ -316,6 +316,25 @@ idakonyvtar@eyan.eu</description>
 			<version>1.0</version>
 			<scope>system</scope>
 			<systemPath>${project.basedir}/src/main/resources/lib/MonteScreenRecorder.jar</systemPath>
+		</dependency>
+		
+		<dependency>
+			<groupId>io.reactivex</groupId>
+			<artifactId>rxscala_2.12</artifactId>
+			<version>0.26.5</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>io.reactivex</groupId>
+			<artifactId>rxscala_2.12</artifactId>
+			<version>0.26.5</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.github.sarxos/webcam-capture -->
+		<dependency>
+			<groupId>com.github.sarxos</groupId>
+			<artifactId>webcam-capture</artifactId>
+			<version>0.3.12</version>
 		</dependency>
 
 	</dependencies>
