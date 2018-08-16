@@ -63,7 +63,7 @@ abstract class MultiField[INPUT, EDITOR <: Component](columnName: String) extend
     val deleteButton = fieldPanel.addButton("x").name(columnName + ".delete." + counter).enabled(!last)
 
     val field = new Field[EDITOR](editor, deleteButton, fieldPanel)
-    deleteButton.onAction { () => { fields -= field; remove(field.panel); revalidate } }
+    deleteButton.onAction {  fields -= field; remove(field.panel); revalidate  }
     fields += field
     add(fieldPanel)
 

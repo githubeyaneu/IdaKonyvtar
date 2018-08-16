@@ -48,6 +48,7 @@ import javax.swing.event.ListDataListener
 import javax.swing.event.ListSelectionEvent
 import javax.swing.event.ListSelectionListener
 import eu.eyan.util.swing.JMenuItemPlus.JMenuItemImplicit
+import scala.collection.mutable.Map
 
 class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void] {
 
@@ -100,7 +101,7 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
     resetTableModel()
   }
 
-  val loadLibrary = () => new JFileChooser()
+  def loadLibrary =  new JFileChooser()
     .withCurrentDirectory(".")
     .withDialogTitle("Töltés")
     .withApproveButtonText("Töltés")
@@ -110,7 +111,7 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
       readLibrary(selectedFile)
     })
 
-  val saveLibrary = () => new JFileChooser(new File("."))
+  def saveLibrary =  new JFileChooser(new File("."))
     .withDialogTitle("Mentés")
     .withApproveButtonText("Mentés")
     .withFileFilter("xls", "Excel97 fájlok")
@@ -120,7 +121,7 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
       catch { case le: LibraryException => Log.error(le) }
     })
 
-  val createNewBook = () => {
+  def createNewBook =  {
     val bookController = new BookController
 
     val editorDialog = DialogHelper.startModalDialog(
@@ -129,7 +130,9 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
         model.library.columns.toList,
         model.library.configuration,
         model.books.getList.toList,
-        true))
+        true,
+        Map() // FIXME read images!
+        ))
 
     if (editorDialog.isOk()) {
       model.books.getList.add(0, bookController.getOutput)
@@ -150,7 +153,9 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
         model.library.columns.toList,
         model.library.configuration,
         model.library.books.toList,
-        false))
+        false,
+        Map()
+        ))
 
     if (editorDialog.isOk()) {
       model.books.getList.set(selectedBookIndex, bookController.getOutput)
@@ -158,7 +163,7 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
     }
   }
 
-  val deleteBook = () => {
+  def deleteBook = {
     if (JOptionPane.OK_OPTION == JOptionPane.showOptionDialog(
       menuAndToolBar.TOOLBAR_BOOK_DELETE,
       "Biztosan törölni akarod?",
@@ -176,17 +181,17 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
 
   def initBindings(): Unit = {
 
-    menuAndToolBar.TOOLBAR_LOAD.onAction(loadLibrary())
-    menuAndToolBar.MENU_EXCEL_LOAD.onAction(loadLibrary())
+    menuAndToolBar.TOOLBAR_LOAD.onAction(loadLibrary)
+    menuAndToolBar.MENU_EXCEL_LOAD.onAction(loadLibrary)
 
-    menuAndToolBar.TOOLBAR_SAVE.onAction(saveLibrary())
-    menuAndToolBar.MENU_EXCEL_SAVE.onAction(saveLibrary())
+    menuAndToolBar.TOOLBAR_SAVE.onAction(saveLibrary)
+    menuAndToolBar.MENU_EXCEL_SAVE.onAction(saveLibrary)
 
-    menuAndToolBar.TOOLBAR_NEW_BOOK.onAction(createNewBook())
+    menuAndToolBar.TOOLBAR_NEW_BOOK.onAction(createNewBook)
 
-    menuAndToolBar.TOOLBAR_BOOK_DELETE.onAction(deleteBook())
+    menuAndToolBar.TOOLBAR_BOOK_DELETE.onAction(deleteBook)
 
-    menuAndToolBar.MENU_OPEN_DEBUG_WINDOW.onAction(() => LogWindow.show(SwingUtilities.windowForComponent(getView)))
+    menuAndToolBar.MENU_OPEN_DEBUG_WINDOW.onAction(LogWindow.show(SwingUtilities.windowForComponent(getView)))
 
     view.getBookTable.getSelectionModel.addListSelectionListener(new ListSelectionListener() {
       def valueChanged(e: ListSelectionEvent) = menuAndToolBar.TOOLBAR_BOOK_DELETE.setEnabled(view.getBookTable().getSelectedRow >= 0)

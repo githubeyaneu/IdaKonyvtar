@@ -55,7 +55,7 @@ class BookView extends AbstractView {
 
     for { i <- 0 until columns.size } {
       val columnName = columns(i)
-		  Log.debug(s"column $columnName")
+      Log.debug(s"column $columnName")
       panel.newRow.addLabel(columnName)
 
       val isMultiEditorField = columnConfiguration.isTrue(columnName, ColumnConfigurations.MULTIFIELD)
@@ -63,8 +63,13 @@ class BookView extends AbstractView {
       val isPictureField = columnConfiguration.isTrue(columnName, ColumnConfigurations.PICTURE)
 
       val editor: Component =
-        if (isPictureField) { new JTextField(TEXTFIELD_DEFAULT_SIZE) }
-        else if (isAutocompleteField) {
+        if (isPictureField) {
+          val panel = JPanelWithFrameLayout()
+          panel.newColumn.addLabel("Néz").name("look")
+          panel.newColumn.addTextField("", TEXTFIELD_DEFAULT_SIZE).name("picturePath")
+          panel.newColumn.addButton("katt").name("click")
+          panel
+        } else if (isAutocompleteField) {
           if (isMultiEditorField) new MultiFieldAutocomplete(columnName, "Autocomplete", "Nincs találat")
           else new JTextFieldAutocomplete().setHintText("Autocomplete")
         } else {

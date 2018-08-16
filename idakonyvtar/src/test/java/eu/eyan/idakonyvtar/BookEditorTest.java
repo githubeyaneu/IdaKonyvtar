@@ -45,7 +45,7 @@ public class BookEditorTest extends AbstractUiTest {
 
 		bookController = new BookController();
 		BookControllerInput bookControllerInput = new BookControllerInput(book, JavaConversions.asScalaBuffer(columns).toList(), columnConfiguration,
-				JavaConversions.asScalaBuffer(bookList).toList(), false);
+				JavaConversions.asScalaBuffer(bookList).toList(), false, null/* FIXME images map*/ );
 
 		SwingUtilities.invokeLater(() -> DialogHelper.startModalDialog(null, bookController, bookControllerInput));
 

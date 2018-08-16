@@ -43,7 +43,7 @@ public class BookEditorIsbnTest extends AbstractUiTest {
 
 		bookController = new BookController();
 		BookControllerInput bookControllerInput = new BookControllerInput(book, JavaConversions.asScalaBuffer(columns).toList(), columnConfig, JavaConversions
-				.asScalaBuffer(bookList).toList(), true);
+				.asScalaBuffer(bookList).toList(), true, null/* FIXME images map*/ );
 
 		SwingUtilities.invokeLater(() -> DialogHelper.startModalDialog(null, bookController, bookControllerInput));
 
