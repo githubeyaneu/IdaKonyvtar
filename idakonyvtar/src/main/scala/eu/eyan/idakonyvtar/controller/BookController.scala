@@ -38,6 +38,13 @@ import eu.eyan.idakonyvtar.view.MultiFieldAutocomplete
 import eu.eyan.util.swing.JTextFieldAutocomplete
 import eu.eyan.util.awt.AwtHelper
 import eu.eyan.util.swing.SwingPlus
+import javax.swing.JPanel
+import javax.swing.JButton
+import eu.eyan.util.swing.JButtonPlus.JButtonImplicit
+import java.awt.Image
+import eu.eyan.idakonyvtar.util.WebCam
+import javax.swing.JLabel
+import eu.eyan.util.swing.JLabelPlus.JLabelImplicit
 
 class BookController extends IDialogController[BookControllerInput, Book] {
   val SPACE = " "
@@ -70,8 +77,21 @@ class BookController extends IDialogController[BookControllerInput, Book] {
       val columnName = model.columns.get(columnIndex)
       val autoComplete = model.columnConfiguration.isTrue(columnName, ColumnConfigurations.AUTOCOMPLETE)
       val multi = model.columnConfiguration.isTrue(columnName, ColumnConfigurations.MULTIFIELD)
-
-      if (autoComplete) {
+      val picture = model.columnConfiguration.isTrue(columnName, ColumnConfigurations.PICTURE)
+      
+      if(picture) {
+        val panel = view.editors(columnIndex).asInstanceOf[JPanel]
+        val text = panel.getComponents.filter(_.getName=="picturePath")(0).asInstanceOf[JTextField]
+    		val button = panel.getComponents.filter(_.getName=="click")(0).asInstanceOf[JButton]
+				val look = panel.getComponents.filter(_.getName=="look")(0).asInstanceOf[JLabel]
+				look.onMouseEntered(println("show image"))
+				look.onMouseExited(println("hide image"))
+				look.onMouseClicked(if (model.images.contains(columnIndex) )look.setIcon(new ImageIcon(model.images(columnIndex))))
+        Bindings.bind(text, new BookFieldValueModel(columnIndex, model.book))
+        button.onClicked(model.images.put(columnIndex, WebCam.getImage))
+        //ImageIO.write(image, "JPG", new File("""C:\Users\anfr895\Desktop\test.JPG"""));
+      }
+      else if (autoComplete) {
         val columnList = BookHelper.getColumnList(model.bookList, columnIndex)
         if (multi) {
           Log.debug("mac " + columnIndex + SPACE + columnList)
@@ -127,7 +147,7 @@ class BookController extends IDialogController[BookControllerInput, Book] {
         view.isbnSearchLabel.setIcon(new ImageIcon(Resources.getResource("icons/search.gif")))
         view.editors.foreach(_.setEnabled(false))
 
-        SwingPlus.invokeLater { () =>
+        SwingPlus.invokeLater { 
           {
             try {
               val marcsToIsbn = OszkKereso.getMarcsToIsbn(view.isbnText.getText().replaceAll("ö", "0"))

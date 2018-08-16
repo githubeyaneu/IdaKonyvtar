@@ -337,6 +337,19 @@ idakonyvtar@eyan.eu</description>
 			<version>0.3.12</version>
 		</dependency>
 
+		<dependency>
+			<groupId>io.reactivex</groupId>
+			<artifactId>rxscala_2.12</artifactId>
+			<version>0.26.5</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.github.sarxos/webcam-capture -->
+		<dependency>
+			<groupId>com.github.sarxos</groupId>
+			<artifactId>webcam-capture</artifactId>
+			<version>0.3.12</version>
+		</dependency>
+
 	</dependencies>
 
 	<reporting>

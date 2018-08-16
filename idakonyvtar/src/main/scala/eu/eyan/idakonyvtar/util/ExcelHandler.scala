@@ -21,6 +21,7 @@ import jxl.write.WritableCellFormat
 import jxl.write.WriteException
 import jxl.write.biff.RowsExceededException
 import eu.eyan.util.backup.BackupHelper
+import eu.eyan.log.Log
 
 object ExcelHandler {
 
@@ -41,6 +42,9 @@ object ExcelHandler {
           yield (
           for { row <- 0 until columnConfigSheet.getRows() }
             yield columnConfigSheet.getCell(col, row).getContents()).toArray).toArray
+            
+      Log.debug(configTable.map(_.mkString(", ")).mkString("\r\n"))
+      
       val colConfig = new ColumnKonfiguration(configTable)
 
       val columns = for { actualColumn <- 0 until booksSheet.getColumns() } yield booksSheet.getCell(actualColumn, 0).getContents()
