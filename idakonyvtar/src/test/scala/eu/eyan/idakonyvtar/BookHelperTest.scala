@@ -21,13 +21,13 @@ class BookHelperTest {
     def books(r: Int) =
       new RandomPlus(r)
         .nextReadableStrings(10000, 10, 20)
-        .map { x => new Book(MutableList(x)) }
+        .map { x => new Book(MutableList(x), null) }
         .toList
 
     def books2(r: Int) = new RandomPlus(r)
       .nextReadableStrings(2000, 10, 20)
       .sliding(2, 2)
-      .map { x => new Book(MutableList(x(0) + BookHelper.LISTA_SEPARATOR + x(1))) }
+      .map { x => new Book(MutableList(x(0) + BookHelper.LISTA_SEPARATOR + x(1)), null) }
       .toList
 
     def allBooks(r: Int) = (books(r).++(books2(r))).toList

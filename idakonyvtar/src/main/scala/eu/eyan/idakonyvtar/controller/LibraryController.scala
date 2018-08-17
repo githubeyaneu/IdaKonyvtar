@@ -49,6 +49,10 @@ import javax.swing.event.ListSelectionEvent
 import javax.swing.event.ListSelectionListener
 import eu.eyan.util.swing.JMenuItemPlus.JMenuItemImplicit
 import scala.collection.mutable.Map
+import eu.eyan.idakonyvtar.model.ColumnConfigurations
+import eu.eyan.util.string.StringPlus.StringPlusImplicit
+import eu.eyan.util.io.FilePlus.FilePlusImplicit
+import javax.imageio.ImageIO
 
 class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void] {
 
@@ -58,6 +62,7 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
   private val highlightRenderer = new HighlightRenderer
 
   var previousBook: Book = null
+  var loadedFile: File = null
 
   override def getToolBar() = menuAndToolBar.getToolBar()
   override def getOutput(): Void = null
@@ -93,6 +98,7 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
 
   private def readLibrary(file: File) = {
     Log.info("Loading file: " + file)
+    loadedFile = file
     try model.library = ExcelHandler.readLibrary(file)
     catch { case le: LibraryException => showErrorDialog(ERROR_AT_READING, le) }
 
@@ -101,7 +107,7 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
     resetTableModel()
   }
 
-  def loadLibrary =  new JFileChooser()
+  def loadLibrary = new JFileChooser()
     .withCurrentDirectory(".")
     .withDialogTitle("Töltés")
     .withApproveButtonText("Töltés")
@@ -111,7 +117,7 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
       readLibrary(selectedFile)
     })
 
-  def saveLibrary =  new JFileChooser(new File("."))
+  def saveLibrary = new JFileChooser(new File("."))
     .withDialogTitle("Mentés")
     .withApproveButtonText("Mentés")
     .withFileFilter("xls", "Excel97 fájlok")
@@ -121,7 +127,7 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
       catch { case le: LibraryException => Log.error(le) }
     })
 
-  def createNewBook =  {
+  def createNewBook = {
     val bookController = new BookController
 
     val editorDialog = DialogHelper.startModalDialog(
@@ -131,10 +137,10 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
         model.library.configuration,
         model.books.getList.toList,
         true,
-        Map() // FIXME read images!
-        ))
+        loadedFile))
 
     if (editorDialog.isOk()) {
+      saveImages(bookController.getOutput)
       model.books.getList.add(0, bookController.getOutput)
       savePreviousBook(bookController.getOutput)
       model.books.fireIntervalAdded(0, 0)
@@ -154,12 +160,32 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
         model.library.configuration,
         model.library.books.toList,
         false,
-        Map()
-        ))
+        loadedFile))
 
     if (editorDialog.isOk()) {
+      saveImages(bookController.getOutput)
       model.books.getList.set(selectedBookIndex, bookController.getOutput)
       model.books.fireSelectedContentsChanged()
+    }
+  }
+
+  def saveImages(book: Book) = {
+    val columns = model.library.columns.toList
+    val columnConfiguration = model.library.configuration
+    for { i <- 0 until columns.size } {
+      val imageName = book.getValue(i)
+      val columnName = columns(i)
+      val isPictureField = columnConfiguration.isTrue(columnName, ColumnConfigurations.PICTURE)
+      if(imageName == "" && book.images.contains(i)){
+        val dir = loadedFile.getParentFile
+        val imagesDir = (loadedFile.getAbsolutePath+".images").asDir
+        if(!imagesDir.exists) imagesDir.mkdir
+        val imageFile = (imagesDir.getAbsolutePath+"\\IMG.JPG").asFile.generateNewNameIfExists()
+        ImageIO.write(book.images.get(i).get, "JPG", imageFile)
+        book.values(i) = imageFile.getName
+      } else {
+        // do nothing image already there
+      }
     }
   }
 
