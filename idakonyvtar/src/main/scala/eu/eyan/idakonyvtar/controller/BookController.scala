@@ -45,6 +45,9 @@ import java.awt.Image
 import eu.eyan.idakonyvtar.util.WebCam
 import javax.swing.JLabel
 import eu.eyan.util.swing.JLabelPlus.JLabelImplicit
+import eu.eyan.util.string.StringPlus.StringPlusImplicit
+import eu.eyan.util.io.FilePlus.FilePlusImplicit
+import javax.imageio.ImageIO
 
 class BookController extends IDialogController[BookControllerInput, Book] {
   val SPACE = " "
@@ -78,20 +81,27 @@ class BookController extends IDialogController[BookControllerInput, Book] {
       val autoComplete = model.columnConfiguration.isTrue(columnName, ColumnConfigurations.AUTOCOMPLETE)
       val multi = model.columnConfiguration.isTrue(columnName, ColumnConfigurations.MULTIFIELD)
       val picture = model.columnConfiguration.isTrue(columnName, ColumnConfigurations.PICTURE)
-      
-      if(picture) {
+
+      if (picture) {
         val panel = view.editors(columnIndex).asInstanceOf[JPanel]
-        val text = panel.getComponents.filter(_.getName=="picturePath")(0).asInstanceOf[JTextField]
-    		val button = panel.getComponents.filter(_.getName=="click")(0).asInstanceOf[JButton]
-				val look = panel.getComponents.filter(_.getName=="look")(0).asInstanceOf[JLabel]
-				look.onMouseEntered(println("show image"))
-				look.onMouseExited(println("hide image"))
-				look.onMouseClicked(if (model.images.contains(columnIndex) )look.setIcon(new ImageIcon(model.images(columnIndex))))
+        val text = panel.getComponents.filter(_.getName == "picturePath")(0).asInstanceOf[JTextField]
+        val button = panel.getComponents.filter(_.getName == "click")(0).asInstanceOf[JButton]
+        val look = panel.getComponents.filter(_.getName == "look")(0).asInstanceOf[JLabel]
+        look.onMouseEntered(println("show image"))
+        look.onMouseExited(println("hide image"))
+        look.onMouseClicked(if (model.book.images.contains(columnIndex)) look.setIcon(new ImageIcon(model.book.images(columnIndex))))
         Bindings.bind(text, new BookFieldValueModel(columnIndex, model.book))
-        button.onClicked(model.images.put(columnIndex, WebCam.getImage))
-        //ImageIO.write(image, "JPG", new File("""C:\Users\anfr895\Desktop\test.JPG"""));
-      }
-      else if (autoComplete) {
+        button.onClicked({ model.book.images.put(columnIndex, WebCam.getImage); model.book.values(columnIndex) = ""; look.setIcon(new ImageIcon(model.book.images(columnIndex))) })
+
+        if (model.book.values(columnIndex) != "") {
+          val dir = model.loadedFile.getParentFile
+          val imagesDir = (model.loadedFile.getAbsolutePath + ".images").asDir
+          val imageFile = (imagesDir.getAbsolutePath + "\\" + model.book.values(columnIndex)).asFile
+          val image = ImageIO.read(imageFile)
+          model.book.images.put(columnIndex, image)
+        }
+
+      } else if (autoComplete) {
         val columnList = BookHelper.getColumnList(model.bookList, columnIndex)
         if (multi) {
           Log.debug("mac " + columnIndex + SPACE + columnList)
@@ -147,7 +157,7 @@ class BookController extends IDialogController[BookControllerInput, Book] {
         view.isbnSearchLabel.setIcon(new ImageIcon(Resources.getResource("icons/search.gif")))
         view.editors.foreach(_.setEnabled(false))
 
-        SwingPlus.invokeLater { 
+        SwingPlus.invokeLater {
           {
             try {
               val marcsToIsbn = OszkKereso.getMarcsToIsbn(view.isbnText.getText().replaceAll("ö", "0"))

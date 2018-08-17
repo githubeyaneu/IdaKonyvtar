@@ -7,12 +7,15 @@ import scala.collection.mutable.MutableList
 import com.jgoodies.binding.beans.Model
 import eu.eyan.log.Log
 import eu.eyan.log.Log
+import java.awt.Image
+import scala.collection.mutable.Map
+import java.awt.image.BufferedImage
 
 object Book {
   def apply(columnCount: Int): Book =
-    new Book(MutableList.fill[String](columnCount)(""))
+    new Book(MutableList.fill[String](columnCount)(""), Map())
 
-  def apply(book: Book): Book = new Book(book.values.clone())
+  def apply(book: Book): Book = new Book(book.values.clone(), book.images)
 
   class BookPropertyChangeEvent(source: Object, propertyName: String, oldValue: Object, newValue: Object, val columnIndex: Int)
     extends PropertyChangeEvent(source, propertyName, oldValue, newValue) {
@@ -32,8 +35,7 @@ object Book {
   }
 }
 
-class Book(val values: MutableList[String]) extends Model {
-
+class Book(val values: MutableList[String], val images: Map[Int, BufferedImage]   ) extends Model {
   def setValue(columnIndex: Int, value: String) = {
     val oldValue: String = this.values(columnIndex);
     if (value != null) {
