@@ -11,6 +11,7 @@ import eu.eyan.idakonyvtar.util.DialogHelper
 import eu.eyan.log.Log
 import eu.eyan.log.LogWindow
 import eu.eyan.util.awt.AwtHelper.onWindowClosing
+import eu.eyan.idakonyvtar.util.WebCam
 
 object IdaLibrary {
 
@@ -30,6 +31,9 @@ object IdaLibrary {
     Log.info("Resource -> File: " + fileToOpen)
 
     val frame = DialogHelper.runInFrameFullScreen(new LibraryController(), new LibraryControllerInput(fileToOpen), Texts.TITLE)
-    frame.addWindowListener(onWindowClosing(e => LogWindow.close))
+    frame.addWindowListener(onWindowClosing(e => {
+      LogWindow.close
+      WebCam.stop
+    }))
   }
 }

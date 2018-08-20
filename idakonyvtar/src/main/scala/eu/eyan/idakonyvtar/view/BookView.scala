@@ -17,6 +17,11 @@ import javax.swing.JTextField
 import eu.eyan.util.swing.JPanelWithFrameLayout
 import eu.eyan.util.awt.ComponentPlus.ComponentPlusImplicit
 import eu.eyan.log.Log
+import com.github.sarxos.webcam.WebcamPanel
+import com.github.sarxos.webcam.WebcamPicker
+import com.github.sarxos.webcam.WebcamResolution
+import java.lang.Thread.UncaughtExceptionHandler
+import javax.swing.JPanel
 
 object BookView {
   val ISBN_TEXT = "isbnText";
@@ -28,6 +33,7 @@ class BookView extends AbstractView {
   val SEPARATOR_PREF = "3dlu, pref"
 
   val editors: MutableList[Component] = MutableList()
+  val images: MutableList[JLabel] = MutableList()
   val isbnSearchLabel = new JLabel()
   val isbnText = new JTextField()
 
@@ -40,23 +46,30 @@ class BookView extends AbstractView {
   var columnConfiguration: ColumnKonfiguration = null
   def setColumnConfiguration(columnConfiguration: ColumnKonfiguration) = this.columnConfiguration = columnConfiguration
 
+  var webcamPanel = new JPanelWithFrameLayout 
+
+
+  
   protected override def createViewComponent(): Component = {
-    val panel = new JPanelWithFrameLayout().withSeparators
-    panel.newColumn.newColumn("pref:grow")
+    val rowsPanel = new JPanelWithFrameLayout().withSeparators
+    rowsPanel.newColumn.newColumn("pref:grow")
+    val imagesPanel = new JPanelWithFrameLayout().name("imagesPanel").withSeparators.newColumn("320px")
+
+    
 
     if (isbnEnabled) {
-      panel.newRow.span.addSeparatorWithTitle("Isbn")
-      panel.newRow
-      panel.add(isbnSearchLabel.name(BookView.ISBN_LABEL))
-      panel.nextColumn.add(isbnText.name(BookView.ISBN_TEXT))
+      rowsPanel.newRow.span.addSeparatorWithTitle("Isbn")
+      rowsPanel.newRow
+      rowsPanel.add(isbnSearchLabel.name(BookView.ISBN_LABEL))
+      rowsPanel.nextColumn.add(isbnText.name(BookView.ISBN_TEXT))
     }
 
-    panel.newRow.span.addSeparatorWithTitle("Adatok")
+    rowsPanel.newRow.span.addSeparatorWithTitle("Adatok")
 
     for { i <- 0 until columns.size } {
       val columnName = columns(i)
       Log.debug(s"column $columnName")
-      panel.newRow.addLabel(columnName)
+      rowsPanel.newRow.addLabel(columnName)
 
       val isMultiEditorField = columnConfiguration.isTrue(columnName, ColumnConfigurations.MULTIFIELD)
       val isAutocompleteField = columnConfiguration.isTrue(columnName, ColumnConfigurations.AUTOCOMPLETE)
@@ -65,7 +78,9 @@ class BookView extends AbstractView {
       val editor: Component =
         if (isPictureField) {
           val panel = JPanelWithFrameLayout()
-          panel.newColumn.addLabel("Néz").name("look")
+          imagesPanel.newRow.addLabel(columnName)
+          val imageLabel = imagesPanel.newRow.addLabel("").name("look" + columnName)
+          images += imageLabel
           panel.newColumn.addTextField("", TEXTFIELD_DEFAULT_SIZE).name("picturePath")
           panel.newColumn.addButton("katt").name("click")
           panel
@@ -78,10 +93,14 @@ class BookView extends AbstractView {
         }
 
       editor.setName(columnName)
-      panel.nextColumn.add(editor)
+      rowsPanel.nextColumn.add(editor)
       editors += editor
     }
 
+    val panel = new JPanelWithFrameLayout().withSeparators
+    panel.newColumn("f:p").add(rowsPanel)
+    panel.newColumn("f:320px").add(imagesPanel)
+    panel.newColumn("f:320px").add(webcamPanel)
     panel
   }
 }

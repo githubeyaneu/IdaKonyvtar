@@ -56,17 +56,17 @@ object DialogHelper {
     panel.newRow("top:pref:grow").add(controller.getView())
 
     dialog.add(addScrollableInBorders(panel))
-    dialog.setTitle(controller.getTitle())
+    dialog.setTitle(controller.getTitle)
     dialog.setResizable(true)
     dialog.addWindowListener(new WindowAdapter() {
       override def windowClosing(e: WindowEvent) = super.windowClosed(e)
     })
 
-    controller.initBindings()
-    dialog.pack()
+    controller.initBindings
+    dialog.pack
     positionToCenter(dialog)
     controller.addResizeListener(dialog)
-
+    dialog.setSize(1200, 768)
     // blockiert:
     dialog.setVisible(true)
     if (parentWindow != null) parentWindow.invalidate()

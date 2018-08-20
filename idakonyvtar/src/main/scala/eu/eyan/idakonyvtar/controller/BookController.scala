@@ -48,6 +48,11 @@ import eu.eyan.util.swing.JLabelPlus.JLabelImplicit
 import eu.eyan.util.string.StringPlus.StringPlusImplicit
 import eu.eyan.util.io.FilePlus.FilePlusImplicit
 import javax.imageio.ImageIO
+import java.lang.Thread.UncaughtExceptionHandler
+import com.github.sarxos.webcam.WebcamPicker
+import com.github.sarxos.webcam.WebcamPanel
+import com.github.sarxos.webcam.WebcamResolution
+import com.github.sarxos.webcam.WebcamResolution
 
 class BookController extends IDialogController[BookControllerInput, Book] {
   val SPACE = " "
@@ -83,16 +88,6 @@ class BookController extends IDialogController[BookControllerInput, Book] {
       val picture = model.columnConfiguration.isTrue(columnName, ColumnConfigurations.PICTURE)
 
       if (picture) {
-        val panel = view.editors(columnIndex).asInstanceOf[JPanel]
-        val text = panel.getComponents.filter(_.getName == "picturePath")(0).asInstanceOf[JTextField]
-        val button = panel.getComponents.filter(_.getName == "click")(0).asInstanceOf[JButton]
-        val look = panel.getComponents.filter(_.getName == "look")(0).asInstanceOf[JLabel]
-        look.onMouseEntered(println("show image"))
-        look.onMouseExited(println("hide image"))
-        look.onMouseClicked(if (model.book.images.contains(columnIndex)) look.setIcon(new ImageIcon(model.book.images(columnIndex))))
-        Bindings.bind(text, new BookFieldValueModel(columnIndex, model.book))
-        button.onClicked({ model.book.images.put(columnIndex, WebCam.getImage); model.book.values(columnIndex) = ""; look.setIcon(new ImageIcon(model.book.images(columnIndex))) })
-
         if (model.book.values(columnIndex) != "") {
           val dir = model.loadedFile.getParentFile
           val imagesDir = (model.loadedFile.getAbsolutePath + ".images").asDir
@@ -100,6 +95,20 @@ class BookController extends IDialogController[BookControllerInput, Book] {
           val image = ImageIO.read(imageFile)
           model.book.images.put(columnIndex, image)
         }
+
+        val panel = view.editors(columnIndex).asInstanceOf[JPanel]
+        val text = panel.getComponents.filter(_.getName == "picturePath")(0).asInstanceOf[JTextField]
+        val button = panel.getComponents.filter(_.getName == "click")(0).asInstanceOf[JButton]
+        val look = view.images.filter(_.getName == "look" + columnName)(0)
+        //val look = panel.getComponents.filter(_.getName == "look")(0).asInstanceOf[JLabel]
+        //look.onMouseClicked(if (model.book.images.contains(columnIndex)) look.setIcon(new ImageIcon(model.book.images(columnIndex))))
+        if (model.book.images.contains(columnIndex)) look.setIcon(new ImageIcon(model.book.images(columnIndex).getScaledInstance(320, 240, Image.SCALE_DEFAULT)))
+        Bindings.bind(text, new BookFieldValueModel(columnIndex, model.book))
+        button.onClicked({
+          model.book.images.put(columnIndex, WebCam.getImage)
+          model.book.values(columnIndex) = ""
+          look.setIcon(new ImageIcon(model.book.images(columnIndex).getScaledInstance(320, 240, Image.SCALE_DEFAULT)))
+        })
 
       } else if (autoComplete) {
         val columnList = BookHelper.getColumnList(model.bookList, columnIndex)
@@ -129,6 +138,8 @@ class BookController extends IDialogController[BookControllerInput, Book] {
         }
       }
     }
+
+    startWebcam
   }
 
   private def multiFieldBind(mmc: MultiField[String, _], bookFieldValueModel: BookFieldValueModel) = {
@@ -204,9 +215,22 @@ class BookController extends IDialogController[BookControllerInput, Book] {
       (marcFromColumn.marc3.equals("") || marcFromOszk.marc3.equalsIgnoreCase(marcFromColumn.marc3))
   }
 
-  def onOk = {}
 
-  def onCancel = {}
+
+  def startWebcam = {
+	  Log.info("start webcam")
+    val webcam = WebCam.startWebcam
+    if (webcam.nonEmpty) {
+    	view.webcamPanel.newRow.add(webcam.get.picker)
+      view.webcamPanel.newRow.add(webcam.get.panel)
+    }
+    else view.webcamPanel.add(new JLabel("No Webcam"))
+  }
+  def stopWebcam = { }
+
+  def onOk = {stopWebcam}
+
+  def onCancel = {stopWebcam}
 
   def getOutput = model.book
 

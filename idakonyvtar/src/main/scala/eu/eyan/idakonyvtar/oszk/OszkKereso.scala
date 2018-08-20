@@ -69,10 +69,10 @@ object OszkKereso {
     regexPost: String): String = {
 
     val postUrl = host.asUrlPost(postParameter).mkString
-		println("postUrl: ", postUrl)
+		Log.info("postUrl: "+ postUrl)
 //    val line = Unix4j.fromString(postUrl).grep(lineGrep).toStringResult()
     val line = postUrl.lines.filter(_.contains(lineGrep)).toList(0)
-    println("Line: ", line)
+    Log.info("Line: "+ line)
     val firstMatch = (regex_prefix + regex + regexPost).r.findFirstIn(line).get
 
     firstMatch.substring(regex_prefix.length(), firstMatch.length() - regexPost.length()).replaceAll("&amp;", "&")

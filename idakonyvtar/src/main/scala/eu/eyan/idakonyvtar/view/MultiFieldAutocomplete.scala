@@ -15,7 +15,7 @@ class MultiFieldAutocomplete(columnName: String, hintText: String, noItemsFoundT
 
   protected def addFieldEditListener(editor: JTextFieldAutocomplete, listener: FieldEditListener[JTextFieldAutocomplete]): Unit = {
     def addIfNotEmpty = if (editor.getText.nonEmpty) listener.fieldEdited(editor)
-  	editor.onMouseReleased(addIfNotEmpty)
+  	editor.onKeyReleased(addIfNotEmpty)
   	editor.autocomplete.autocompleteList.onDoubleClick(addIfNotEmpty)
   }
 
