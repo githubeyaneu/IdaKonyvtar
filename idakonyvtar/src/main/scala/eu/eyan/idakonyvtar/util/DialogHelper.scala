@@ -28,6 +28,7 @@ import eu.eyan.util.swing.OkCancelDialog
 import eu.eyan.util.swing.JPanelWithFrameLayout
 import javax.swing.JPanel
 import eu.eyan.util.awt.ComponentPlus.ComponentPlusImplicit
+import eu.eyan.util.swing.JDialogPlus.JdialogPlusImplicit
 
 object DialogHelper {
 
@@ -64,7 +65,7 @@ object DialogHelper {
 
     controller.initBindings
     dialog.pack
-    positionToCenter(dialog)
+    dialog.positionToCenter
     controller.addResizeListener(dialog)
     dialog.setSize(1200, 768)
     // blockiert:
@@ -84,41 +85,6 @@ object DialogHelper {
     scrollPane
   }
 
-  def runInFrame[INPUT](
-    parent: Component,
-    controller: IController[INPUT, _],
-    input: INPUT,
-    jMenuBar: JMenuBar,
-    toolBar: JToolBar,
-    fullScreen: Boolean,
-    name: String) =
-    {
-      controller.initData(input)
-      val frame = new JXFrame()
-      frame.add(toolBar, BorderLayout.NORTH)
-      frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
-      frame.add(controller.getView())
-      frame.setTitle(controller.getTitle())
-      frame.setName(name)
-      frame.setJMenuBar(jMenuBar)
-      controller.initBindings()
-      frame.setVisible(true)
-      frame.pack()
-      positionToCenter(frame)
-      if (fullScreen) frame.setExtendedState(Frame.MAXIMIZED_BOTH)
-      val initFocusComponent = controller.getComponentForFocus()
-      if (initFocusComponent != null) initFocusComponent.requestFocusInWindow()
-      frame
-    }
-
-  def positionToCenter(component: Component) = {
-    val screenSize = Toolkit.getDefaultToolkit().getScreenSize()
-    val width = component.getSize().width
-    val height = component.getSize().height
-    component.setSize(width, height)
-    component.setLocation((screenSize.width - width) / 2, (screenSize.height - height) / 2)
-  }
-
   def getButtons(dialog: OkCancelDialog, dialogController: IDialogController[_, _]) = {
     val panel = new JPanelWithFrameLayout().withSeparators.newColumn("pref:grow")
     
@@ -129,9 +95,6 @@ object DialogHelper {
     panel.addButton(CANCEL).name(CANCEL).onAction( {dialogController.onCancel(); dialog.dispose()})
     panel
   }
-
-  def runInFrameFullScreen[INPUT](controller: IControllerWithMenu[INPUT, _], input: INPUT, name: String): JFrame =
-    runInFrame(null, controller, input, controller.getMenuBar(), controller.getToolBar(), true, name)
 
   def yesNo(parent: Component, question: String, dialogTitle: String) =
     JOptionPane.showOptionDialog(parent,

@@ -15,7 +15,7 @@ import java.awt.Dimension
 case class WebCamStartResult(panel: WebcamPanel, thread: Thread, picker: JComboBox[Webcam])
 
 object WebCam {
-	var webcam: Option[WebCamStartResult] = null
+	var webcam: Option[WebCamStartResult] = None
 	
   def getImage = {
 	  if (webcam.nonEmpty) {
@@ -25,7 +25,7 @@ object WebCam {
   }
 
   def startWebcam = {
-    if (webcam == null) {
+    if (webcam == None) {
       //    with WebcamListener
       //    with WindowListener
       //    with ItemListener
