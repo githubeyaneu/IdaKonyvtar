@@ -101,6 +101,9 @@ object IdaLibrary {
     controller.initData(new LibraryControllerInput(fileToOpen))
     controller.initBindings
 
+    def confirmExit(frame: JFrame) = DialogHelper.yesNo(frame, "Biztos ki akar lépni?", "Megerősítés")
+    def closeFrame(frame: JFrame) = frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+    
     val frame: JFrame = new JFrame()
       .title(controller.getTitle) // todo replace with observable
       .name(Texts.TITLE)
@@ -110,8 +113,16 @@ object IdaLibrary {
       .packAndSetVisible
       .positionToCenter
       .maximize
-      .onWindowClosing({ LogWindow.close; WebCam.stop })
-      .onCloseDisposeWithCondition(frame => DialogHelper.yesNo(frame, "Biztos ki akar lépni?", "Megerősítés"))
+      .onCloseDisposeWithCondition(confirmExit )
+      .onWindowClosed({ LogWindow.close; WebCam.stop })
+      .iconFromChar('I')
+      .menuItemEvent("Fájl", "Kilépés", closeFrame)
+      .menuItemEvent("Debug", "Napló ablak", LogWindow.show)
+//    .menuItem("Debug", "Copy logs to clipboard", ClipboardPlus.copyToClipboard(getAllLogs))
+//    .menuItem("Debug", "Clear registry values", RegistryPlus.clear("Ticket downloader"))
+//    .menuItem("Help", "Write email", writeEmail)
+//    .menuItem("Help", "About", showAbout)
+  
 
     val initFocusComponent = controller.getComponentForFocus()
     if (initFocusComponent != null) initFocusComponent.requestFocusInWindow()

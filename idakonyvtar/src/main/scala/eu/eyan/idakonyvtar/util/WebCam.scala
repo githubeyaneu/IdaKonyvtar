@@ -61,6 +61,7 @@ object WebCam {
       Log.info("stop webcam")
       webcam.get.panel.stop
       webcam.get.thread.stop
+      webcam=None
     }
   }
 
