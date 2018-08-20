@@ -69,7 +69,6 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
   override def getComponentForFocus(): Component = menuAndToolBar.TOOLBAR_SEARCH
   override def getTitle() = TITLE + TITLE_SEPARATOR + model.books.getList.size() + TITLE_PIECES
   def refreshTitle() = SwingUtilities.getWindowAncestor(view.getComponent()).asInstanceOf[JFrame].setTitle(getTitle())
-  override def getMenuBar() = menuAndToolBar.getMenuBar()
 
   override def getView() = {
     view.getComponent()
@@ -112,7 +111,7 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
     .withDialogTitle("Töltés")
     .withApproveButtonText("Töltés")
     .withFileFilter("xls", "Excel97 fájlok")
-    .showAndHandleResult(menuAndToolBar.MENU_EXCEL_LOAD, selectedFile => {
+    .showAndHandleResult(view.getComponent/* JFrame*/ , selectedFile => {
       Log.info("selected file: " + selectedFile)
       readLibrary(selectedFile)
     })
@@ -121,7 +120,7 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
     .withDialogTitle("Mentés")
     .withApproveButtonText("Mentés")
     .withFileFilter("xls", "Excel97 fájlok")
-    .showAndHandleResult(menuAndToolBar.MENU_EXCEL_LOAD, selectedFile => {
+    .showAndHandleResult(view.getComponent/* JFrame*/, selectedFile => {
       Log.info("Save " + selectedFile)
       try ExcelHandler.saveLibrary(selectedFile, model.library)
       catch { case le: LibraryException => Log.error(le) }
@@ -208,16 +207,12 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
   def initBindings(): Unit = {
 
     menuAndToolBar.TOOLBAR_LOAD.onAction(loadLibrary)
-    menuAndToolBar.MENU_EXCEL_LOAD.onAction(loadLibrary)
 
     menuAndToolBar.TOOLBAR_SAVE.onAction(saveLibrary)
-    menuAndToolBar.MENU_EXCEL_SAVE.onAction(saveLibrary)
 
     menuAndToolBar.TOOLBAR_NEW_BOOK.onAction(createNewBook)
 
     menuAndToolBar.TOOLBAR_BOOK_DELETE.onAction(deleteBook)
-
-    menuAndToolBar.MENU_OPEN_DEBUG_WINDOW.onAction(LogWindow.show(SwingUtilities.windowForComponent(getView)))
 
     view.getBookTable.getSelectionModel.addListSelectionListener(new ListSelectionListener() {
       def valueChanged(e: ListSelectionEvent) = menuAndToolBar.TOOLBAR_BOOK_DELETE.setEnabled(view.getBookTable().getSelectedRow >= 0)

@@ -7,7 +7,6 @@ import LibraryMenuAndToolBar.DELETE_BOOK
 import LibraryMenuAndToolBar.FILE
 import LibraryMenuAndToolBar.FILTER
 import LibraryMenuAndToolBar.LOAD_LIBRARY
-import LibraryMenuAndToolBar.OPEN_DEBUG_WINDOW
 import LibraryMenuAndToolBar.SAVE_LIBRARY
 import javax.swing.ImageIcon
 import javax.swing.JButton
@@ -26,43 +25,23 @@ object LibraryMenuAndToolBar {
   val LOAD_LIBRARY = "Library betöltése"
   val ISBN_SEARCH = "ISBN keresés"
   val FILE = "Fájl"
-  val OPEN_DEBUG_WINDOW = "Debug"
 }
 
 class LibraryMenuAndToolBar {
   val SEARCH_TEXTFIELD_SIZE = 5
   val SEARCH_TOOLBAR_SIZE = 200
   private val toolBar = new JToolBar("Alapfunkciók")
-  private val menuBar = new JMenuBar()
 
   def getToolBar() = toolBar
-  def getMenuBar() = menuBar
 
-  val MENU_EXCEL_LOAD = new JMenuItem(LOAD_LIBRARY)
-  val MENU_EXCEL_SAVE = new JMenuItem(SAVE_LIBRARY)
-  val MENU_OPEN_DEBUG_WINDOW = new JMenuItem(OPEN_DEBUG_WINDOW)
   val TOOLBAR_SAVE = new JButton("Mentés", new ImageIcon(Resources.getResource("icons/save.gif")))
   val TOOLBAR_LOAD = new JButton("Töltés", new ImageIcon(Resources.getResource("icons/load.gif")))
   val TOOLBAR_NEW_BOOK = new JButton("Új book", new ImageIcon(Resources.getResource("icons/newbook.gif")))
   val TOOLBAR_BOOK_DELETE = new JButton("Törlés", new ImageIcon(Resources.getResource("icons/delete.gif")))
   val TOOLBAR_SEARCH = new JTextField(SEARCH_TEXTFIELD_SIZE)
 
-  private val MENU_FILE = new JMenu(FILE)
   private val TOOLBAR_SEARCH_LABEL = new JLabel(FILTER)
 
-  menuBar.add(MENU_FILE)
-  MENU_FILE.setName(FILE)
-
-  MENU_FILE.add(MENU_EXCEL_LOAD)
-  MENU_EXCEL_LOAD.setName(LOAD_LIBRARY)
-
-  MENU_FILE.add(MENU_EXCEL_SAVE)
-  MENU_EXCEL_SAVE.setName(SAVE_LIBRARY)
-
-  MENU_FILE.addSeparator()
-
-  MENU_FILE.add(MENU_OPEN_DEBUG_WINDOW)
-  MENU_OPEN_DEBUG_WINDOW.setName(OPEN_DEBUG_WINDOW)
 
   toolBar.add(TOOLBAR_SAVE)
   TOOLBAR_SAVE.setName(SAVE_LIBRARY)

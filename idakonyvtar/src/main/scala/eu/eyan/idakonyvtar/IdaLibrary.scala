@@ -26,6 +26,13 @@ import javax.swing.WindowConstants
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import eu.eyan.idakonyvtar.util.DialogHelper
+import eu.eyan.util.awt.clipboard.ClipboardPlus
+import eu.eyan.util.swing.Alert
+import eu.eyan.util.registry.RegistryPlus
+import java.awt.Desktop
+import java.net.URI
+import java.net.URLEncoder
+import eu.eyan.idakonyvtar.view.LibraryMenuAndToolBar
 
 object IdaLibrary {
 
@@ -95,7 +102,6 @@ object IdaLibrary {
     Log.info("Resource -> File: " + fileToOpen)
 
     val controller = new LibraryController
-    val jMenuBar = controller.getMenuBar
     val toolBar = controller.getToolBar
 
     controller.initData(new LibraryControllerInput(fileToOpen))
@@ -104,25 +110,37 @@ object IdaLibrary {
     def confirmExit(frame: JFrame) = DialogHelper.yesNo(frame, "Biztos ki akar lépni?", "Megerősítés")
     def closeFrame(frame: JFrame) = frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
     
+    def getAllLogs = {
+    		Alert.alert("Kérem ellenőrizze az adatokat. A naplófájlok tartalmazhatnak személyes információkat, pl. könyvek adatai.")
+    		val loggerLogs = LogWindow.getAllLogs
+    		loggerLogs
+    }
+    
+    def showAbout = Alert.alert("Személyes használatra. A készítő nem vállal felelősséget a program használatából eredő károkért. A program külső forrásból próbálhat adatokat gyűjteni ennek a következményeiért is a felhasználó a felelős.")
+
+    def writeEmail =
+      Desktop.getDesktop.mail(new URI("mailto:idalibrary@eyan.hu?subject=IdaLibrary%20error&body=" + URLEncoder.encode(getAllLogs, "utf-8").replace("+", "%20")))
+
     val frame: JFrame = new JFrame()
-      .title(controller.getTitle) // todo replace with observable
+      .title(controller.getTitle) // TODO replace with observable
       .name(Texts.TITLE)
-      .jMenuBar(jMenuBar)
       .addFluent(toolBar, BorderLayout.NORTH)
       .addFluent(controller.getView)
       .packAndSetVisible
       .positionToCenter
       .maximize
-      .onCloseDisposeWithCondition(confirmExit )
+      .onCloseDisposeWithCondition(confirmExit)
       .onWindowClosed({ LogWindow.close; WebCam.stop })
       .iconFromChar('I')
-      .menuItemEvent("Fájl", "Kilépés", closeFrame)
+      .menuItem(LibraryMenuAndToolBar.FILE, LibraryMenuAndToolBar.LOAD_LIBRARY, controller.loadLibrary)
+      .menuItem(LibraryMenuAndToolBar.FILE, LibraryMenuAndToolBar.SAVE_LIBRARY, controller.saveLibrary)
+      .menuItemSeparator(LibraryMenuAndToolBar.FILE)
+      .menuItemEvent(LibraryMenuAndToolBar.FILE, "Kilépés", closeFrame)
       .menuItemEvent("Debug", "Napló ablak", LogWindow.show)
-//    .menuItem("Debug", "Copy logs to clipboard", ClipboardPlus.copyToClipboard(getAllLogs))
-//    .menuItem("Debug", "Clear registry values", RegistryPlus.clear("Ticket downloader"))
-//    .menuItem("Help", "Write email", writeEmail)
-//    .menuItem("Help", "About", showAbout)
-  
+      .menuItem("Debug", "Napló másolása a vágólapra", ClipboardPlus.copyToClipboard(getAllLogs))
+      .menuItem("Debug", "Registry adatok törlése", RegistryPlus.clear(Texts.TITLE)) // FIXME!!! remember takes the title of the JFrame! should take name of JFrame!!!!
+      .menuItem("Segítség", "Hibajelentés emailben", writeEmail)
+      .menuItem("Segítség", "About", showAbout)
 
     val initFocusComponent = controller.getComponentForFocus()
     if (initFocusComponent != null) initFocusComponent.requestFocusInWindow()
