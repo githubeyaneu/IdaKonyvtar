@@ -234,13 +234,6 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
       }
     })
 
-    val frame = SwingUtilities.getRoot(view.getComponent()).asInstanceOf[JFrame]
-    frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE)
-    frame.addWindowListener(new WindowAdapter() {
-      override def windowClosing(e: WindowEvent) =
-        if (DialogHelper.yesNo(frame, "Biztos ki akar lépni?", "Megerősítés")) frame.dispose()
-    })
-
     model.books.addListDataListener(new ListDataListener() {
       def intervalRemoved(e: ListDataEvent) = refreshTitle()
       def intervalAdded(e: ListDataEvent) = refreshTitle()

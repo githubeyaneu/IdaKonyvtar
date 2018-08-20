@@ -22,6 +22,10 @@ import java.awt.Frame
 import eu.eyan.idakonyvtar.controller.IControllerWithMenu
 import eu.eyan.util.swing.JFramePlus.JFramePlusImplicit
 import eu.eyan.util.awt.ComponentPlus.ComponentPlusImplicit
+import javax.swing.WindowConstants
+import java.awt.event.WindowAdapter
+import java.awt.event.WindowEvent
+import eu.eyan.idakonyvtar.util.DialogHelper
 
 object IdaLibrary {
 
@@ -95,9 +99,10 @@ object IdaLibrary {
     val toolBar = controller.getToolBar
 
     controller.initData(new LibraryControllerInput(fileToOpen))
-    val frame = new JFrame()
-      .onCloseExit
-      .title(controller.getTitle)
+    controller.initBindings
+
+    val frame: JFrame = new JFrame()
+      .title(controller.getTitle) // todo replace with observable
       .name(Texts.TITLE)
       .jMenuBar(jMenuBar)
       .addFluent(toolBar, BorderLayout.NORTH)
@@ -106,8 +111,7 @@ object IdaLibrary {
       .positionToCenter
       .maximize
       .onWindowClosing({ LogWindow.close; WebCam.stop })
-      
-    controller.initBindings
+      .onCloseDisposeWithCondition(frame => DialogHelper.yesNo(frame, "Biztos ki akar lépni?", "Megerősítés"))
 
     val initFocusComponent = controller.getComponentForFocus()
     if (initFocusComponent != null) initFocusComponent.requestFocusInWindow()
