@@ -11,7 +11,6 @@
 /src/main/resources/backup/*
 .cache*
 .project
-*.xls
 /FailedTestVideos
 release.properties
 ${data}
