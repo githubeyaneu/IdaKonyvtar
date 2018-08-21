@@ -34,8 +34,10 @@ import java.net.URI
 import java.net.URLEncoder
 import eu.eyan.idakonyvtar.view.LibraryMenuAndToolBar
 import eu.eyan.idakonyvtar.text.Texts
-import eu.eyan.idakonyvtar.text.IdaLibraryTitle
+import eu.eyan.idakonyvtar.text.TextIdaLibraryTitle
 import rx.lang.scala.subjects.BehaviorSubject
+import eu.eyan.idakonyvtar.text.TextExitWindowConfirmQuestion
+import eu.eyan.util.string.StringPlus.StringPlusImplicit
 
 object IdaLibrary {
 
@@ -97,11 +99,12 @@ object IdaLibrary {
 
     val file = new File(path)
 
+    //TODO refact...
     val fileToOpen =
       if (file.exists()) file
-      else new File(Resources.getResource(path).getFile)
+      else path.toResourceFile.get
 
-    Log.activateInfoLevel
+    Log.activateDebugLevel
     Log.info("Resource -> File: " + fileToOpen)
 
     val controller = new LibraryController
@@ -109,7 +112,7 @@ object IdaLibrary {
 
     controller.initData(new LibraryControllerInput(fileToOpen))
 
-    def confirmExit(frame: JFrame) = DialogHelper.yesNo(frame, "Biztos ki akar lépni?", "Megerősítés")
+    def confirmExit(frame: JFrame) = DialogHelper.yesNo(frame, TextExitWindowConfirmQuestion.get, "Megerősítés")
     def closeFrame(frame: JFrame) = frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 
     def getAllLogs = {
@@ -124,10 +127,9 @@ object IdaLibrary {
       Desktop.getDesktop.mail(new URI("mailto:idalibrary@eyan.hu?subject=IdaLibrary%20error&body=" + URLEncoder.encode(getAllLogs, "utf-8").replace("+", "%20")))
 
     // TODO observable stringContext? : https://docs.scala-lang.org/overviews/core/string-interpolation.html
-    
-    
+
     val frame: JFrame = new JFrame()
-      .title(IdaLibraryTitle(controller.numberOfBooks))
+      .title(TextIdaLibraryTitle(controller.numberOfBooks))
       .name(TITLE) // TODO refact dont use the same text for name and title
       .addFluent(toolBar, BorderLayout.NORTH)
       .addFluent(controller.getView)

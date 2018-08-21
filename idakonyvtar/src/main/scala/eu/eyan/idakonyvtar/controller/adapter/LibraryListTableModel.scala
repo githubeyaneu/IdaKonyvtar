@@ -18,7 +18,7 @@ object LibraryListTableModel {
 
     if (columnNamesAndIndexesToShow.size < 1)
       throw new IllegalArgumentException(
-        "Legalább 1 columnot meg kell jeleníteni! Columnconfigurationban helyesen kell konfigurálni.");
+        "Legalább 1 oszlopot meg kell jeleníteni! Az oszlop konfigurációban helyesen kell konfigurálni.");
 
     new LibraryListTableModel(listModel, columnNamesAndIndexesToShow.unzip._2, columnNamesAndIndexesToShow.unzip._1.toArray)
   }

@@ -22,12 +22,37 @@ import jxl.write.WriteException
 import jxl.write.biff.RowsExceededException
 import eu.eyan.util.backup.BackupHelper
 import eu.eyan.log.Log
+import eu.eyan.util.io.FilePlus.FilePlusImplicit
 
 object ExcelHandler {
 
   val COLUMN_CONFIGURATION = "OszlopKonfiguráció"
   val BOOKS = "Könyvek"
   val ERROR_TEXT = "Nem sikerült a mentés."
+
+  case class Excel(val columns: Int, val rows: Int, val cells: Map[(Int, Int), String]){
+    def row(rowIndex: Int) = for(columnIndex <- 0 until columns) yield cells((columnIndex, rowIndex)) 
+		def column(columnIndex: Int) = for(rowIndex <- 0 until rows) yield cells((columnIndex, rowIndex))
+    def rowIndex(firstRowContent: String) = column(0).zipWithIndex.filter(_._1 == firstRowContent).map(_._2).lift(0)
+    def columnIndex(firstColumnContent: String) = row(0).zipWithIndex.filter(_._1 == firstColumnContent).map(_._2).lift(0)
+  }
+  
+  def readExcel(file: File, sheetName: String) = {
+    Log.info(s"$file exists: ${file.exists}")
+    val workbook = Workbook.getWorkbook(file, getWorkbookSettings())
+
+    Log.info(s"Sheets: ${workbook.getSheetNames.mkString}")
+    
+    val sheet = getSheet(getWorkbookSettings(), workbook, sheetName)
+
+    val columnCount = sheet.getColumns
+    val rowCount = sheet.getRows
+    val table = 
+      for ( columnIndex <- 0 until columnCount; rowIndex <- 0 until rowCount ) 
+        yield ((columnIndex, rowIndex),sheet.getCell(columnIndex, rowIndex).getContents)
+    workbook.close
+    Excel(columnCount, rowCount, table.toMap)
+  }
 
   @throws(classOf[LibraryException])
   def readLibrary(file: File): Library = {
@@ -42,9 +67,9 @@ object ExcelHandler {
           yield (
           for { row <- 0 until columnConfigSheet.getRows() }
             yield columnConfigSheet.getCell(col, row).getContents()).toArray).toArray
-            
+
       Log.debug(configTable.map(_.mkString(", ")).mkString("\r\n"))
-      
+
       val colConfig = new ColumnKonfiguration(configTable)
 
       val columns = for { actualColumn <- 0 until booksSheet.getColumns() } yield booksSheet.getCell(actualColumn, 0).getContents()
@@ -60,10 +85,10 @@ object ExcelHandler {
 
       val library = new Library(colConfig, columns)
       for { book <- books } library.books.add(book)
-
+      libraryWorkbook.close
+      
       library
-    }
-    catch {
+    } catch {
       case e: BiffException => throw new LibraryException("Biff Hiba a beolvasásnál " + e.getLocalizedMessage());
       case e: IOException   => throw new LibraryException("Hiba a beolvasásnál " + e.getLocalizedMessage());
       case e: Exception     => throw new LibraryException(e.getLocalizedMessage());
@@ -89,8 +114,7 @@ object ExcelHandler {
         try {
           backup(targetFile);
           FileUtils.forceDelete(targetFile)
-        }
-        catch {
+        } catch {
           case e: IOException => e.printStackTrace()
         }
       else
@@ -112,8 +136,8 @@ object ExcelHandler {
       for { column <- 0 until table.length; sor <- 0 until table(0).length }
         columnConfigurationSheet.addCell(new Label(column, sor, table(column)(sor)))
 
-      workbook.write();
-      workbook.close();
+      workbook.write
+      workbook.close
     } catch {
       case e: IOException           => throw new LibraryException(ERROR_TEXT, e)
       case e: RowsExceededException => throw new LibraryException(ERROR_TEXT, e)
