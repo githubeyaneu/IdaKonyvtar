@@ -22,8 +22,6 @@ import eu.eyan.idakonyvtar.text.Texts.NO
 import eu.eyan.idakonyvtar.text.Texts.NO_BOOK_FOR_THE_FILTER
 import eu.eyan.idakonyvtar.text.Texts.NO_BOOK_IN_THE_LIST
 import eu.eyan.idakonyvtar.text.Texts.TITLE
-import eu.eyan.idakonyvtar.text.Texts.TITLE_PIECES
-import eu.eyan.idakonyvtar.text.Texts.TITLE_SEPARATOR
 import eu.eyan.idakonyvtar.text.Texts.YES
 import eu.eyan.idakonyvtar.util.DialogHelper
 import eu.eyan.idakonyvtar.util.ExcelHandler
@@ -53,6 +51,8 @@ import eu.eyan.idakonyvtar.model.ColumnConfigurations
 import eu.eyan.util.string.StringPlus.StringPlusImplicit
 import eu.eyan.util.io.FilePlus.FilePlusImplicit
 import javax.imageio.ImageIO
+import eu.eyan.util.swing.SwingPlus
+import rx.lang.scala.subjects.BehaviorSubject
 
 class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void] {
 
@@ -67,8 +67,10 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
   override def getToolBar() = menuAndToolBar.getToolBar()
   override def getOutput(): Void = null
   override def getComponentForFocus(): Component = menuAndToolBar.TOOLBAR_SEARCH
-  override def getTitle() = TITLE + TITLE_SEPARATOR + model.books.getList.size() + TITLE_PIECES
-  def refreshTitle() = SwingUtilities.getWindowAncestor(view.getComponent()).asInstanceOf[JFrame].setTitle(getTitle())
+
+  @deprecated override def getTitle = "" 
+  
+  lazy val numberOfBooks = BehaviorSubject(model.books.getList.size)
 
   override def getView() = {
     view.getComponent()
@@ -215,7 +217,9 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
     menuAndToolBar.TOOLBAR_BOOK_DELETE.onAction(deleteBook)
 
     view.getBookTable.getSelectionModel.addListSelectionListener(new ListSelectionListener() {
-      def valueChanged(e: ListSelectionEvent) = menuAndToolBar.TOOLBAR_BOOK_DELETE.setEnabled(view.getBookTable().getSelectedRow >= 0)
+      def valueChanged(e: ListSelectionEvent) = {
+        menuAndToolBar.TOOLBAR_BOOK_DELETE.setEnabled(view.getBookTable().getSelectedRow >= 0)
+      }
     })
 
     view.getBookTable().addMouseListener(new MouseAdapter() {
@@ -230,9 +234,11 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
     })
 
     model.books.addListDataListener(new ListDataListener() {
-      def intervalRemoved(e: ListDataEvent) = refreshTitle()
-      def intervalAdded(e: ListDataEvent) = refreshTitle()
-      def contentsChanged(e: ListDataEvent) = refreshTitle()
+      def onNumberOfBooks = numberOfBooks.onNext(model.books.getList.size)
+      //TODO refactor add listener and listlistener     SwingPlus.onIntervalRemoved(action)
+      def intervalRemoved(e: ListDataEvent) = onNumberOfBooks
+      def intervalAdded(e: ListDataEvent) = onNumberOfBooks
+      def contentsChanged(e: ListDataEvent) = onNumberOfBooks
     })
   }
 

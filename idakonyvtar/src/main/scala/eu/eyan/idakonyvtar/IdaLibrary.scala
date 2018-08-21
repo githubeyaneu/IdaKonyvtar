@@ -6,7 +6,7 @@ import com.google.common.io.Resources
 
 import eu.eyan.idakonyvtar.controller.LibraryController
 import eu.eyan.idakonyvtar.controller.input.LibraryControllerInput
-import eu.eyan.idakonyvtar.text.Texts
+import eu.eyan.idakonyvtar.text.Texts._
 import eu.eyan.log.Log
 import eu.eyan.log.LogWindow
 import eu.eyan.util.awt.AwtHelper.onWindowClosing
@@ -33,6 +33,9 @@ import java.awt.Desktop
 import java.net.URI
 import java.net.URLEncoder
 import eu.eyan.idakonyvtar.view.LibraryMenuAndToolBar
+import eu.eyan.idakonyvtar.text.Texts
+import eu.eyan.idakonyvtar.text.IdaLibraryTitle
+import rx.lang.scala.subjects.BehaviorSubject
 
 object IdaLibrary {
 
@@ -105,25 +108,27 @@ object IdaLibrary {
     val toolBar = controller.getToolBar
 
     controller.initData(new LibraryControllerInput(fileToOpen))
-    controller.initBindings
 
     def confirmExit(frame: JFrame) = DialogHelper.yesNo(frame, "Biztos ki akar lépni?", "Megerősítés")
     def closeFrame(frame: JFrame) = frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
-    
+
     def getAllLogs = {
-    		Alert.alert("Kérem ellenőrizze az adatokat. A naplófájlok tartalmazhatnak személyes információkat, pl. könyvek adatai.")
-    		val loggerLogs = LogWindow.getAllLogs
-    		loggerLogs
+      Alert.alert("Kérem ellenőrizze az adatokat. A naplófájlok tartalmazhatnak személyes információkat, pl. könyvek adatai.")
+      val loggerLogs = LogWindow.getAllLogs
+      loggerLogs
     }
-    
+
     def showAbout = Alert.alert("Személyes használatra. A készítő nem vállal felelősséget a program használatából eredő károkért. A program külső forrásból próbálhat adatokat gyűjteni ennek a következményeiért is a felhasználó a felelős.")
 
     def writeEmail =
       Desktop.getDesktop.mail(new URI("mailto:idalibrary@eyan.hu?subject=IdaLibrary%20error&body=" + URLEncoder.encode(getAllLogs, "utf-8").replace("+", "%20")))
 
+    // TODO observable stringContext? : https://docs.scala-lang.org/overviews/core/string-interpolation.html
+    
+    
     val frame: JFrame = new JFrame()
-      .title(controller.getTitle) // TODO replace with observable
-      .name(Texts.TITLE)
+      .title(IdaLibraryTitle(controller.numberOfBooks))
+      .name(TITLE) // TODO refact dont use the same text for name and title
       .addFluent(toolBar, BorderLayout.NORTH)
       .addFluent(controller.getView)
       .packAndSetVisible
@@ -138,9 +143,11 @@ object IdaLibrary {
       .menuItemEvent(LibraryMenuAndToolBar.FILE, "Kilépés", closeFrame)
       .menuItemEvent("Debug", "Napló ablak", LogWindow.show)
       .menuItem("Debug", "Napló másolása a vágólapra", ClipboardPlus.copyToClipboard(getAllLogs))
-      .menuItem("Debug", "Registry adatok törlése", RegistryPlus.clear(Texts.TITLE)) // FIXME!!! remember takes the title of the JFrame! should take name of JFrame!!!!
+      .menuItem("Debug", "Registry adatok törlése", RegistryPlus.clear(TITLE)) // FIXME!!! remember takes the title of the JFrame! should take name of JFrame!!!!
       .menuItem("Segítség", "Hibajelentés emailben", writeEmail)
       .menuItem("Segítség", "About", showAbout)
+
+    controller.initBindings // TODO has to be after get view (set selection model for list)
 
     val initFocusComponent = controller.getComponentForFocus()
     if (initFocusComponent != null) initFocusComponent.requestFocusInWindow()

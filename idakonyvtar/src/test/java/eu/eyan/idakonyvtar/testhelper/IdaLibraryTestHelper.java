@@ -114,10 +114,7 @@ public class IdaLibraryTestHelper {
 	}
 
 	public void checkTitleWithNumber(int numberOfBooks) {
-		requireTitle(Texts.TITLE()
-				+ Texts.TITLE_SEPARATOR() + numberOfBooks
-				+ Texts.TITLE_PIECES());
-
+		requireTitle("IdaKönyvtár - " + numberOfBooks + "db könyv");
 	}
 
 	public void clickExit() {

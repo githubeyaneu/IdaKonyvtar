@@ -6,6 +6,7 @@ trait IController[INPUT, OUTPUT] {
 
   def getView(): Component
 
+  @deprecated("change to observable")
   def getTitle(): String
 
   def initData(input: INPUT): Unit
