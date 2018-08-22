@@ -23,9 +23,9 @@ object TextIdaLibrary {
 
   lazy val language = BehaviorSubject[String]("")
 
-  def getTextTranslation(technicalName: String) = {
-    Log.debug("technicalName: " + technicalName)
-    val translationColumnIndex = translationsTable.columnIndex("Magyar")
+  def getTextTranslation(technicalName: String, language: String) = {
+    Log.debug(s"TechnicalName=$technicalName, language=$language")
+    val translationColumnIndex = translationsTable.columnIndex(language)
     Log.debug("Language col " + translationColumnIndex)
     val rowIndex = translationsTable.rowIndex(technicalName)
     Log.debug("technicalName row " + rowIndex)
@@ -41,26 +41,33 @@ object TextIdaLibrary {
 }
 
 abstract class IdaText(private val txt: String, private val args: Observable[Any]*) extends Text(BehaviorSubject(txt), args: _*) {
-  def translate = TextIdaLibrary.getTextTranslation(this.getClass.getSimpleName.replace("$", ""))
+  lazy val language = TextIdaLibrary.language
+  def translate(language: String) = TextIdaLibrary.getTextTranslation(this.getClass.getSimpleName.replace("$", ""), language)
+  lazy val templateTranslated = language map translate
+  def validTranslation(opt: Option[String]) = opt.nonEmpty && opt.get.nonEmpty
+  lazy val onlyValidTranslations = templateTranslated.filter(validTranslation).map(_.get) 
+  onlyValidTranslations.subscribe(template)
 
   def get = {
     Log.debug("txt: " + txt)
-    val translation = translate
-    Log.debug("translation " + translation)
-    val template = translation.getOrElse(txt)
+//    val translation = translate
+//    Log.debug("translation " + translation)
+//    val template = translation.getOrElse(txt)
     Log.debug("template " + template)
     template
+    txt
   }
 }
 
 case object TextMenuLanguages extends IdaText("Languages")
 case object TextExitWindowConfirmQuestion extends IdaText("Do you really want to quit?")
-case class TextIdaLibraryTitle(nrOfBooks: Observable[Int]) extends IdaText("IdaLibrary - %s books.", nrOfBooks)
 
+//case class TextIdaLibraryTitle(nrOfBooks: Observable[Int]) extends IdaText("IdaLibrary - %s books.", nrOfBooks)
 //case object TextMenuDebug extends IdaText("Debug")
 //case object TextMenuDebugLogWindow extends IdaText("Log Window")
 //case object TextMenuDebugCopyLogs extends IdaText("Copy logs")
 //case object TextMenuDebugClearRegistry extends IdaText("Clear registry")
+case class TextIdaLibraryTitle(nrOfBooks: Observable[Int]) extends IdaText("IDALIBRARY", nrOfBooks)
 case object TextMenuDebug extends IdaText("DBG")
 case object TextMenuDebugLogWindow extends IdaText("LOGWIND")
 case object TextMenuDebugCopyLogs extends IdaText("CPYLOG")
