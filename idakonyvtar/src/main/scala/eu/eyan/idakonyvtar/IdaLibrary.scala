@@ -6,7 +6,7 @@ import com.google.common.io.Resources
 
 import eu.eyan.idakonyvtar.controller.LibraryController
 import eu.eyan.idakonyvtar.controller.input.LibraryControllerInput
-import eu.eyan.idakonyvtar.text.Texts._
+import eu.eyan.idakonyvtar.text.TextIdaLibrary._
 import eu.eyan.log.Log
 import eu.eyan.log.LogWindow
 import eu.eyan.util.awt.AwtHelper.onWindowClosing
@@ -33,7 +33,7 @@ import java.awt.Desktop
 import java.net.URI
 import java.net.URLEncoder
 import eu.eyan.idakonyvtar.view.LibraryMenuAndToolBar
-import eu.eyan.idakonyvtar.text.Texts
+import eu.eyan.idakonyvtar.text.TextIdaLibrary
 import eu.eyan.idakonyvtar.text.TextIdaLibraryTitle
 import rx.lang.scala.subjects.BehaviorSubject
 import eu.eyan.idakonyvtar.text.TextExitWindowConfirmQuestion
@@ -143,6 +143,7 @@ object IdaLibrary {
       .menuItem(LibraryMenuAndToolBar.FILE, LibraryMenuAndToolBar.SAVE_LIBRARY, controller.saveLibrary)
       .menuItemSeparator(LibraryMenuAndToolBar.FILE)
       .menuItemEvent(LibraryMenuAndToolBar.FILE, "Kilépés", closeFrame)
+      .menuItems("Nyelv", TextIdaLibrary.languages, TextIdaLibrary.onLanguageSelected)
       .menuItemEvent("Debug", "Napló ablak", LogWindow.show)
       .menuItem("Debug", "Napló másolása a vágólapra", ClipboardPlus.copyToClipboard(getAllLogs))
       .menuItem("Debug", "Registry adatok törlése", RegistryPlus.clear(TITLE)) // FIXME!!! remember takes the title of the JFrame! should take name of JFrame!!!!

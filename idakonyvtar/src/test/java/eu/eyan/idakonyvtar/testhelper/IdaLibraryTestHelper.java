@@ -12,7 +12,7 @@ import org.fest.swing.fixture.DialogFixture;
 import org.fest.swing.fixture.FrameFixture;
 
 import eu.eyan.idakonyvtar.IdaLibrary;
-import eu.eyan.idakonyvtar.text.Texts;
+import eu.eyan.idakonyvtar.text.TextIdaLibrary;
 import eu.eyan.idakonyvtar.view.LibraryMenuAndToolBar;
 
 public class IdaLibraryTestHelper {
@@ -20,7 +20,7 @@ public class IdaLibraryTestHelper {
 
 	public void start(String filenév) {
 		IdaLibrary.main(new String[] { filenév });
-		frame = new FrameFixture(Texts.TITLE());
+		frame = new FrameFixture(TextIdaLibrary.TITLE());
 		frame.target.toFront();
 	}
 
@@ -84,12 +84,12 @@ public class IdaLibraryTestHelper {
 	}
 
 	public void clickApproveYes() {
-		frame.dialog().button(JButtonMatcher.withText(Texts.YES()))
+		frame.dialog().button(JButtonMatcher.withText(TextIdaLibrary.YES()))
 				.click();
 	}
 
 	public void clickApproveNo() {
-		frame.dialog().button(JButtonMatcher.withText(Texts.NO()))
+		frame.dialog().button(JButtonMatcher.withText(TextIdaLibrary.NO()))
 				.click();
 	}
 
