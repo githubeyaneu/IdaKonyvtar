@@ -6,7 +6,7 @@ import com.google.common.io.Resources
 
 import eu.eyan.idakonyvtar.controller.LibraryController
 import eu.eyan.idakonyvtar.controller.input.LibraryControllerInput
-import eu.eyan.idakonyvtar.text.TextIdaLibrary._
+import eu.eyan.idakonyvtar.text.LanguageHandler._
 import eu.eyan.log.Log
 import eu.eyan.log.LogWindow
 import eu.eyan.util.awt.AwtHelper.onWindowClosing
@@ -33,10 +33,8 @@ import java.awt.Desktop
 import java.net.URI
 import java.net.URLEncoder
 import eu.eyan.idakonyvtar.view.LibraryMenuAndToolBar
-import eu.eyan.idakonyvtar.text.TextIdaLibrary
-import eu.eyan.idakonyvtar.text.TextIdaLibraryTitle
+import eu.eyan.idakonyvtar.text.LanguageHandler
 import rx.lang.scala.subjects.BehaviorSubject
-import eu.eyan.idakonyvtar.text.TextExitWindowConfirmQuestion
 import eu.eyan.util.string.StringPlus.StringPlusImplicit
 
 object IdaLibrary {
@@ -107,12 +105,21 @@ object IdaLibrary {
     Log.activateDebugLevel
     Log.info("Resource -> File: " + fileToOpen)
 
+    new IdaLibrary().startLibrary(fileToOpen)
+  }
+}
+
+class IdaLibrary {
+  def startLibrary(fileToOpen: File) = {
     val controller = new LibraryController
     val toolBar = controller.getToolBar
 
     controller.initData(new LibraryControllerInput(fileToOpen))
 
-    def confirmExit(frame: JFrame) = DialogHelper.yesNo(frame, TextExitWindowConfirmQuestion.get, "Megerősítés")
+    lazy val frame: JFrame = new JFrame()
+    lazy val texts = new LanguageHandler(IdaLibrary.getClass.getName)
+
+    def confirmExit(frame: JFrame) = DialogHelper.yesNo(frame, texts.TextExitWindowConfirmQuestion.get, "Megerősítés")
     def closeFrame(frame: JFrame) = frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 
     def getAllLogs = {
@@ -128,31 +135,31 @@ object IdaLibrary {
 
     // TODO observable stringContext? : https://docs.scala-lang.org/overviews/core/string-interpolation.html
 
-    val frame: JFrame = new JFrame()
-      .title(TextIdaLibraryTitle(controller.numberOfBooks))
-      .name(TITLE) // TODO refact dont use the same text for name and title
-      .addFluent(toolBar, BorderLayout.NORTH)
-      .addFluent(controller.getView)
-      .packAndSetVisible
-      .positionToCenter
-      .maximize
-      .onCloseDisposeWithCondition(confirmExit)
-      .onWindowClosed({ LogWindow.close; WebCam.stop })
+    frame
+      .name(IdaLibrary.getClass.getName) // TODO refact dont use the same text for name and title
+      .title(texts.TextIdaLibraryTitle(controller.numberOfBooks))
       .iconFromChar('I')
+      .addFluent(toolBar, BorderLayout.NORTH)
+      .addFluent(controller.getView, BorderLayout.CENTER)
       .menuItem(LibraryMenuAndToolBar.FILE, LibraryMenuAndToolBar.LOAD_LIBRARY, controller.loadLibrary)
       .menuItem(LibraryMenuAndToolBar.FILE, LibraryMenuAndToolBar.SAVE_LIBRARY, controller.saveLibrary)
       .menuItemSeparator(LibraryMenuAndToolBar.FILE)
       .menuItemEvent(LibraryMenuAndToolBar.FILE, "Kilépés", closeFrame)
-      .menuItems("Nyelv", TextIdaLibrary.languages, TextIdaLibrary.onLanguageSelected)
+      .menuItems("Nyelv", texts.languages, texts.onLanguageSelected)
       .menuItemEvent("Debug", "Napló ablak", LogWindow.show)
       .menuItem("Debug", "Napló másolása a vágólapra", ClipboardPlus.copyToClipboard(getAllLogs))
-      .menuItem("Debug", "Registry adatok törlése", RegistryPlus.clear(TITLE)) // FIXME!!! remember takes the title of the JFrame! should take name of JFrame!!!!
+      .menuItem("Debug", "Registry adatok törlése", RegistryPlus.clear(IdaLibrary.getClass.getName)) // FIXME!!! remember takes the title of the JFrame! should take name of JFrame!!!!
       .menuItem("Segítség", "Hibajelentés emailben", writeEmail)
       .menuItem("Segítség", "About", showAbout)
+      .onCloseDisposeWithCondition(confirmExit)
+      .onWindowClosed({ LogWindow.close; WebCam.stop })
+      .packAndSetVisible
+      .positionToCenter
+      .maximize
 
     controller.initBindings // TODO has to be after get view (set selection model for list)
 
-    val initFocusComponent = controller.getComponentForFocus()
-    if (initFocusComponent != null) initFocusComponent.requestFocusInWindow()
+    val initFocusComponent = controller.getComponentForFocus
+    if (initFocusComponent != null) initFocusComponent.requestFocusInWindow
   }
 }
