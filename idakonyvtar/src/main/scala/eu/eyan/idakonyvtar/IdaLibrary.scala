@@ -42,7 +42,6 @@ import eu.eyan.util.text.Text._
 
 object IdaLibrary {
 
-  // TODO - összes java test megszüntetése
   // TODO - tabs for more libraries
   // TODO - tabok bezárása
   // TODO - changed * for the libs and by close show not saved and so on.
@@ -134,24 +133,22 @@ class IdaLibrary {
 
     // TODO observable stringContext? : https://docs.scala-lang.org/overviews/core/string-interpolation.html
 
-    
-
     frame
       .name(classOf[IdaLibrary].getName) // TODO refact dont use the same text for name and title
       .title(emptySingularPlural(controller.numberOfBooks, texts.IdaLibraryTitleEmpty, texts.IdaLibraryTitleSingular, texts.IdaLibraryTitlePlural(controller.numberOfBooks)))
       .iconFromChar('I')
       .addFluent(toolBar, BorderLayout.NORTH)
       .addFluent(controller.getView, BorderLayout.CENTER)
-      .menuItem2(texts.MenuFile, texts.MenuFileLoad, controller.loadLibrary)
-      .menuItem2(texts.MenuFile, texts.MenuFileSave, controller.saveLibrary)
-      .menuItemSeparator2(texts.MenuFile)
-      .menuItemEvent2(texts.MenuFile, texts.MenuFileExit, closeFrame)
-      .menuItems2(texts.MenuLanguages, texts.languages, texts.onLanguageSelected)
-      .menuItemEvent2(texts.MenuDebug, texts.MenuDebugLogWindow, LogWindow.show)
-      .menuItem2(texts.MenuDebug, texts.MenuDebugCopyLogs,  ClipboardPlus.copyToClipboard(getAllLogs))
-      .menuItem2(texts.MenuDebug, texts.MenuDebugClearRegistry,  RegistryPlus.clear(classOf[IdaLibrary].getName)) // FIXME!!! remember takes the title of the JFrame! should take name of JFrame!!!!
-      .menuItem2(texts.MenuHelp, texts.MenuHelpEmailError, writeEmail)
-      .menuItem2(texts.MenuHelp, texts.MenuHelpAbout, showAbout)
+      .menuItem(texts.MenuFile, texts.MenuFileLoad, controller.loadLibrary:Unit)
+      .menuItem(texts.MenuFile, texts.MenuFileSave, controller.saveLibrary:Unit)
+      .menuItemSeparator(texts.MenuFile)
+      .menuItemEvent(texts.MenuFile, texts.MenuFileExit, closeFrame)
+      .menuItems(texts.MenuLanguages, texts.languages, texts.onLanguageSelected:String=>Unit)
+      .menuItemEvent(texts.MenuDebug, texts.MenuDebugLogWindow, LogWindow.show)
+      .menuItem(texts.MenuDebug, texts.MenuDebugCopyLogs,  ClipboardPlus.copyToClipboard(getAllLogs))
+      .menuItem(texts.MenuDebug, texts.MenuDebugClearRegistry,  RegistryPlus.clear(classOf[IdaLibrary].getName)) // FIXME!!! remember takes the title of the JFrame! should take name of JFrame!!!!
+      .menuItem(texts.MenuHelp, texts.MenuHelpEmailError, writeEmail)
+      .menuItem(texts.MenuHelp, texts.MenuHelpAbout, showAbout:Unit)
       .onCloseDisposeWithCondition(confirmExit)
       .onWindowClosed({ LogWindow.close; WebCam.stop })
       .packAndSetVisible
