@@ -36,6 +36,9 @@ import eu.eyan.idakonyvtar.view.LibraryMenuAndToolBar
 import eu.eyan.idakonyvtar.text.LanguageHandler
 import rx.lang.scala.subjects.BehaviorSubject
 import eu.eyan.util.string.StringPlus.StringPlusImplicit
+import java.util.Locale
+import rx.lang.scala.Observable
+import eu.eyan.util.text.Text._
 
 object IdaLibrary {
 
@@ -117,40 +120,38 @@ class IdaLibrary {
     controller.initData(new LibraryControllerInput(fileToOpen))
 
     lazy val frame: JFrame = new JFrame()
-    lazy val texts = new LanguageHandler(IdaLibrary.getClass.getName)
+    lazy val texts = new LanguageHandler(classOf[IdaLibrary].getName)
 
-    def confirmExit(frame: JFrame) = DialogHelper.yesNo(frame, texts.TextExitWindowConfirmQuestion.get, "Megerősítés")
-    def closeFrame(frame: JFrame) = frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+    def confirmExit(frame: JFrame) = DialogHelper.yesNo(frame, texts.ExitWindowConfirmQuestion, texts.ExitWindowTitle, texts.ExitWindowYes, texts.ExitWindowNo)
+    def closeFrame(frame: JFrame) = frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING))
 
-    def getAllLogs = {
-      Alert.alert("Kérem ellenőrizze az adatokat. A naplófájlok tartalmazhatnak személyes információkat, pl. könyvek adatai.")
-      val loggerLogs = LogWindow.getAllLogs
-      loggerLogs
-    }
+    def getAllLogs = { Alert.alert(texts.CopyLogsWindowText); LogWindow.getAllLogs }
 
-    def showAbout = Alert.alert("Személyes használatra. A készítő nem vállal felelősséget a program használatából eredő károkért. A program külső forrásból próbálhat adatokat gyűjteni ennek a következményeiért is a felhasználó a felelős.")
+    def showAbout = Alert.alert(texts.AboutWindowText)
 
     def writeEmail =
       Desktop.getDesktop.mail(new URI("mailto:idalibrary@eyan.hu?subject=IdaLibrary%20error&body=" + URLEncoder.encode(getAllLogs, "utf-8").replace("+", "%20")))
 
     // TODO observable stringContext? : https://docs.scala-lang.org/overviews/core/string-interpolation.html
 
+    
+
     frame
-      .name(IdaLibrary.getClass.getName) // TODO refact dont use the same text for name and title
-      .title(texts.TextIdaLibraryTitle(controller.numberOfBooks))
+      .name(classOf[IdaLibrary].getName) // TODO refact dont use the same text for name and title
+      .title(emptySingularPlural(controller.numberOfBooks, texts.IdaLibraryTitleEmpty, texts.IdaLibraryTitleSingular, texts.IdaLibraryTitlePlural(controller.numberOfBooks)))
       .iconFromChar('I')
       .addFluent(toolBar, BorderLayout.NORTH)
       .addFluent(controller.getView, BorderLayout.CENTER)
-      .menuItem(LibraryMenuAndToolBar.FILE, LibraryMenuAndToolBar.LOAD_LIBRARY, controller.loadLibrary)
-      .menuItem(LibraryMenuAndToolBar.FILE, LibraryMenuAndToolBar.SAVE_LIBRARY, controller.saveLibrary)
-      .menuItemSeparator(LibraryMenuAndToolBar.FILE)
-      .menuItemEvent(LibraryMenuAndToolBar.FILE, "Kilépés", closeFrame)
-      .menuItems("Nyelv", texts.languages, texts.onLanguageSelected)
-      .menuItemEvent("Debug", "Napló ablak", LogWindow.show)
-      .menuItem("Debug", "Napló másolása a vágólapra", ClipboardPlus.copyToClipboard(getAllLogs))
-      .menuItem("Debug", "Registry adatok törlése", RegistryPlus.clear(IdaLibrary.getClass.getName)) // FIXME!!! remember takes the title of the JFrame! should take name of JFrame!!!!
-      .menuItem("Segítség", "Hibajelentés emailben", writeEmail)
-      .menuItem("Segítség", "About", showAbout)
+      .menuItem2(texts.MenuFile, texts.MenuFileLoad, controller.loadLibrary)
+      .menuItem2(texts.MenuFile, texts.MenuFileSave, controller.saveLibrary)
+      .menuItemSeparator2(texts.MenuFile)
+      .menuItemEvent2(texts.MenuFile, texts.MenuFileExit, closeFrame)
+      .menuItems2(texts.MenuLanguages, texts.languages, texts.onLanguageSelected)
+      .menuItemEvent2(texts.MenuDebug, texts.MenuDebugLogWindow, LogWindow.show)
+      .menuItem2(texts.MenuDebug, texts.MenuDebugCopyLogs,  ClipboardPlus.copyToClipboard(getAllLogs))
+      .menuItem2(texts.MenuDebug, texts.MenuDebugClearRegistry,  RegistryPlus.clear(classOf[IdaLibrary].getName)) // FIXME!!! remember takes the title of the JFrame! should take name of JFrame!!!!
+      .menuItem2(texts.MenuHelp, texts.MenuHelpEmailError, writeEmail)
+      .menuItem2(texts.MenuHelp, texts.MenuHelpAbout, showAbout)
       .onCloseDisposeWithCondition(confirmExit)
       .onWindowClosed({ LogWindow.close; WebCam.stop })
       .packAndSetVisible

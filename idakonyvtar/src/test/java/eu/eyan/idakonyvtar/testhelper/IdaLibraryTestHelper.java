@@ -20,7 +20,7 @@ public class IdaLibraryTestHelper {
 
 	public void start(String filenév) {
 		IdaLibrary.main(new String[] { filenév });
-		frame = new FrameFixture(LanguageHandler.TITLE());
+		frame = new FrameFixture(IdaLibrary.class.getName());
 		frame.target.toFront();
 	}
 
@@ -41,19 +41,18 @@ public class IdaLibraryTestHelper {
 	}
 
 	public void load(File file) {
-		clickMenu(LibraryMenuAndToolBar.FILE());
-		clickMenu(LibraryMenuAndToolBar.LOAD_LIBRARY());
+		clickMenu("File");
+		clickMenu("Load");
 		frame.fileChooser().selectFile(file).approve();
 	}
 
 	public void assertTableCell(int col, int row, String content) {
-		assertThat(frame.table().contents()[row - 1][col - 1]).isEqualTo(
-				content);
+		assertThat(frame.table().contents()[row - 1][col - 1]).isEqualTo(content);
 	}
 
 	public void save(File file) {
-		clickMenu(LibraryMenuAndToolBar.FILE());
-		clickMenu(LibraryMenuAndToolBar.SAVE_LIBRARY());
+		clickMenu("File");
+		clickMenu("Save");
 		frame.fileChooser().selectFile(file).approve();
 	}
 
@@ -67,7 +66,7 @@ public class IdaLibraryTestHelper {
 	}
 
 	public void requireDeleteDisabled() {
-		frame.button(LibraryMenuAndToolBar.DELETE_BOOK()).requireDisabled();
+		frame.button("Book törlése").requireDisabled();
 
 	}
 
@@ -76,21 +75,19 @@ public class IdaLibraryTestHelper {
 	}
 
 	public void requireDeleteEnabled() {
-		frame.button(LibraryMenuAndToolBar.DELETE_BOOK()).requireEnabled();
+		frame.button("Book törlése").requireEnabled();
 	}
 
 	public void clickDeleteButton() {
-		frame.button(LibraryMenuAndToolBar.DELETE_BOOK()).click();
+		frame.button("Book törlése").click();
 	}
 
 	public void clickApproveYes() {
-		frame.dialog().button(JButtonMatcher.withText(LanguageHandler.YES()))
-				.click();
+		frame.dialog().button(JButtonMatcher.withText(LanguageHandler.YES())).click();
 	}
 
 	public void clickApproveNo() {
-		frame.dialog().button(JButtonMatcher.withText(LanguageHandler.NO()))
-				.click();
+		frame.dialog().button(JButtonMatcher.withText(LanguageHandler.NO())).click();
 	}
 
 	public void filter(String filter) {
@@ -114,7 +111,12 @@ public class IdaLibraryTestHelper {
 	}
 
 	public void checkTitleWithNumber(int numberOfBooks) {
-		requireTitle("IdaKönyvtár - " + numberOfBooks + "db könyv");
+		if (numberOfBooks == 0)
+			requireTitle("IdaLibrary - no books");
+		else if (numberOfBooks == 1)
+			requireTitle("IdaLibrary - one book");
+		else
+			requireTitle("IdaLibrary - " + numberOfBooks + " books");
 	}
 
 	public void clickExit() {

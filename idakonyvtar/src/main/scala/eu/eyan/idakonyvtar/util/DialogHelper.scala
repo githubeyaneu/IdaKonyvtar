@@ -29,6 +29,7 @@ import eu.eyan.util.swing.JPanelWithFrameLayout
 import javax.swing.JPanel
 import eu.eyan.util.awt.ComponentPlus.ComponentPlusImplicit
 import eu.eyan.util.swing.JDialogPlus.JdialogPlusImplicit
+import eu.eyan.util.text.Text
 
 object DialogHelper {
 
@@ -87,22 +88,24 @@ object DialogHelper {
 
   def getButtons(dialog: OkCancelDialog, dialogController: IDialogController[_, _]) = {
     val panel = new JPanelWithFrameLayout().withSeparators.newColumn("pref:grow")
-    
+
     panel.newColumn
-    panel.addButton(SAVE).name(SAVE).onAction( {dialogController.onOk(); dialog.setOk(true); dialog.dispose()})
-    
+    panel.addButton(SAVE).name(SAVE).onAction({ dialogController.onOk(); dialog.setOk(true); dialog.dispose() })
+
     panel.newColumn
-    panel.addButton(CANCEL).name(CANCEL).onAction( {dialogController.onCancel(); dialog.dispose()})
+    panel.addButton(CANCEL).name(CANCEL).onAction({ dialogController.onCancel(); dialog.dispose() })
     panel
   }
 
-  def yesNo(parent: Component, question: String, dialogTitle: String) =
-    JOptionPane.showOptionDialog(parent,
-      question,
-      dialogTitle,
-      JOptionPane.YES_NO_OPTION,
-      JOptionPane.QUESTION_MESSAGE,
-      null,
-      Array[Object]("Igen", CANCEL),
-      CANCEL) == JOptionPane.OK_OPTION
+  def yesNo(parent: Component, question: Text, dialogTitle: Text, yes: Text, no: Text) =
+    Text.combineAndExecute("question" -> question, "title" -> dialogTitle, "yes" -> yes, "no" -> no)(texts =>
+      JOptionPane.showOptionDialog(
+        parent,
+        texts("question"),
+        texts("title"),
+        JOptionPane.YES_NO_OPTION,
+        JOptionPane.QUESTION_MESSAGE,
+        null,
+        Array[Object](texts("yes"), texts("no")),
+        texts("no")) == JOptionPane.OK_OPTION)
 }
