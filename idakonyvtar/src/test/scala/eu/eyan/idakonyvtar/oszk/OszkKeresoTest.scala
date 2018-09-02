@@ -23,24 +23,26 @@ class OszkKeresoTest {
   @Test def isbnKeresOszkban_muxik() = {
     try {
       assertThat(OszkKereso.isbnKeresOszkban(ABIGEL_ISBN)).contains("Abigél");
-    }
-    catch {
+    } catch {
       case e: IOException => { e.printStackTrace(); Fail.fail(e.getMessage()) }
     }
   }
 
   @Test def marc_parse_muxik() = {
     val abigel = OszkKereso.getMarcsToIsbn(ABIGEL_ISBN);
-    assertThat(findMarc(abigel, MarcCodes.CIM)).isEqualTo("Abigél");
+    assertThat(findMarc(abigel, CIM)).isEqualTo("Abigél");
 
     val marai = OszkKereso.getMarcsToIsbn("9789632273822");
-    assertThat(findMarc(marai, MarcCodes.CIM)).isEqualTo("Hallgatni akartam");
+    assertThat(findMarc(marai, CIM)).isEqualTo("Hallgatni akartam");
   }
 
   def findMarc(marcs: List[Marc], marcCode: MarcCodes) = {
     marcs.filter(marc =>
-      marcCode.getMarc1().equals(marc.marc1)
-        && marcCode.getMarc2().equals(marc.marc2)
-        && marcCode.getMarc3().equals(marc.marc3)).headOption.getOrElse(null).value
+      marcCode.marc1.equals(marc.marc1)
+        && marcCode.marc2.equals(marc.marc2)
+        && marcCode.marc3.equals(marc.marc3)).headOption.getOrElse(null).value
   }
+
+  class MarcCodes(val marc1: String, val marc2: String, val marc3: String)
+  case object CIM extends MarcCodes("245", "10", "a")
 }
