@@ -10,13 +10,16 @@ import java.awt.Dimension
 import com.github.sarxos.webcam.WebcamResolution
 import com.github.sarxos.webcam.WebcamPanel
 import javax.swing.JFrame
+import eu.eyan.testutil.TestPlus
 
 @RunWith(classOf[ScalaEclipseJunitRunner])
-class WebCamTest {
-  @Test
+class WebCamTest extends TestPlus{
+  
+//  @Test
   def takePhoto = {
     //https://github.com/sarxos/webcam-capture
     val webcam = Webcam.getDefault
+    waitFor(webcam.isOpen ==> false, 1000)
     webcam.setViewSize(webcam.getViewSizes.last)
     webcam.open
     val image = webcam.getImage
