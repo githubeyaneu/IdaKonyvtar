@@ -9,26 +9,20 @@ import org.junit.Rule
 import org.junit.rules.Timeout
 import org.junit.runner.RunWith
 import eu.eyan.testutil.video.VideoRunner
+import eu.eyan.testutil.TestPlus
+import org.junit.Before
 
 object AbstractUiTest {
-
-  @BeforeClass
-  def setUpClass(): Unit = {
-    EmergencyAbortListener.registerInToolkit()
-  }
-
+  @BeforeClass def setUpClass = EmergencyAbortListener.registerInToolkit
 }
 
 @RunWith(classOf[VideoRunner])
-abstract class AbstractUiTest {
+abstract class AbstractUiTest extends TestPlus {
 
-  val globalTimeout_ : Timeout = new Timeout(60, TimeUnit.SECONDS)
+  @Before def setUpAbstractUiTest = EmergencyAbortListener.registerInToolkit
+  
+  val globalTimeout_ : Timeout = new Timeout(30, TimeUnit.SECONDS)
+  @Rule def globalTimeout = globalTimeout_
 
-  @Rule
-  def globalTimeout = globalTimeout_
-
-  protected def pause(ms: Long): Unit = {
-    Pause.pause(ms)
-  }
-
+  protected def pause(ms: Long) = Pause.pause(ms) 
 }

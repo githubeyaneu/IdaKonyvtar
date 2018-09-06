@@ -1,44 +1,27 @@
 package eu.eyan.idakonyvtar
 
+import java.awt.BorderLayout
+import java.awt.Desktop
+import java.awt.event.WindowEvent
 import java.io.File
-
-import com.google.common.io.Resources
+import java.net.URI
+import java.net.URLEncoder
 
 import eu.eyan.idakonyvtar.controller.LibraryController
 import eu.eyan.idakonyvtar.controller.input.LibraryControllerInput
+import eu.eyan.idakonyvtar.text.LanguageHandler
 import eu.eyan.idakonyvtar.text.LanguageHandler._
+import eu.eyan.idakonyvtar.util.DialogHelper
+import eu.eyan.idakonyvtar.util.WebCam
 import eu.eyan.log.Log
 import eu.eyan.log.LogWindow
-import eu.eyan.util.awt.AwtHelper.onWindowClosing
-import eu.eyan.idakonyvtar.util.WebCam
-import javax.swing.JMenuBar
-import org.jdesktop.swingx.JXFrame
-import javax.swing.JToolBar
-import eu.eyan.idakonyvtar.controller.IController
-import java.awt.Component
-import java.awt.BorderLayout
-import javax.swing.JFrame
-import java.awt.Frame
-import eu.eyan.idakonyvtar.controller.IControllerWithMenu
-import eu.eyan.util.swing.JFramePlus.JFramePlusImplicit
-import eu.eyan.util.awt.ComponentPlus.ComponentPlusImplicit
-import javax.swing.WindowConstants
-import java.awt.event.WindowAdapter
-import java.awt.event.WindowEvent
-import eu.eyan.idakonyvtar.util.DialogHelper
 import eu.eyan.util.awt.clipboard.ClipboardPlus
-import eu.eyan.util.swing.Alert
 import eu.eyan.util.registry.RegistryPlus
-import java.awt.Desktop
-import java.net.URI
-import java.net.URLEncoder
-import eu.eyan.idakonyvtar.view.LibraryMenuAndToolBar
-import eu.eyan.idakonyvtar.text.LanguageHandler
-import rx.lang.scala.subjects.BehaviorSubject
 import eu.eyan.util.string.StringPlus.StringPlusImplicit
-import java.util.Locale
-import rx.lang.scala.Observable
+import eu.eyan.util.swing.Alert
+import eu.eyan.util.swing.JFramePlus.JFramePlusImplicit
 import eu.eyan.util.text.Text._
+import javax.swing.JFrame
 
 object IdaLibrary {
 
@@ -124,12 +107,22 @@ class IdaLibrary {
     def confirmExit(frame: JFrame) = DialogHelper.yesNo(frame, texts.ExitWindowConfirmQuestion, texts.ExitWindowTitle, texts.ExitWindowYes, texts.ExitWindowNo)
     def closeFrame(frame: JFrame) = frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING))
 
-    def getAllLogs = { Alert.alert(texts.CopyLogsWindowText); LogWindow.getAllLogs }
+    def formatAllLogs = {
+      var logs = new StringBuilder()
+      def formatLog(log: Log) = Log.logToConsoleText(log) + "\r\n"
+      val s = Log.logsObservable.map(formatLog).subscribe(log => logs.append(log))
+      s.unsubscribe
+      logs.toString
+    }
+    def getAllLogs = { Alert.alert(texts.CopyLogsWindowTitle, texts.CopyLogsWindowText, texts.CopyLogsWindowButton); formatAllLogs }
 
-    def showAbout = Alert.alert(texts.AboutWindowText)
+    def showAbout: Unit = Alert.alert(texts.AboutWindowTitle, texts.AboutWindowText, texts.AboutWindowButton)
 
-    def writeEmail =
-      Desktop.getDesktop.mail(new URI("mailto:idalibrary@eyan.hu?subject=IdaLibrary%20error&body=" + URLEncoder.encode(getAllLogs, "utf-8").replace("+", "%20")))
+    def writeEmail = {
+      val desktop = Desktop.getDesktop
+      Log.info(desktop)
+      desktop.mail(new URI("mailto:idalibrary@eyan.hu?subject=IdaLibrary%20error&body=" + URLEncoder.encode(getAllLogs, "utf-8").replace("\\+", "%20")))
+    }
 
     // TODO observable stringContext? : https://docs.scala-lang.org/overviews/core/string-interpolation.html
 
@@ -139,16 +132,16 @@ class IdaLibrary {
       .iconFromChar('I')
       .addFluent(toolBar, BorderLayout.NORTH)
       .addFluent(controller.getView, BorderLayout.CENTER)
-      .menuItem(texts.MenuFile, texts.MenuFileLoad, controller.loadLibrary:Unit)
-      .menuItem(texts.MenuFile, texts.MenuFileSave, controller.saveLibrary:Unit)
+      .menuItem(texts.MenuFile, texts.MenuFileLoad, controller.loadLibrary: Unit)
+      .menuItem(texts.MenuFile, texts.MenuFileSave, controller.saveLibrary: Unit)
       .menuItemSeparator(texts.MenuFile)
       .menuItemEvent(texts.MenuFile, texts.MenuFileExit, closeFrame)
-      .menuItems(texts.MenuLanguages, texts.languages, texts.onLanguageSelected:String=>Unit)
+      .menuItems(texts.MenuLanguages, texts.languages, texts.onLanguageSelected: String => Unit)
       .menuItemEvent(texts.MenuDebug, texts.MenuDebugLogWindow, LogWindow.show)
-      .menuItem(texts.MenuDebug, texts.MenuDebugCopyLogs,  ClipboardPlus.copyToClipboard(getAllLogs))
-      .menuItem(texts.MenuDebug, texts.MenuDebugClearRegistry,  RegistryPlus.clear(classOf[IdaLibrary].getName)) // FIXME!!! remember takes the title of the JFrame! should take name of JFrame!!!!
+      .menuItem(texts.MenuDebug, texts.MenuDebugCopyLogs, ClipboardPlus.copyToClipboard(getAllLogs))
+      .menuItem(texts.MenuDebug, texts.MenuDebugClearRegistry, RegistryPlus.clear(classOf[IdaLibrary].getName)) // FIXME!!! remember takes the title of the JFrame! should take name of JFrame!!!!
       .menuItem(texts.MenuHelp, texts.MenuHelpEmailError, writeEmail)
-      .menuItem(texts.MenuHelp, texts.MenuHelpAbout, showAbout:Unit)
+      .menuItem(texts.MenuHelp, texts.MenuHelpAbout, showAbout)
       .onCloseDisposeWithCondition(confirmExit)
       .onWindowClosed({ LogWindow.close; WebCam.stop })
       .packAndSetVisible

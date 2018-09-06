@@ -25,13 +25,12 @@ object LanguageHandler {
 
   // TODO make a Registry class (not object) to remove code duplication
   // TODO make a RegistryParam class (not object) to remove code duplication
-  lazy val registryLanguageParameter = LanguageHandler.getClass.getName
+  lazy val registryLanguageParameter = classOf[LanguageHandler].getName
   def readStoredLanguageFromRegistry(registryName: String) = RegistryPlus.readOption(registryName, registryLanguageParameter)
   def saveSelectedLanguageInRegistry(registryName: String)(selectedLanguage: String) = RegistryPlus.write(registryName, registryLanguageParameter, selectedLanguage)
 }
 
 class LanguageHandler(registryName: String) { // TODO rename LanguageHandler
-
 
   lazy val translationsXls = "translations.xls".toResourceFile.get
   lazy val translationsTable = ExcelHandler.readExcel(translationsXls, "translations")
@@ -46,8 +45,7 @@ class LanguageHandler(registryName: String) { // TODO rename LanguageHandler
 
   lazy val language = BehaviorSubject[String](usedLanguage)
 
-
-  def selectLanguageByDialog = Alert.alertOptions("Please select your language!", languages.toArray)
+  def selectLanguageByDialog = Alert.alertOptions("Language selection", "Please select your language!", languages.toArray)
 
   def getTextTranslation(technicalName: String, language: String) = {
     Log.debug(s"TechnicalName=$technicalName, language=$language")
@@ -55,13 +53,15 @@ class LanguageHandler(registryName: String) { // TODO rename LanguageHandler
     Log.debug("Language col " + translationColumnIndex)
     val rowIndex = translationsTable.rowIndex(technicalName)
     Log.debug("technicalName row " + rowIndex)
-    if (translationColumnIndex.nonEmpty && rowIndex.nonEmpty) {
+    val translation = if (translationColumnIndex.nonEmpty && rowIndex.nonEmpty) {
       val option = translationsTable.cells.get((translationColumnIndex.get, rowIndex.get))
-      if(option.nonEmpty && option.get.nonEmpty) option
+      if (option.nonEmpty && option.get.nonEmpty) option
       else None
-    }
-    else 
+    } else
       None
+    Log.debug("translation " + translation)
+
+    translation
   }
 
   def onLanguageSelected(selectedLanguage: String) = {
@@ -72,11 +72,11 @@ class LanguageHandler(registryName: String) { // TODO rename LanguageHandler
   }
 
   def translate(technicalName: String)(language: String) = getTextTranslation(technicalName, language) // this.getClass.getSimpleName.replace("$", "")
-  def optionGetOrElse(orElse:String)(option: Option[String]) = option.getOrElse(orElse)
+  def optionGetOrElse(orElse: String)(option: Option[String]) = option.getOrElse(orElse)
   def noTranslation(technicalName: String) = s"**$technicalName**"
-  
+
   protected class IdaText(private val technicalName: String, private val args: Observable[Any]*) extends Text(BehaviorSubject(noTranslation(technicalName)), args: _*) {
-	  lazy val translateText = translate(technicalName)(_)
+    lazy val translateText = translate(technicalName)(_)
     lazy val translated = language map translateText
     lazy val validTranslationObs = translated map optionGetOrElse(noTranslation(technicalName))
     validTranslationObs subscribe template

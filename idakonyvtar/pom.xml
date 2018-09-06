@@ -303,13 +303,20 @@ idakonyvtar@eyan.eu</description>
 			<scope>test</scope>
 		</dependency>
 
+<!-- 		<dependency> -->
+<!-- 			<groupId>org.mockito</groupId> -->
+<!-- 			<artifactId>mockito-all</artifactId> -->
+<!-- 			<version>1.8.4</version> -->
+<!-- 			<scope>test</scope> -->
+<!-- 		</dependency> -->
+		<!-- https://mvnrepository.com/artifact/org.mockito/mockito-core -->
 		<dependency>
 			<groupId>org.mockito</groupId>
-			<artifactId>mockito-all</artifactId>
-			<version>1.8.4</version>
+			<artifactId>mockito-core</artifactId>
+			<version>2.20.1</version>
 			<scope>test</scope>
 		</dependency>
-
+		
 		<dependency>
 			<groupId>ch.randelshofer</groupId>
 			<artifactId>monte</artifactId>

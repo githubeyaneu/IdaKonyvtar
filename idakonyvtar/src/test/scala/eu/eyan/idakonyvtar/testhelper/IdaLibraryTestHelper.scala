@@ -13,16 +13,24 @@ import org.fest.swing.fixture.FrameFixture
 import eu.eyan.idakonyvtar.IdaLibrary
 import eu.eyan.idakonyvtar.text.LanguageHandler
 import eu.eyan.idakonyvtar.view.LibraryMenuAndToolBar
+import eu.eyan.testutil.TestPlus
+import org.fest.swing.fixture.JMenuItemFixture
+import eu.eyan.log.Log
+import org.fest.swing.core.Robot
+import org.fest.swing.core.BasicRobot
+import org.fest.swing.exception.ComponentLookupException
 
-class IdaLibraryTestHelper {
+class IdaLibraryTestHelper extends TestPlus {
 
-  private var frame: FrameFixture = _
+	lazy val robot = BasicRobot.robotWithCurrentAwtHierarchy
+  lazy val frame = new FrameFixture(robot, classOf[IdaLibrary].getName)
+  def dialog = frame.dialog
+  
+  def start: IdaLibraryTestHelper = start()
+  def start(filenév: String = null) = { IdaLibrary.main(Array(filenév)); this }
 
-  def start(filenév: String): Unit = {
-    IdaLibrary.main(Array(filenév))
-    frame = new FrameFixture(classOf[IdaLibrary].getName)
-    frame.target.toFront()
-  }
+
+  def toFront = frame.target.toFront
 
   def requireVisible(): Unit = {
     assertThat(frame.target.isVisible).isTrue
@@ -40,15 +48,20 @@ class IdaLibraryTestHelper {
     frame.menuItem(menuPoint).click()
   }
 
+  implicit class JMenuItemFixtureImplicit(menuItem: JMenuItemFixture) {
+    def requireText(expected: String) = menuItem.component.getText ==> expected
+  }
+  def requireMenuText(expected: String, path: String*) = menuItem(path: _*).requireText(expected)
+
+  def menuItem(path: String*) = frame.menuItemWithPath(path: _*)
+
   def load(file: File): Unit = {
     clickMenu("File")
     clickMenu("Load")
     frame.fileChooser().selectFile(file).approve()
   }
 
-  def assertTableCell(col: Int, row: Int, content: String): Unit = {
-    assertThat(frame.table().contents()(row - 1)(col - 1)).isEqualTo(content)
-  }
+  def assertTableCell(col: Int, row: Int, content: String) = assertThat(frame.table().contents()(row - 1)(col - 1)).isEqualTo(content)
 
   def save(file: File): Unit = {
     clickMenu("File")
@@ -56,11 +69,9 @@ class IdaLibraryTestHelper {
     frame.fileChooser().selectFile(file).approve()
   }
 
-  def clickNewButton(): Unit = {
-    frame.button(LibraryMenuAndToolBar.ADD_NEW_BOOK).click()
-  }
+  def clickNewButton = frame.button(LibraryMenuAndToolBar.ADD_NEW_BOOK).click()
 
-  def editor(): BookEditorTestHelper = new BookEditorTestHelper(frame.robot)
+  def editor = new BookEditorTestHelper(frame.robot)
 
   def requireDeleteDisabled(): Unit = {
     frame.button("Book törlése").requireDisabled()
@@ -108,9 +119,7 @@ class IdaLibraryTestHelper {
     frame.table().robot.click(firstRow, MouseButton.LEFT_BUTTON, 2)
   }
 
-  def cleanUp(): Unit = {
-    frame.cleanUp()
-  }
+  def cleanUp = frame.cleanUp
 
   def checkTitleWithNumber(numberOfBooks: Int): Unit = {
     if (numberOfBooks == 0) requireTitle("IdaLibrary - no books")
@@ -118,16 +127,11 @@ class IdaLibraryTestHelper {
     else requireTitle("IdaLibrary - " + numberOfBooks + " books")
   }
 
-  def clickExit(): Unit = {
-    frame.close()
-  }
+  def clickExit = frame.close()
 
-  def exitDialog(): DialogFixture = frame.dialog()
+  def requireInvisible = assertThat(frame.target.isVisible).isFalse
+  
+  def requireNotExists = expectThrowable(classOf[ComponentLookupException], {frame})
 
-  def requireInvisible(): Unit = {
-    assertThat(frame.target.isVisible).isFalse
-  }
-
-  def getComponentToRecord(): Component = frame.target
-
+  def getComponentToRecord = frame.target
 }
