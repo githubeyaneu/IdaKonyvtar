@@ -12,7 +12,7 @@ import IdaLibraryTestNoLanguage.library
 import eu.eyan.idakonyvtar.model.ColumnConfigurations
 import eu.eyan.idakonyvtar.testhelper.IdaLibraryTestHelper
 import eu.eyan.idakonyvtar.testhelper.LibraryFileBuilder
-import eu.eyan.idakonyvtar.text.LanguageHandler
+import eu.eyan.idakonyvtar.text.TextsIda
 import eu.eyan.idakonyvtar.util.ExcelHandler
 import eu.eyan.idakonyvtar.view.LibraryMenuAndToolBar
 import eu.eyan.testutil.ExcelAssert

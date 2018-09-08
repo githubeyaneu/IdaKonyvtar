@@ -11,7 +11,7 @@ import org.fest.swing.fixture.DialogFixture
 import org.fest.swing.fixture.FrameFixture
 
 import eu.eyan.idakonyvtar.IdaLibrary
-import eu.eyan.idakonyvtar.text.LanguageHandler
+import eu.eyan.idakonyvtar.text.TextsIda
 import eu.eyan.idakonyvtar.view.LibraryMenuAndToolBar
 import eu.eyan.testutil.TestPlus
 import org.fest.swing.fixture.JMenuItemFixture
@@ -92,14 +92,14 @@ class IdaLibraryTestHelper extends TestPlus {
   def clickApproveYes(): Unit = {
     frame
       .dialog()
-      .button(JButtonMatcher.withText(LanguageHandler.YES))
+      .button(JButtonMatcher.withText("Igen"))
       .click()
   }
 
   def clickApproveNo(): Unit = {
     frame
       .dialog()
-      .button(JButtonMatcher.withText(LanguageHandler.NO))
+      .button(JButtonMatcher.withText("Nem"))
       .click()
   }
 

@@ -14,10 +14,10 @@ object AbstractView {
 abstract class AbstractView extends IView {
   var view: Component = null
 
-  override def getComponent(): Component = {
-    if (this.view == null) this.view = createViewComponent()
+  override def getComponent: Component = {
+    if (this.view == null) this.view = createViewComponent
     view
   }
 
-  protected def createViewComponent(): Component
+  protected def createViewComponent: Component
 }

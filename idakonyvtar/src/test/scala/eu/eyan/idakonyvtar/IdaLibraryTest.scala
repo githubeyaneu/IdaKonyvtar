@@ -11,7 +11,7 @@ import org.junit.Test
 import eu.eyan.idakonyvtar.model.ColumnConfigurations
 import eu.eyan.idakonyvtar.testhelper.IdaLibraryTestHelper
 import eu.eyan.idakonyvtar.testhelper.LibraryFileBuilder
-import eu.eyan.idakonyvtar.text.LanguageHandler
+import eu.eyan.idakonyvtar.text.TextsIda
 import eu.eyan.idakonyvtar.util.ExcelHandler
 import eu.eyan.idakonyvtar.view.LibraryMenuAndToolBar
 import eu.eyan.testutil.ExcelAssert
@@ -41,7 +41,7 @@ class IdaLibraryTest extends AbstractUiTest {
 
   @Before
   def setUp = {
-    LanguageHandler.saveSelectedLanguageInRegistry(classOf[IdaLibrary].getName)("English")
+    RegistryPlus.write(classOf[IdaLibrary].getName, classOf[TextsIda].getName, "English")
     library.start.toFront
     VideoRunner.setComponentToRecord(library.getComponentToRecord)
   }
@@ -256,10 +256,10 @@ class IdaLibraryTest extends AbstractUiTest {
 
   @Test
   def clearRegistry = {
-    RegistryPlus.readOption(classOf[IdaLibrary].getName, classOf[LanguageHandler].getName).get ==> "English"
+    RegistryPlus.readOption(classOf[IdaLibrary].getName, classOf[TextsIda].getName).get ==> "English"
     RegistryPlus.write(classOf[IdaLibrary].getName, "test", "xyz")
     library.menuItem("Debug", "Clear registry").click
-    RegistryPlus.readOption(classOf[IdaLibrary].getName, classOf[LanguageHandler].getName) ==> None
+    RegistryPlus.readOption(classOf[IdaLibrary].getName, classOf[TextsIda].getName) ==> None
     RegistryPlus.readOption(classOf[IdaLibrary].getName, "test") ==> None
   }
 

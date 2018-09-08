@@ -19,7 +19,7 @@ object AbstractUiTest {
 @RunWith(classOf[VideoRunner])
 abstract class AbstractUiTest extends TestPlus {
 
-  @Before def setUpAbstractUiTest = EmergencyAbortListener.registerInToolkit
+  @Before def setUpAbstractUiTest = EmergencyAbortListener.registerInToolkit // TODO do a system exit also (wont execute any more test)
   
   val globalTimeout_ : Timeout = new Timeout(30, TimeUnit.SECONDS)
   @Rule def globalTimeout = globalTimeout_

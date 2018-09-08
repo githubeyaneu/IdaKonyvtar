@@ -9,8 +9,7 @@ import java.net.URLEncoder
 
 import eu.eyan.idakonyvtar.controller.LibraryController
 import eu.eyan.idakonyvtar.controller.input.LibraryControllerInput
-import eu.eyan.idakonyvtar.text.LanguageHandler
-import eu.eyan.idakonyvtar.text.LanguageHandler._
+import eu.eyan.idakonyvtar.text.TextsIda
 import eu.eyan.idakonyvtar.util.DialogHelper
 import eu.eyan.idakonyvtar.util.WebCam
 import eu.eyan.log.Log
@@ -22,6 +21,8 @@ import eu.eyan.util.swing.Alert
 import eu.eyan.util.swing.JFramePlus.JFramePlusImplicit
 import eu.eyan.util.text.Text._
 import javax.swing.JFrame
+import eu.eyan.util.swing.JFramePlus
+import eu.eyan.util.awt.ComponentPlus.ComponentPlusImplicit
 
 object IdaLibrary {
 
@@ -95,39 +96,30 @@ object IdaLibrary {
 }
 
 class IdaLibrary {
+
+	private lazy val texts = new TextsIda( classOf[IdaLibrary].getName , selectLanguageByDialog )
+	
+  private def selectLanguageByDialog(languages:Array[String]) = Alert.alertOptions("Language selection", "Please select your language!", languages)
+	
+	private def confirmExit(frame: JFrame) = DialogHelper.yesNo(frame, texts.ExitWindowConfirmQuestion, texts.ExitWindowTitle, texts.ExitWindowYes, texts.ExitWindowNo)
+	
+	private def getAllLogs = { Alert.alert(texts.CopyLogsWindowTitle, texts.CopyLogsWindowText, texts.CopyLogsWindowButton); Log.toString }
+	
+  private def showAbout: Unit = Alert.alert(texts.AboutWindowTitle, texts.AboutWindowText, texts.AboutWindowButton)
+  
+  private def writeEmail = Desktop.getDesktop.mail(new URI("mailto:idalibrary@eyan.hu?subject=IdaLibrary%20error&body=" + URLEncoder.encode(getAllLogs, "utf-8").replace("\\+", "%20")))
+  
   def startLibrary(fileToOpen: File) = {
-    val controller = new LibraryController
-    val toolBar = controller.getToolBar
 
+		val controller = new LibraryController
     controller.initData(new LibraryControllerInput(fileToOpen))
+    controller.getView
+    controller.initBindings // TODO has to be after get view (set selection model for list)
 
-    lazy val frame: JFrame = new JFrame()
-    lazy val texts = new LanguageHandler(classOf[IdaLibrary].getName)
+    val toolBar = controller.menuAndToolBar.getToolBar
 
-    def confirmExit(frame: JFrame) = DialogHelper.yesNo(frame, texts.ExitWindowConfirmQuestion, texts.ExitWindowTitle, texts.ExitWindowYes, texts.ExitWindowNo)
-    def closeFrame(frame: JFrame) = frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING))
-
-    def formatAllLogs = {
-      var logs = new StringBuilder()
-      def formatLog(log: Log) = Log.logToConsoleText(log) + "\r\n"
-      val s = Log.logsObservable.map(formatLog).subscribe(log => logs.append(log))
-      s.unsubscribe
-      logs.toString
-    }
-    def getAllLogs = { Alert.alert(texts.CopyLogsWindowTitle, texts.CopyLogsWindowText, texts.CopyLogsWindowButton); formatAllLogs }
-
-    def showAbout: Unit = Alert.alert(texts.AboutWindowTitle, texts.AboutWindowText, texts.AboutWindowButton)
-
-    def writeEmail = {
-      val desktop = Desktop.getDesktop
-      Log.info(desktop)
-      desktop.mail(new URI("mailto:idalibrary@eyan.hu?subject=IdaLibrary%20error&body=" + URLEncoder.encode(getAllLogs, "utf-8").replace("\\+", "%20")))
-    }
-
-    // TODO observable stringContext? : https://docs.scala-lang.org/overviews/core/string-interpolation.html
-
-    frame
-      .name(classOf[IdaLibrary].getName) // TODO refact dont use the same text for name and title
+    new JFrame()
+      .name(classOf[IdaLibrary].getName)
       .title(emptySingularPlural(controller.numberOfBooks, texts.IdaLibraryTitleEmpty, texts.IdaLibraryTitleSingular, texts.IdaLibraryTitlePlural(controller.numberOfBooks)))
       .iconFromChar('I')
       .addFluent(toolBar, BorderLayout.NORTH)
@@ -135,11 +127,11 @@ class IdaLibrary {
       .menuItem(texts.MenuFile, texts.MenuFileLoad, controller.loadLibrary: Unit)
       .menuItem(texts.MenuFile, texts.MenuFileSave, controller.saveLibrary: Unit)
       .menuItemSeparator(texts.MenuFile)
-      .menuItemEvent(texts.MenuFile, texts.MenuFileExit, closeFrame)
+      .menuItemEvent(texts.MenuFile, texts.MenuFileExit, JFramePlus.close)
       .menuItems(texts.MenuLanguages, texts.languages, texts.onLanguageSelected: String => Unit)
       .menuItemEvent(texts.MenuDebug, texts.MenuDebugLogWindow, LogWindow.show)
       .menuItem(texts.MenuDebug, texts.MenuDebugCopyLogs, ClipboardPlus.copyToClipboard(getAllLogs))
-      .menuItem(texts.MenuDebug, texts.MenuDebugClearRegistry, RegistryPlus.clear(classOf[IdaLibrary].getName)) // FIXME!!! remember takes the title of the JFrame! should take name of JFrame!!!!
+      .menuItem(texts.MenuDebug, texts.MenuDebugClearRegistry, RegistryPlus.clear(classOf[IdaLibrary].getName))
       .menuItem(texts.MenuHelp, texts.MenuHelpEmailError, writeEmail)
       .menuItem(texts.MenuHelp, texts.MenuHelpAbout, showAbout)
       .onCloseDisposeWithCondition(confirmExit)
@@ -147,10 +139,6 @@ class IdaLibrary {
       .packAndSetVisible
       .positionToCenter
       .maximize
-
-    controller.initBindings // TODO has to be after get view (set selection model for list)
-
-    val initFocusComponent = controller.getComponentForFocus
-    if (initFocusComponent != null) initFocusComponent.requestFocusInWindow
+      .focusComponentInWindow(controller.getComponentForFocus)
   }
 }

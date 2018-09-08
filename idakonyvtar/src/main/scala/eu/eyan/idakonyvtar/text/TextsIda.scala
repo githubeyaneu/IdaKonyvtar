@@ -13,39 +13,28 @@ import javax.swing.JFrame
 import eu.eyan.util.awt.ComponentPlus.ComponentPlusImplicit
 import eu.eyan.util.swing.Alert
 import javax.swing.JComboBox
+import eu.eyan.util.text.Texts
+import eu.eyan.util.registry.RegistryValue
 
 // TODO write tests
-object LanguageHandler {
-  val NO = "Nem"
-  val TITLE = "IdaKönyvtár"
-  val YES = "Igen"
-  val NO_BOOK_FOR_THE_FILTER = "Ilyen szűrőfeltételekkel nem található book."
-  val NO_BOOK_IN_THE_LIST = "Nincs book a listában."
-  val ERROR_AT_READING = "Hiba a beolvasáskor"
-
-  // TODO make a Registry class (not object) to remove code duplication
-  // TODO make a RegistryParam class (not object) to remove code duplication
-  lazy val registryLanguageParameter = classOf[LanguageHandler].getName
-  def readStoredLanguageFromRegistry(registryName: String) = RegistryPlus.readOption(registryName, registryLanguageParameter)
-  def saveSelectedLanguageInRegistry(registryName: String)(selectedLanguage: String) = RegistryPlus.write(registryName, registryLanguageParameter, selectedLanguage)
-}
-
-class LanguageHandler(registryName: String) { // TODO rename LanguageHandler
+class TextsIda(registryName: String, defaultLanguage: Array[String]=> Option[String]) extends Texts {
+  lazy val registryValue = RegistryValue(registryName, classOf[TextsIda].getName)
 
   lazy val translationsXls = "translations.xls".toResourceFile.get
   lazy val translationsTable = ExcelHandler.readExcel(translationsXls, "translations")
   lazy val languages = translationsTable.row(0).drop(2).filter(_.nonEmpty)
+  lazy val initialLanguage = registryValue.read orElse defaultLanguage(languages.toArray)
 
-  lazy val initialLanguage = LanguageHandler.readStoredLanguageFromRegistry(registryName) orElse selectLanguageByDialog
-
-  lazy val usedLanguage = {
-    initialLanguage foreach LanguageHandler.saveSelectedLanguageInRegistry(registryName)
+  lazy val getAndSaveLanguage = {
+    initialLanguage foreach registryValue.save
     initialLanguage getOrElse "Magyar"
   }
 
-  lazy val language = BehaviorSubject[String](usedLanguage)
+  
+  
+  lazy val language = BehaviorSubject[String](getAndSaveLanguage)
 
-  def selectLanguageByDialog = Alert.alertOptions("Language selection", "Please select your language!", languages.toArray)
+  
 
   def getTextTranslation(technicalName: String, language: String) = {
     Log.debug(s"TechnicalName=$technicalName, language=$language")
@@ -67,7 +56,7 @@ class LanguageHandler(registryName: String) { // TODO rename LanguageHandler
   def onLanguageSelected(selectedLanguage: String) = {
     Log.info(selectedLanguage)
     language.onNext(selectedLanguage)
-    LanguageHandler.saveSelectedLanguageInRegistry(registryName)(selectedLanguage)
+    registryValue.save(selectedLanguage)
     this
   }
 
@@ -81,6 +70,7 @@ class LanguageHandler(registryName: String) { // TODO rename LanguageHandler
     lazy val validTranslationObs = translated map optionGetOrElse(noTranslation(technicalName))
     validTranslationObs subscribe template
   }
+  ///////////////////////////////////////////////////////////////////////////////////////////////
 
   case object IdaLibraryTitleSingular extends IdaText("IdaLibraryTitleSingular")
   case object IdaLibraryTitlePlural { def apply(nrOfBooks: Observable[Int]) = new IdaText("IdaLibraryTitlePlural", nrOfBooks) }

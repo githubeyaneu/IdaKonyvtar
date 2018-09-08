@@ -60,7 +60,7 @@ class BookController extends IDialogController[BookControllerInput, Book] {
   var model: BookControllerInput = null
   val resizeListeners: java.util.List[Window] = newArrayList()
 
-  def getView = view.getComponent()
+  def getView = view.getComponent
 
   def getTitle =
     if (model.columns.indexOf("Szerző") >= 0)

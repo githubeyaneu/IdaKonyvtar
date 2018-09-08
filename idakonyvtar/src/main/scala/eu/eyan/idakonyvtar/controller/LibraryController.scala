@@ -17,12 +17,6 @@ import eu.eyan.idakonyvtar.controller.input.BookControllerInput
 import eu.eyan.idakonyvtar.controller.input.LibraryControllerInput
 import eu.eyan.idakonyvtar.model.Book
 import eu.eyan.idakonyvtar.model.LibraryModel
-import eu.eyan.idakonyvtar.text.LanguageHandler.ERROR_AT_READING
-import eu.eyan.idakonyvtar.text.LanguageHandler.NO
-import eu.eyan.idakonyvtar.text.LanguageHandler.NO_BOOK_FOR_THE_FILTER
-import eu.eyan.idakonyvtar.text.LanguageHandler.NO_BOOK_IN_THE_LIST
-import eu.eyan.idakonyvtar.text.LanguageHandler.TITLE
-import eu.eyan.idakonyvtar.text.LanguageHandler.YES
 import eu.eyan.idakonyvtar.util.DialogHelper
 import eu.eyan.idakonyvtar.util.ExcelHandler
 import eu.eyan.idakonyvtar.util.LibraryException
@@ -54,9 +48,9 @@ import javax.imageio.ImageIO
 import eu.eyan.util.swing.SwingPlus
 import rx.lang.scala.subjects.BehaviorSubject
 
-class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void] {
+class LibraryController extends IController[LibraryControllerInput, Void] {
 
-  private val menuAndToolBar = new LibraryMenuAndToolBar
+  val menuAndToolBar = new LibraryMenuAndToolBar
   private val view = new LibraryView
   private val model = new LibraryModel
   private val highlightRenderer = new HighlightRenderer
@@ -64,7 +58,6 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
   var previousBook: Book = null
   var loadedFile: File = null
 
-  override def getToolBar() = menuAndToolBar.getToolBar()
   override def getOutput(): Void = null
   override def getComponentForFocus(): Component = menuAndToolBar.TOOLBAR_SEARCH
 
@@ -72,24 +65,24 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
   
   lazy val numberOfBooks = BehaviorSubject(model.books.getList.size)
 
-  override def getView() = {
-    view.getComponent()
-    resetTableModel()
-    view.getBookTable().setSelectionModel(new SingleListSelectionAdapter(model.books.getSelectionIndexHolder))
-    view.getBookTable().setEnabled(true)
-    view.getBookTable().setDefaultRenderer(classOf[Object], highlightRenderer)
-    view.getBookTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
-    view.getComponent()
+  override def getView = {
+    view.getComponent
+    resetTableModel
+    view.getBookTable.setSelectionModel(new SingleListSelectionAdapter(model.books.getSelectionIndexHolder))
+    view.getBookTable.setEnabled(true)
+    view.getBookTable.setDefaultRenderer(classOf[Object], highlightRenderer)
+    view.getBookTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+    view.getComponent
   }
 
   private def resetTableModel() = {
     if (model.books.getSize > 0)
-      view.getBookTable().setEmptyText(NO_BOOK_FOR_THE_FILTER)
+      view.getBookTable.setEmptyText("Ilyen szűrőfeltételekkel nem található book.")
     else
-      view.getBookTable().setEmptyText(NO_BOOK_IN_THE_LIST)
+      view.getBookTable.setEmptyText("Nincs book a listában.")
 
     val dataModel = LibraryListTableModel(model.books, model.library.columns.toList, model.library.configuration)
-    view.getBookTable().setModel(dataModel)
+    view.getBookTable.setModel(dataModel)
   }
 
   override def initData(input: LibraryControllerInput): Unit = {
@@ -101,7 +94,7 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
     Log.info("Loading file: " + file)
     loadedFile = file
     try model.library = ExcelHandler.readLibrary(file)
-    catch { case le: LibraryException => showErrorDialog(ERROR_AT_READING, le) }
+    catch { case le: LibraryException => showErrorDialog("Hiba a beolvasáskor", le) }
 
     model.books.getList.clear()
     model.books.setList(model.library.books)
@@ -132,7 +125,7 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
     val bookController = new BookController
 
     val editorDialog = DialogHelper.startModalDialog(
-      view.getComponent(), bookController, new BookControllerInput(
+      view.getComponent, bookController, new BookControllerInput(
         newPreviousBook(model.library.columns.size),
         model.library.columns.toList,
         model.library.configuration,
@@ -153,7 +146,7 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
 
     val bookController = new BookController
     val editorDialog = DialogHelper.startModalDialog(
-      view.getComponent(),
+      view.getComponent,
       bookController,
       new BookControllerInput(
         Book(model.books.getList.get(selectedBookIndex)),
@@ -198,8 +191,8 @@ class LibraryController extends IControllerWithMenu[LibraryControllerInput, Void
       JOptionPane.YES_NO_OPTION,
       JOptionPane.QUESTION_MESSAGE,
       null,
-      Array(YES, NO),
-      NO)) {
+      Array("Igen", "Nem"),
+      "Nem")) {
       val selectionIndex = model.books.getSelectionIndex
       model.books.getList.remove(selectionIndex)
       model.books.fireIntervalRemoved(selectionIndex, selectionIndex)
