@@ -49,11 +49,8 @@ class IdaLibraryTestHelper extends TestPlus {
       pause(1000)
     }
 
-  def start: IdaLibraryTestHelper = start()
-  def start(filenév: String = null) = {
-    IdaLibrary.main(Array(filenév))
-    this
-  }
+  def start = { IdaLibrary.main(Array()); this }
+  def start(filenév: String) = { IdaLibrary.main(Array(filenév)); this }
 
   def toFront = frame.target.toFront
 

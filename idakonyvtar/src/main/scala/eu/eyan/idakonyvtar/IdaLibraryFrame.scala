@@ -21,12 +21,18 @@ import eu.eyan.util.swing.JFramePlus.JFramePlusImplicit
 import eu.eyan.util.text.Text.emptySingularPlural
 import javax.swing.JFrame
 import eu.eyan.idakonyvtar.view.LibraryMenuAndToolBar
+import eu.eyan.util.swing.JButtonPlus.JButtonImplicit
+import javax.swing.event.ListSelectionEvent
+import javax.swing.event.ListSelectionListener
+import java.awt.event.KeyAdapter
+import java.awt.event.KeyEvent
+import eu.eyan.util.swing.SpecialCharacterRowFilter
 
 object IdaLibraryFrame {
   def apply(fileToOpen: File) = new IdaLibraryFrame().startLibrary(fileToOpen)
 }
 
-class IdaLibraryFrame private(){
+class IdaLibraryFrame private () {
 
   private val texts = new TextsIda
 
@@ -43,19 +49,36 @@ class IdaLibraryFrame private(){
   def startLibrary(fileToOpen: File) = {
     if (texts.initialLanguage.isEmpty) selectLanguageByDialog(texts.languages).foreach(texts.onLanguageSelected)
 
+    // TODO: remove toolbar from controller
+    //    val toolBar_ = controller.menuAndToolBar.getToolBar
+    val menuAndToolBar = new LibraryMenuAndToolBar()
+    val toolBar = menuAndToolBar.getToolBar
+    def initialComponentToFocus = menuAndToolBar.TOOLBAR_SEARCH
+
     val controller = new LibraryController
     controller.initData(new LibraryControllerInput(fileToOpen))
     val view = controller.getView
-    controller.initBindings // TODO has to be after get view (set selection model for list)
-    def loadLibrary:Unit = controller.loadLibrary
-    def saveLibrary:Unit = controller.saveLibrary
-    def numberOfBooks = controller.numberOfBooks
-    def initialComponentToFocus = controller.getComponentForFocus
     
+    controller.initBindings // TODO has to be after get view (set selection model for list)
+    menuAndToolBar.TOOLBAR_LOAD.onAction(controller.loadLibrary)
+    menuAndToolBar.TOOLBAR_SAVE.onAction(controller.saveLibrary)
+    menuAndToolBar.TOOLBAR_NEW_BOOK.onAction(controller.createNewBook)
+    menuAndToolBar.TOOLBAR_BOOK_DELETE.onAction(controller.deleteBook(menuAndToolBar.TOOLBAR_BOOK_DELETE))
+    controller.view.getBookTable.getSelectionModel.addListSelectionListener(new ListSelectionListener() {
+      def valueChanged(e: ListSelectionEvent) = {
+        menuAndToolBar.TOOLBAR_BOOK_DELETE.setEnabled(controller.view.getBookTable().getSelectedRow >= 0)
+      }
+    })
+    menuAndToolBar.TOOLBAR_SEARCH.addKeyListener(new KeyAdapter() {
+      override def keyReleased(e: KeyEvent) = {
+        controller.view.getBookTable().setRowFilter(new SpecialCharacterRowFilter(menuAndToolBar.TOOLBAR_SEARCH.getText()))
+        controller.highlightRenderer.setHighlightText(menuAndToolBar.TOOLBAR_SEARCH.getText())
+      }
+    })
 
-    // TODO: remove toolbar from controller
-    val toolBar = controller.menuAndToolBar.getToolBar
-    val toolBar_ = new LibraryMenuAndToolBar().getToolBar
+    def loadLibrary: Unit = controller.loadLibrary
+    def saveLibrary: Unit = controller.saveLibrary
+    def numberOfBooks = controller.numberOfBooks
 
     new JFrame()
       .name(classOf[IdaLibrary].getName)

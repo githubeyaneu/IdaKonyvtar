@@ -50,16 +50,15 @@ import rx.lang.scala.subjects.BehaviorSubject
 
 class LibraryController extends IController[LibraryControllerInput, Void] {
 
-  val menuAndToolBar = new LibraryMenuAndToolBar
-  private val view = new LibraryView
+  /*TODO private*/ val view = new LibraryView
   private val model = new LibraryModel
-  private val highlightRenderer = new HighlightRenderer
+  /*TODO private*/ val highlightRenderer = new HighlightRenderer
 
   var previousBook: Book = null
   var loadedFile: File = null
 
   override def getOutput(): Void = null
-  override def getComponentForFocus(): Component = menuAndToolBar.TOOLBAR_SEARCH
+  override def getComponentForFocus(): Component = ???// TODO delete menuAndToolBar.TOOLBAR_SEARCH
 
   @deprecated override def getTitle = "" 
   
@@ -183,9 +182,9 @@ class LibraryController extends IController[LibraryControllerInput, Void] {
     }
   }
 
-  def deleteBook = {
+  def deleteBook(parent: Component) = {
     if (JOptionPane.OK_OPTION == JOptionPane.showOptionDialog(
-      menuAndToolBar.TOOLBAR_BOOK_DELETE,
+      parent,
       "Biztosan törölni akarod?",
       "Törlés megerősítése",
       JOptionPane.YES_NO_OPTION,
@@ -201,30 +200,12 @@ class LibraryController extends IController[LibraryControllerInput, Void] {
 
   def initBindings(): Unit = {
 
-    menuAndToolBar.TOOLBAR_LOAD.onAction(loadLibrary)
-
-    menuAndToolBar.TOOLBAR_SAVE.onAction(saveLibrary)
-
-    menuAndToolBar.TOOLBAR_NEW_BOOK.onAction(createNewBook)
-
-    menuAndToolBar.TOOLBAR_BOOK_DELETE.onAction(deleteBook)
-
-    view.getBookTable.getSelectionModel.addListSelectionListener(new ListSelectionListener() {
-      def valueChanged(e: ListSelectionEvent) = {
-        menuAndToolBar.TOOLBAR_BOOK_DELETE.setEnabled(view.getBookTable().getSelectedRow >= 0)
-      }
-    })
 
     view.getBookTable().addMouseListener(new MouseAdapter() {
       override def mouseClicked(e: MouseEvent) = if (e.getClickCount == 2) editBook
     })
 
-    menuAndToolBar.TOOLBAR_SEARCH.addKeyListener(new KeyAdapter() {
-      override def keyReleased(e: KeyEvent) = {
-        view.getBookTable().setRowFilter(new SpecialCharacterRowFilter(menuAndToolBar.TOOLBAR_SEARCH.getText()))
-        highlightRenderer.setHighlightText(menuAndToolBar.TOOLBAR_SEARCH.getText())
-      }
-    })
+
 
     model.books.addListDataListener(new ListDataListener() {
       def onNumberOfBooks = numberOfBooks.onNext(model.books.getList.size)
