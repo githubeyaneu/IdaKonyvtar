@@ -28,6 +28,7 @@ import org.mockito.Mockito
 import org.mockito.ArgumentCaptor
 import java.net.URI
 import java.awt.Desktop.Action
+import org.fest.swing.core.BasicRobot
 
 object IdaLibraryTest {
   def main(args: Array[String]) = {
@@ -37,7 +38,7 @@ object IdaLibraryTest {
 }
 
 class IdaLibraryTest extends AbstractUiTest {
-  private var library: IdaLibraryTestHelper = new IdaLibraryTestHelper
+  private var library = new IdaLibraryTestHelper
 
   @Before
   def setUp = {
@@ -210,7 +211,7 @@ class IdaLibraryTest extends AbstractUiTest {
     library.dialog.button(JButtonMatcher.withText("No")).requireText("No") // :)
     library.dialog.button(JButtonMatcher.withText("Yes")).requireText("Yes") // :)
     library.dialog.button(JButtonMatcher.withText("Yes")).click
-    library.requireInvisible
+    library.requireNotExists
   }
 
   @Test
@@ -278,6 +279,9 @@ class IdaLibraryTest extends AbstractUiTest {
     library.requireTitle("IdaLibrary - 4 books")
     library.menuItem("Language", "Deutsch").click
     library.requireTitle("IdaBibliothek - 4 Bücher")
+    library.cleanUp
+    library.start
+    library.frame.target.getTitle ==>  "IdaBibliothek - 4 Bücher"
   }
 
   @Test

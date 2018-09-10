@@ -14,63 +14,43 @@ import eu.eyan.util.awt.ComponentPlus.ComponentPlusImplicit
 import eu.eyan.util.swing.Alert
 import javax.swing.JComboBox
 import eu.eyan.util.text.Texts
-import eu.eyan.util.registry.RegistryValue
+import eu.eyan.util.registry.RegistryGroup
 
-// TODO write tests
-class TextsIda(registryName: String, defaultLanguage: Array[String]=> Option[String]) extends Texts {
-  lazy val registryValue = RegistryValue(registryName, classOf[TextsIda].getName)
+class TextsIda extends Texts {
+	lazy val languageInRegistry = IdaLibrary.registryValue(classOf[TextsIda].getName)
+	def initialLanguage = languageInRegistry.read
+	language.subscribe(_.foreach(languageInRegistry.save))
+
 
   lazy val translationsXls = "translations.xls".toResourceFile.get
   lazy val translationsTable = ExcelHandler.readExcel(translationsXls, "translations")
-  lazy val languages = translationsTable.row(0).drop(2).filter(_.nonEmpty)
-  lazy val initialLanguage = registryValue.read orElse defaultLanguage(languages.toArray)
+  lazy val languages = translationsTable.row(0).drop(2).filter(_.nonEmpty).toArray
 
-  lazy val getAndSaveLanguage = {
-    initialLanguage foreach registryValue.save
-    initialLanguage getOrElse "Magyar"
-  }
 
-  
-  
-  lazy val language = BehaviorSubject[String](getAndSaveLanguage)
-
-  
-
-  def getTextTranslation(technicalName: String, language: String) = {
+  def getTextTranslation(technicalName: String, language: Option[String]) = {
     Log.debug(s"TechnicalName=$technicalName, language=$language")
-    val translationColumnIndex = translationsTable.columnIndex(language)
+
+    val translationColumnIndex = translationsTable.columnIndex(language.getOrElse("English"))
     Log.debug("Language col " + translationColumnIndex)
+
     val rowIndex = translationsTable.rowIndex(technicalName)
     Log.debug("technicalName row " + rowIndex)
-    val translation = if (translationColumnIndex.nonEmpty && rowIndex.nonEmpty) {
-      val option = translationsTable.cells.get((translationColumnIndex.get, rowIndex.get))
-      if (option.nonEmpty && option.get.nonEmpty) option
-      else None
-    } else
-      None
+
+    val colAndRow = for (a <- translationColumnIndex; b <-rowIndex) yield (a,b)
+    val translation = colAndRow.map(translationsTable.cells.get).flatten
     Log.debug("translation " + translation)
 
     translation
   }
 
-  def onLanguageSelected(selectedLanguage: String) = {
-    Log.info(selectedLanguage)
-    language.onNext(selectedLanguage)
-    registryValue.save(selectedLanguage)
-    this
-  }
-
-  def translate(technicalName: String)(language: String) = getTextTranslation(technicalName, language) // this.getClass.getSimpleName.replace("$", "")
-  def optionGetOrElse(orElse: String)(option: Option[String]) = option.getOrElse(orElse)
-  def noTranslation(technicalName: String) = s"**$technicalName**"
 
   protected class IdaText(private val technicalName: String, private val args: Observable[Any]*) extends Text(BehaviorSubject(noTranslation(technicalName)), args: _*) {
-    lazy val translateText = translate(technicalName)(_)
-    lazy val translated = language map translateText
-    lazy val validTranslationObs = translated map optionGetOrElse(noTranslation(technicalName))
+	  def optionGetOrElse(orElse: String)(option: Option[String]) = option.getOrElse(orElse)
+    val translateText = translate(technicalName)(_)
+    val translated = language map translateText
+    val validTranslationObs = translated map optionGetOrElse(noTranslation(technicalName))
     validTranslationObs subscribe template
   }
-  ///////////////////////////////////////////////////////////////////////////////////////////////
 
   case object IdaLibraryTitleSingular extends IdaText("IdaLibraryTitleSingular")
   case object IdaLibraryTitlePlural { def apply(nrOfBooks: Observable[Int]) = new IdaText("IdaLibraryTitlePlural", nrOfBooks) }

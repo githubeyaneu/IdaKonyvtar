@@ -19,16 +19,41 @@ import eu.eyan.log.Log
 import org.fest.swing.core.Robot
 import org.fest.swing.core.BasicRobot
 import org.fest.swing.exception.ComponentLookupException
+import org.fest.swing.core.TypeMatcher
+import java.awt.Dialog
+import org.fest.swing.core.ComponentFoundCondition
+import org.fest.swing.timing.Pause
+import org.fest.swing.timing.Timeout
 
 class IdaLibraryTestHelper extends TestPlus {
 
-	lazy val robot = BasicRobot.robotWithCurrentAwtHierarchy
-  lazy val frame = new FrameFixture(robot, classOf[IdaLibrary].getName)
-  def dialog = frame.dialog
-  
-  def start: IdaLibraryTestHelper = start()
-  def start(filenév: String = null) = { IdaLibrary.main(Array(filenév)); this }
+  var robot: Robot = null
 
+  def dialog = {
+    if (robot == null) robot = BasicRobot.robotWithCurrentAwtHierarchy
+    val matcher = new TypeMatcher(classOf[Dialog], true)
+    val description = "dialog to be found using matcher " + matcher
+    val condition = new ComponentFoundCondition(description, robot.finder(), matcher)
+    Pause.pause(condition, Timeout.timeout(100))
+    new DialogFixture(robot, condition.found.asInstanceOf[Dialog])
+  }
+
+  def frame = {
+    if (robot == null) robot = BasicRobot.robotWithCurrentAwtHierarchy
+    new FrameFixture(robot, classOf[IdaLibrary].getName)
+  }
+
+  def cleanUp =
+    if (robot != null) {
+      robot.cleanUp
+      pause(1000)
+    }
+
+  def start: IdaLibraryTestHelper = start()
+  def start(filenév: String = null) = {
+    IdaLibrary.main(Array(filenév))
+    this
+  }
 
   def toFront = frame.target.toFront
 
@@ -119,8 +144,6 @@ class IdaLibraryTestHelper extends TestPlus {
     frame.table().robot.click(firstRow, MouseButton.LEFT_BUTTON, 2)
   }
 
-  def cleanUp = frame.cleanUp
-
   def checkTitleWithNumber(numberOfBooks: Int): Unit = {
     if (numberOfBooks == 0) requireTitle("IdaLibrary - no books")
     else if (numberOfBooks == 1) requireTitle("IdaLibrary - one book")
@@ -130,8 +153,8 @@ class IdaLibraryTestHelper extends TestPlus {
   def clickExit = frame.close()
 
   def requireInvisible = assertThat(frame.target.isVisible).isFalse
-  
-  def requireNotExists = expectThrowable(classOf[ComponentLookupException], {frame})
+
+  def requireNotExists = expectThrowable(classOf[ComponentLookupException], frame)
 
   def getComponentToRecord = frame.target
 }

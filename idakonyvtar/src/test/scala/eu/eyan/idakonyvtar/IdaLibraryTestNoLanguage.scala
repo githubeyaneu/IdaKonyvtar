@@ -29,24 +29,31 @@ import java.awt.Component
 import org.fest.swing.fixture.DialogFixture
 import eu.eyan.util.java.lang.RunnablePlus
 import eu.eyan.util.java.lang.ThreadPlus
+import eu.eyan.idakonyvtar.text.TextsIda
+import org.fest.swing.core.BasicRobot
+import org.fest.swing.exception.ComponentLookupException
+import org.fest.swing.core.TypeMatcher
+import java.awt.Dialog
+import org.fest.swing.core.ComponentFoundCondition
+import org.fest.swing.timing.Pause
+import org.fest.swing.timing.Timeout
+import org.fest.swing.core.Robot
 
 object IdaLibraryTestNoLanguage {
-
   private var library: IdaLibraryTestHelper = new IdaLibraryTestHelper()
 
   def main(args: Array[String]) = {
     val t = new IdaLibraryTestNoLanguage()
     t.setUp
   }
-
 }
 
 class IdaLibraryTestNoLanguage extends AbstractUiTest {
 
   @Before
   def setUp = {
-    Try( RegistryPlus.clear(classOf[IdaLibrary].getName) )
-    ThreadPlus.run(library.start)
+    Try(RegistryPlus.clear(classOf[IdaLibrary].getName))
+    ThreadPlus.run(IdaLibrary.main(Array()))
     VideoRunner.setFullScreenToRecord
   }
 
@@ -54,15 +61,29 @@ class IdaLibraryTestNoLanguage extends AbstractUiTest {
   def tearDown = library.cleanUp
 
   @Test
-  def startNoLanguage = {
+  def start_NoLanguage_None = {
+    RegistryPlus.readOption(classOf[IdaLibrary].getName, classOf[TextsIda].getName) ==> None
+    val langDialog = library.dialog
     library.requireNotExists
-    val langDialog = waitFor(new DialogFixture(library.robot, "dialog0"))
+    langDialog.close
+    val frame = waitFor(library.frame)
+    RegistryPlus.readOption(classOf[IdaLibrary].getName, classOf[TextsIda].getName) ==> None
+    frame.target.getTitle ==> "IdaLibrary - 4 books"
+  }
+
+  @Test
+  def start_NoLanguage_Magyar = {
+    RegistryPlus.readOption(classOf[IdaLibrary].getName, classOf[TextsIda].getName) ==> None
+    val langDialog = library.dialog
+    library.requireNotExists
     langDialog.component.getTitle ==> "Language selection"
     langDialog.optionPane.requireMessage("Please select your language!")
     langDialog.button(JButtonMatcher.withText("Magyar")).requireText("Magyar") // :)
     langDialog.button(JButtonMatcher.withText("English")).requireText("English") // :)
     langDialog.button(JButtonMatcher.withText("Deutsch")).requireText("Deutsch") // :)
     langDialog.button(JButtonMatcher.withText("Magyar")).click
-    waitFor(library.requireVisible)
+    val frame = waitFor(library.frame)
+    RegistryPlus.readOption(classOf[IdaLibrary].getName, classOf[TextsIda].getName).get ==> "Magyar"
+    frame.target.getTitle ==> "IdaKönyvtár - 4 könyv"
   }
 }
