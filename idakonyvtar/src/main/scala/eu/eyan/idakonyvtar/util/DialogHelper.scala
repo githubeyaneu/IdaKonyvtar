@@ -30,6 +30,7 @@ import javax.swing.JPanel
 import eu.eyan.util.awt.ComponentPlus.ComponentPlusImplicit
 import eu.eyan.util.swing.JDialogPlus.JdialogPlusImplicit
 import eu.eyan.util.text.Text
+import eu.eyan.util.swing.JButtonPlus.JButtonImplicit
 
 object DialogHelper {
 

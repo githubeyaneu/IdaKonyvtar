@@ -22,6 +22,7 @@ import javax.swing.JPanel
 import javax.swing.SwingUtilities
 import eu.eyan.util.swing.JPanelWithFrameLayout
 import eu.eyan.util.awt.ComponentPlus.ComponentPlusImplicit
+import eu.eyan.util.swing.JButtonPlus.JButtonImplicit
 
 abstract class MultiField[INPUT, EDITOR <: Component](columnName: String) extends JPanel with FieldEditListener[EDITOR] {
 

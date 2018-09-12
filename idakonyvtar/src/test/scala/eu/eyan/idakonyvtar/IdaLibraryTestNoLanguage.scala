@@ -14,7 +14,6 @@ import eu.eyan.idakonyvtar.testhelper.IdaLibraryTestHelper
 import eu.eyan.idakonyvtar.testhelper.LibraryFileBuilder
 import eu.eyan.idakonyvtar.text.TextsIda
 import eu.eyan.idakonyvtar.util.ExcelHandler
-import eu.eyan.idakonyvtar.view.LibraryMenuAndToolBar
 import eu.eyan.testutil.ExcelAssert
 import eu.eyan.testutil.video.VideoRunner
 import eu.eyan.util.swing.HighlightRenderer

@@ -8,7 +8,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import eu.eyan.util.swing.JPanelWithFrameLayout
 
 class LibraryView extends AbstractView {
-  private val bookTable = new BookTable();
+  private val bookTable = new BookTable
   def getBookTable() = bookTable
 
   override def createViewComponent(): Component = {

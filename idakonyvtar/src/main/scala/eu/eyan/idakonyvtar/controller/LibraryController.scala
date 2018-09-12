@@ -20,7 +20,6 @@ import eu.eyan.idakonyvtar.model.LibraryModel
 import eu.eyan.idakonyvtar.util.DialogHelper
 import eu.eyan.idakonyvtar.util.ExcelHandler
 import eu.eyan.idakonyvtar.util.LibraryException
-import eu.eyan.idakonyvtar.view.LibraryMenuAndToolBar
 import eu.eyan.idakonyvtar.view.LibraryView
 import eu.eyan.log.Log
 import eu.eyan.log.LogWindow
@@ -47,33 +46,51 @@ import eu.eyan.util.io.FilePlus.FilePlusImplicit
 import javax.imageio.ImageIO
 import eu.eyan.util.swing.SwingPlus
 import rx.lang.scala.subjects.BehaviorSubject
+import eu.eyan.util.swing.JTablePlus.JTableImplicit
+import com.jgoodies.binding.list.SelectionInList
+import eu.eyan.util.jgoodies.SelectionInListPlus.SelectionInListImplicit
 
-class LibraryController extends IController[LibraryControllerInput, Void] {
+class LibraryController(file: File) extends IController[LibraryControllerInput, Void] {
 
-  /*TODO private*/ val view = new LibraryView
+  private val view = new LibraryView
   private val model = new LibraryModel
-  /*TODO private*/ val highlightRenderer = new HighlightRenderer
+  private val highlightRenderer = new HighlightRenderer
 
-  var previousBook: Book = null
+
+  val isBookSelected = BehaviorSubject(false)
+
   var loadedFile: File = null
 
-  override def getOutput(): Void = null
-  override def getComponentForFocus(): Component = ???// TODO delete menuAndToolBar.TOOLBAR_SEARCH
+  override def getOutput: Void = null
+  override def getComponentForFocus: Component = ??? // TODO delete menuAndToolBar.TOOLBAR_SEARCH
 
-  @deprecated override def getTitle = "" 
-  
+  @deprecated override def getTitle = ""
+
   lazy val numberOfBooks = BehaviorSubject(model.books.getList.size)
 
-  override def getView = {
-    view.getComponent
-    resetTableModel
-    view.getBookTable.setSelectionModel(new SingleListSelectionAdapter(model.books.getSelectionIndexHolder))
-    view.getBookTable.setEnabled(true)
-    view.getBookTable.setDefaultRenderer(classOf[Object], highlightRenderer)
-    view.getBookTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
-    view.getComponent
-  }
+  readLibrary(file)
+  var previousBook: Book = Book(model.library.columns.size)
+  view.getComponent
+  resetTableModel
+  view.getBookTable.setSelectionModel(new SingleListSelectionAdapter(model.books.getSelectionIndexHolder))
+  view.getBookTable.setEnabled(true)
+  view.getBookTable.setDefaultRenderer(classOf[Object], highlightRenderer)
+  view.getBookTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+  view.getComponent
 
+  view.getBookTable.onDoubleClick(editBook)
+  model.books.onListData(numberOfBooks.onNext(model.books.getList.size))
+  view.getBookTable.onValueChanged(isBookSelected.onNext(view.getBookTable.getSelectedRow >= 0))
+
+  override def initData(input: LibraryControllerInput): Unit = {}
+  override def getView = view.getComponent
+  def initBindings(): Unit = {}
+  
+  def filter(textToFilter: String) = {
+    view.getBookTable.setRowFilter(new SpecialCharacterRowFilter(textToFilter))
+    highlightRenderer.setHighlightText(textToFilter)
+  }
+    
   private def resetTableModel() = {
     if (model.books.getSize > 0)
       view.getBookTable.setEmptyText("Ilyen szűrőfeltételekkel nem található book.")
@@ -84,10 +101,7 @@ class LibraryController extends IController[LibraryControllerInput, Void] {
     view.getBookTable.setModel(dataModel)
   }
 
-  override def initData(input: LibraryControllerInput): Unit = {
-    readLibrary(input.file)
-    previousBook = Book(model.library.columns.size)
-  }
+
 
   private def readLibrary(file: File) = {
     Log.info("Loading file: " + file)
@@ -105,7 +119,7 @@ class LibraryController extends IController[LibraryControllerInput, Void] {
     .withDialogTitle("Töltés")
     .withApproveButtonText("Töltés")
     .withFileFilter("xls", "Excel97 fájlok")
-    .showAndHandleResult(view.getComponent/* JFrame*/ , selectedFile => {
+    .showAndHandleResult(view.getComponent /* JFrame*/ , selectedFile => {
       Log.info("selected file: " + selectedFile)
       readLibrary(selectedFile)
     })
@@ -114,7 +128,7 @@ class LibraryController extends IController[LibraryControllerInput, Void] {
     .withDialogTitle("Mentés")
     .withApproveButtonText("Mentés")
     .withFileFilter("xls", "Excel97 fájlok")
-    .showAndHandleResult(view.getComponent/* JFrame*/, selectedFile => {
+    .showAndHandleResult(view.getComponent /* JFrame*/ , selectedFile => {
       Log.info("Save " + selectedFile)
       try ExcelHandler.saveLibrary(selectedFile, model.library)
       catch { case le: LibraryException => Log.error(le) }
@@ -169,11 +183,11 @@ class LibraryController extends IController[LibraryControllerInput, Void] {
       val imageName = book.getValue(i)
       val columnName = columns(i)
       val isPictureField = columnConfiguration.isTrue(columnName, ColumnConfigurations.PICTURE)
-      if(imageName == "" && book.images.contains(i)){
+      if (imageName == "" && book.images.contains(i)) {
         val dir = loadedFile.getParentFile
-        val imagesDir = (loadedFile.getAbsolutePath+".images").asDir
-        if(!imagesDir.exists) imagesDir.mkdir
-        val imageFile = (imagesDir.getAbsolutePath+"\\IMG.JPG").asFile.generateNewNameIfExists()
+        val imagesDir = (loadedFile.getAbsolutePath + ".images").asDir
+        if (!imagesDir.exists) imagesDir.mkdir
+        val imageFile = (imagesDir.getAbsolutePath + "\\IMG.JPG").asFile.generateNewNameIfExists()
         ImageIO.write(book.images.get(i).get, "JPG", imageFile)
         book.values(i) = imageFile.getName
       } else {
@@ -196,24 +210,6 @@ class LibraryController extends IController[LibraryControllerInput, Void] {
       model.books.getList.remove(selectionIndex)
       model.books.fireIntervalRemoved(selectionIndex, selectionIndex)
     }
-  }
-
-  def initBindings(): Unit = {
-
-
-    view.getBookTable().addMouseListener(new MouseAdapter() {
-      override def mouseClicked(e: MouseEvent) = if (e.getClickCount == 2) editBook
-    })
-
-
-
-    model.books.addListDataListener(new ListDataListener() {
-      def onNumberOfBooks = numberOfBooks.onNext(model.books.getList.size)
-      //TODO refactor add listener and listlistener     SwingPlus.onIntervalRemoved(action)
-      def intervalRemoved(e: ListDataEvent) = onNumberOfBooks
-      def intervalAdded(e: ListDataEvent) = onNumberOfBooks
-      def contentsChanged(e: ListDataEvent) = onNumberOfBooks
-    })
   }
 
   private def savePreviousBook(book: Book) = {

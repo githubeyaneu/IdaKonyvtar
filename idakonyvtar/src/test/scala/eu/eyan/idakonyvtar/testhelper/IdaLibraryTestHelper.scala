@@ -12,7 +12,6 @@ import org.fest.swing.fixture.FrameFixture
 
 import eu.eyan.idakonyvtar.IdaLibrary
 import eu.eyan.idakonyvtar.text.TextsIda
-import eu.eyan.idakonyvtar.view.LibraryMenuAndToolBar
 import eu.eyan.testutil.TestPlus
 import org.fest.swing.fixture.JMenuItemFixture
 import eu.eyan.log.Log
@@ -91,7 +90,7 @@ class IdaLibraryTestHelper extends TestPlus {
     frame.fileChooser().selectFile(file).approve()
   }
 
-  def clickNewButton = frame.button(LibraryMenuAndToolBar.ADD_NEW_BOOK).click()
+  def clickNewButton = frame.button("Új book hozzáadása").click()
 
   def editor = new BookEditorTestHelper(frame.robot)
 
@@ -126,7 +125,7 @@ class IdaLibraryTestHelper extends TestPlus {
   }
 
   def filter(filter: String): Unit = {
-    frame.textBox(LibraryMenuAndToolBar.FILTER).robot.enterText(filter)
+    frame.textBox("filter").robot.enterText(filter)
   }
 
   def assertTableRowCount(rowsCount: Int): Unit = {

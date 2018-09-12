@@ -20,13 +20,18 @@ import eu.eyan.util.swing.JFramePlus
 import eu.eyan.util.swing.JFramePlus.JFramePlusImplicit
 import eu.eyan.util.text.Text.emptySingularPlural
 import javax.swing.JFrame
-import eu.eyan.idakonyvtar.view.LibraryMenuAndToolBar
 import eu.eyan.util.swing.JButtonPlus.JButtonImplicit
 import javax.swing.event.ListSelectionEvent
 import javax.swing.event.ListSelectionListener
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 import eu.eyan.util.swing.SpecialCharacterRowFilter
+import eu.eyan.util.swing.JTextFieldPlus.JTextFieldPlusImplicit
+import eu.eyan.util.swing.JToolBarPlus.JToolBarImplicit
+import javax.swing.JToolBar
+import java.awt.Component
+import eu.eyan.util.awt.ComponentPlus.ComponentPlusImplicit
+import javax.swing.JTextField
 
 object IdaLibraryFrame {
   def apply(fileToOpen: File) = new IdaLibraryFrame().startLibrary(fileToOpen)
@@ -49,43 +54,29 @@ class IdaLibraryFrame private () {
   def startLibrary(fileToOpen: File) = {
     if (texts.initialLanguage.isEmpty) selectLanguageByDialog(texts.languages).foreach(texts.onLanguageSelected)
 
-    // TODO: remove toolbar from controller
-    //    val toolBar_ = controller.menuAndToolBar.getToolBar
-    val menuAndToolBar = new LibraryMenuAndToolBar()
-    val toolBar = menuAndToolBar.getToolBar
-    def initialComponentToFocus = menuAndToolBar.TOOLBAR_SEARCH
+    val controller = new LibraryController(fileToOpen)
 
-    val controller = new LibraryController
-    controller.initData(new LibraryControllerInput(fileToOpen))
-    val view = controller.getView
-    
-    controller.initBindings // TODO has to be after get view (set selection model for list)
-    menuAndToolBar.TOOLBAR_LOAD.onAction(controller.loadLibrary)
-    menuAndToolBar.TOOLBAR_SAVE.onAction(controller.saveLibrary)
-    menuAndToolBar.TOOLBAR_NEW_BOOK.onAction(controller.createNewBook)
-    menuAndToolBar.TOOLBAR_BOOK_DELETE.onAction(controller.deleteBook(menuAndToolBar.TOOLBAR_BOOK_DELETE))
-    controller.view.getBookTable.getSelectionModel.addListSelectionListener(new ListSelectionListener() {
-      def valueChanged(e: ListSelectionEvent) = {
-        menuAndToolBar.TOOLBAR_BOOK_DELETE.setEnabled(controller.view.getBookTable().getSelectedRow >= 0)
-      }
-    })
-    menuAndToolBar.TOOLBAR_SEARCH.addKeyListener(new KeyAdapter() {
-      override def keyReleased(e: KeyEvent) = {
-        controller.view.getBookTable().setRowFilter(new SpecialCharacterRowFilter(menuAndToolBar.TOOLBAR_SEARCH.getText()))
-        controller.highlightRenderer.setHighlightText(menuAndToolBar.TOOLBAR_SEARCH.getText())
-      }
-    })
+    val jToolBar = new JToolBar("Alapfunkciók")
+    jToolBar.addButton(texts.ToolbarSaveButton, "Library mentése", texts.ToolbarSaveButtonTooltip, texts.ToolbarSaveButtonIcon).onAction(controller.saveLibrary)
+    jToolBar.addButton(texts.ToolbarLoadButton, "Library betöltése", texts.ToolbarLoadButtonTooltip, texts.ToolbarLoadButtonIcon).onAction(controller.loadLibrary)
+    jToolBar.addButton(texts.ToolbarNewBookButton, "Új book hozzáadása", texts.ToolbarNewBookButtonTooltip, texts.ToolbarNewBookButtonIcon).onAction(controller.createNewBook)
+    jToolBar.addButton(texts.ToolbarDeleteBookButton, "Book törlése", texts.ToolbarDeleteBookButtonTooltip, texts.ToolbarDeleteBookButtonIcon)
+      .onActionPerformedEvent(evt => controller.deleteBook(evt.getSource.asInstanceOf[Component]))
+      .enabled(controller.isBookSelected)
+    jToolBar.addLabel(texts.ToolbarFilterLabel)
+    val filterTextField = jToolBar.addTextField(5, "", "filter").widthSet(200).onTextChanged(controller.filter _)
 
     def loadLibrary: Unit = controller.loadLibrary
     def saveLibrary: Unit = controller.saveLibrary
     def numberOfBooks = controller.numberOfBooks
+    def initialComponentToFocus = filterTextField
 
     new JFrame()
       .name(classOf[IdaLibrary].getName)
       .title(emptySingularPlural(numberOfBooks, texts.IdaLibraryTitleEmpty, texts.IdaLibraryTitleSingular, texts.IdaLibraryTitlePlural(numberOfBooks)))
       .iconFromChar('I')
-      .addFluent(toolBar, BorderLayout.NORTH)
-      .addFluent(view, BorderLayout.CENTER)
+      .addFluent(jToolBar, BorderLayout.NORTH)
+      .addFluent(controller.getView, BorderLayout.CENTER)
       .menuItem(texts.MenuFile, texts.MenuFileLoad, loadLibrary)
       .menuItem(texts.MenuFile, texts.MenuFileSave, saveLibrary)
       .menuItemSeparator(texts.MenuFile)
