@@ -76,7 +76,7 @@ class IdaLibraryFrame private () {
       .title(emptySingularPlural(numberOfBooks, texts.IdaLibraryTitleEmpty, texts.IdaLibraryTitleSingular, texts.IdaLibraryTitlePlural(numberOfBooks)))
       .iconFromChar('I')
       .addFluent(jToolBar, BorderLayout.NORTH)
-      .addFluent(controller.getView, BorderLayout.CENTER)
+      .addFluent(controller.component, BorderLayout.CENTER)
       .menuItem(texts.MenuFile, texts.MenuFileLoad, loadLibrary)
       .menuItem(texts.MenuFile, texts.MenuFileSave, saveLibrary)
       .menuItemSeparator(texts.MenuFile)

@@ -11,14 +11,7 @@ object IdaLibrary {
   // TODO - changed * for the libs and by close show not saved and so on.
   // TODO - Fájl menü library betöltése -> Könyvtár vagy fájl
   // TODO - Fájl menü library mentése -> Könyvtár vagy fájl
-  // TODO - Fájl menü debug -> ...
-  // TODO - Fájl menü kilépés
-  // TODO - menü gombok feliratok magyarosítása
-  // TODO - menü gombok Törlés -> Könyv törlése
-  // TODO - nyelv kezelése rendesen - menü - xls
-  // TODO - menu - hiba - open log windows , copy logs to clipboard, clear registry values(?)
   // TODO - menu - Help - about, write email, ötlet, javaslat,
-  // TODO - menu - Help - about leírás: felelöösségvállalás oszk stb
   // TODO - menu - Help - seg<tség a konfigurációhoz
   // TODO - menü gombok több köztes hely
   // TODO - Mentés -> kiválasztás nélkül

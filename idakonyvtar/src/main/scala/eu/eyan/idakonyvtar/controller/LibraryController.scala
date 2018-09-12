@@ -1,116 +1,107 @@
 package eu.eyan.idakonyvtar.controller
 
 import java.awt.Component
-import java.awt.event.KeyAdapter
-import java.awt.event.KeyEvent
-import java.awt.event.MouseAdapter
-import java.awt.event.MouseEvent
-import java.awt.event.WindowAdapter
-import java.awt.event.WindowEvent
 import java.io.File
 
 import scala.collection.JavaConversions.asScalaBuffer
 
 import com.jgoodies.binding.adapter.SingleListSelectionAdapter
+import com.jgoodies.binding.list.SelectionInList
+
 import eu.eyan.idakonyvtar.controller.adapter.LibraryListTableModel
 import eu.eyan.idakonyvtar.controller.input.BookControllerInput
-import eu.eyan.idakonyvtar.controller.input.LibraryControllerInput
 import eu.eyan.idakonyvtar.model.Book
-import eu.eyan.idakonyvtar.model.LibraryModel
+import eu.eyan.idakonyvtar.model.ColumnConfigurations
+import eu.eyan.idakonyvtar.model.Library
 import eu.eyan.idakonyvtar.util.DialogHelper
 import eu.eyan.idakonyvtar.util.ExcelHandler
 import eu.eyan.idakonyvtar.util.LibraryException
-import eu.eyan.idakonyvtar.view.LibraryView
+import eu.eyan.idakonyvtar.view.BookTable
 import eu.eyan.log.Log
-import eu.eyan.log.LogWindow
+import eu.eyan.util.io.FilePlus.FilePlusImplicit
+import eu.eyan.util.jgoodies.SelectionInListPlus.SelectionInListImplicit
+import eu.eyan.util.string.StringPlus.StringPlusImplicit
 import eu.eyan.util.swing.HighlightRenderer
-import eu.eyan.util.swing.JButtonPlus.JButtonImplicit
 import eu.eyan.util.swing.JFileChooserPlus.JFileChooserImplicit
+import eu.eyan.util.swing.JPanelWithFrameLayout
+import eu.eyan.util.swing.JTablePlus.JTableImplicit
 import eu.eyan.util.swing.SpecialCharacterRowFilter
 import eu.eyan.util.swing.SwingPlus.showErrorDialog
+import javax.imageio.ImageIO
 import javax.swing.JFileChooser
-import javax.swing.JFrame
 import javax.swing.JOptionPane
 import javax.swing.ListSelectionModel
-import javax.swing.SwingUtilities
-import javax.swing.WindowConstants
-import javax.swing.event.ListDataEvent
-import javax.swing.event.ListDataListener
-import javax.swing.event.ListSelectionEvent
-import javax.swing.event.ListSelectionListener
-import eu.eyan.util.swing.JMenuItemPlus.JMenuItemImplicit
-import scala.collection.mutable.Map
-import eu.eyan.idakonyvtar.model.ColumnConfigurations
-import eu.eyan.util.string.StringPlus.StringPlusImplicit
-import eu.eyan.util.io.FilePlus.FilePlusImplicit
-import javax.imageio.ImageIO
-import eu.eyan.util.swing.SwingPlus
 import rx.lang.scala.subjects.BehaviorSubject
-import eu.eyan.util.swing.JTablePlus.JTableImplicit
-import com.jgoodies.binding.list.SelectionInList
-import eu.eyan.util.jgoodies.SelectionInListPlus.SelectionInListImplicit
 
-class LibraryController(file: File) extends IController[LibraryControllerInput, Void] {
-
-  private val view = new LibraryView
-  private val model = new LibraryModel
-  private val highlightRenderer = new HighlightRenderer
-
+class LibraryController(file: File) {
+	private val bookTable = new BookTable
+	private val highlightRenderer = new HighlightRenderer
+  private val books: SelectionInList[Book] = new SelectionInList[Book]()
+  private var library: Library = null  // TODO /* var, because of loading other library */
+  private var loadedFile: File = null
 
   val isBookSelected = BehaviorSubject(false)
+  val numberOfBooks = BehaviorSubject(books.getList.size)
 
-  var loadedFile: File = null
-
-  override def getOutput: Void = null
-  override def getComponentForFocus: Component = ??? // TODO delete menuAndToolBar.TOOLBAR_SEARCH
-
-  @deprecated override def getTitle = ""
-
-  lazy val numberOfBooks = BehaviorSubject(model.books.getList.size)
+  val component = new JPanelWithFrameLayout()
+    .withBorders
+    .withSeparators
+    .newColumnFPG
+    .newRowFPG
+    .addInScrollPane(bookTable)
 
   readLibrary(file)
-  var previousBook: Book = Book(model.library.columns.size)
-  view.getComponent
+  var previousBook: Book = Book(library.columns.size)
   resetTableModel
-  view.getBookTable.setSelectionModel(new SingleListSelectionAdapter(model.books.getSelectionIndexHolder))
-  view.getBookTable.setEnabled(true)
-  view.getBookTable.setDefaultRenderer(classOf[Object], highlightRenderer)
-  view.getBookTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
-  view.getComponent
+  bookTable.setSelectionModel(new SingleListSelectionAdapter(books.getSelectionIndexHolder))
+  bookTable.setEnabled(true)
+  bookTable.setDefaultRenderer(classOf[Object], highlightRenderer)
+  bookTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
 
-  view.getBookTable.onDoubleClick(editBook)
-  model.books.onListData(numberOfBooks.onNext(model.books.getList.size))
-  view.getBookTable.onValueChanged(isBookSelected.onNext(view.getBookTable.getSelectedRow >= 0))
+  bookTable.onDoubleClick(editBook)
+  books.onListData(numberOfBooks.onNext(books.getList.size))
+  bookTable.onValueChanged(isBookSelected.onNext(bookTable.getSelectedRow >= 0))
 
-  override def initData(input: LibraryControllerInput): Unit = {}
-  override def getView = view.getComponent
-  def initBindings(): Unit = {}
-  
   def filter(textToFilter: String) = {
-    view.getBookTable.setRowFilter(new SpecialCharacterRowFilter(textToFilter))
+    bookTable.setRowFilter(new SpecialCharacterRowFilter(textToFilter))
     highlightRenderer.setHighlightText(textToFilter)
   }
-    
-  private def resetTableModel() = {
-    if (model.books.getSize > 0)
-      view.getBookTable.setEmptyText("Ilyen szűrőfeltételekkel nem található book.")
-    else
-      view.getBookTable.setEmptyText("Nincs book a listában.")
 
-    val dataModel = LibraryListTableModel(model.books, model.library.columns.toList, model.library.configuration)
-    view.getBookTable.setModel(dataModel)
+	  def deleteBook(parent: Component) = {
+    if (JOptionPane.OK_OPTION == JOptionPane.showOptionDialog( // TODO DialogHelper.yesNo
+      parent,
+      "Biztosan törölni akarod?",
+      "Törlés megerősítése",
+      JOptionPane.YES_NO_OPTION,
+      JOptionPane.QUESTION_MESSAGE,
+      null,
+      Array("Igen", "Nem"),
+      "Nem")) {
+      val selectionIndex = books.getSelectionIndex
+      books.getList.remove(selectionIndex)
+      books.fireIntervalRemoved(selectionIndex, selectionIndex)
+    }
   }
+	  
+	  
+  private def resetTableModel() = {
+    if (books.getSize > 0)
+      bookTable.setEmptyText("Ilyen szűrőfeltételekkel nem található book.")
+    else
+      bookTable.setEmptyText("Nincs book a listában.")
 
-
+    val dataModel = LibraryListTableModel(books, library.columns.toList, library.configuration)
+    bookTable.setModel(dataModel)
+  }
 
   private def readLibrary(file: File) = {
     Log.info("Loading file: " + file)
     loadedFile = file
-    try model.library = ExcelHandler.readLibrary(file)
+    try library = ExcelHandler.readLibrary(file)
     catch { case le: LibraryException => showErrorDialog("Hiba a beolvasáskor", le) }
 
-    model.books.getList.clear()
-    model.books.setList(model.library.books)
+    books.getList.clear()
+    books.setList(library.books)
     resetTableModel()
   }
 
@@ -119,7 +110,7 @@ class LibraryController(file: File) extends IController[LibraryControllerInput, 
     .withDialogTitle("Töltés")
     .withApproveButtonText("Töltés")
     .withFileFilter("xls", "Excel97 fájlok")
-    .showAndHandleResult(view.getComponent /* JFrame*/ , selectedFile => {
+    .showAndHandleResult(component /* JFrame*/ , selectedFile => {
       Log.info("selected file: " + selectedFile)
       readLibrary(selectedFile)
     })
@@ -128,9 +119,9 @@ class LibraryController(file: File) extends IController[LibraryControllerInput, 
     .withDialogTitle("Mentés")
     .withApproveButtonText("Mentés")
     .withFileFilter("xls", "Excel97 fájlok")
-    .showAndHandleResult(view.getComponent /* JFrame*/ , selectedFile => {
+    .showAndHandleResult(component /* JFrame*/ , selectedFile => {
       Log.info("Save " + selectedFile)
-      try ExcelHandler.saveLibrary(selectedFile, model.library)
+      try ExcelHandler.saveLibrary(selectedFile, library)
       catch { case le: LibraryException => Log.error(le) }
     })
 
@@ -138,47 +129,47 @@ class LibraryController(file: File) extends IController[LibraryControllerInput, 
     val bookController = new BookController
 
     val editorDialog = DialogHelper.startModalDialog(
-      view.getComponent, bookController, new BookControllerInput(
-        newPreviousBook(model.library.columns.size),
-        model.library.columns.toList,
-        model.library.configuration,
-        model.books.getList.toList,
-        true,
-        loadedFile))
+      component, bookController, new BookControllerInput(
+      newPreviousBook(library.columns.size),
+      library.columns.toList,
+      library.configuration,
+      books.getList.toList,
+      true,
+      loadedFile))
 
     if (editorDialog.isOk()) {
       saveImages(bookController.getOutput)
-      model.books.getList.add(0, bookController.getOutput)
+      books.getList.add(0, bookController.getOutput)
       savePreviousBook(bookController.getOutput)
-      model.books.fireIntervalAdded(0, 0)
+      books.fireIntervalAdded(0, 0)
     }
   }
 
   def editBook = {
-    val selectedBookIndex = view.getBookTable().convertRowIndexToModel(view.getBookTable().getSelectedRow)
+    val selectedBookIndex = bookTable.convertRowIndexToModel(bookTable.getSelectedRow)
 
     val bookController = new BookController
     val editorDialog = DialogHelper.startModalDialog(
-      view.getComponent,
+      component,
       bookController,
       new BookControllerInput(
-        Book(model.books.getList.get(selectedBookIndex)),
-        model.library.columns.toList,
-        model.library.configuration,
-        model.library.books.toList,
+        Book(books.getList.get(selectedBookIndex)),
+        library.columns.toList,
+        library.configuration,
+        library.books.toList,
         false,
         loadedFile))
 
     if (editorDialog.isOk()) {
       saveImages(bookController.getOutput)
-      model.books.getList.set(selectedBookIndex, bookController.getOutput)
-      model.books.fireSelectedContentsChanged()
+      books.getList.set(selectedBookIndex, bookController.getOutput)
+      books.fireSelectedContentsChanged()
     }
   }
 
-  def saveImages(book: Book) = {
-    val columns = model.library.columns.toList
-    val columnConfiguration = model.library.configuration
+  private def saveImages(book: Book) = {
+    val columns = library.columns.toList
+    val columnConfiguration = library.configuration
     for { i <- 0 until columns.size } {
       val imageName = book.getValue(i)
       val columnName = columns(i)
@@ -196,25 +187,9 @@ class LibraryController(file: File) extends IController[LibraryControllerInput, 
     }
   }
 
-  def deleteBook(parent: Component) = {
-    if (JOptionPane.OK_OPTION == JOptionPane.showOptionDialog(
-      parent,
-      "Biztosan törölni akarod?",
-      "Törlés megerősítése",
-      JOptionPane.YES_NO_OPTION,
-      JOptionPane.QUESTION_MESSAGE,
-      null,
-      Array("Igen", "Nem"),
-      "Nem")) {
-      val selectionIndex = model.books.getSelectionIndex
-      model.books.getList.remove(selectionIndex)
-      model.books.fireIntervalRemoved(selectionIndex, selectionIndex)
-    }
-  }
-
   private def savePreviousBook(book: Book) = {
-    model.library.configuration.getRememberingColumns().foreach(colName => {
-      val columnIndex = model.library.columns.indexOf(colName)
+    library.configuration.getRememberingColumns().foreach(colName => {
+      val columnIndex = library.columns.indexOf(colName)
       Log.info("LibraryController.savePreviousBook")
       previousBook.setValue(columnIndex, book.getValue(columnIndex))
     })
@@ -222,8 +197,8 @@ class LibraryController(file: File) extends IController[LibraryControllerInput, 
 
   private def newPreviousBook(size: Int): Book = {
     val newBook = Book(size)
-    model.library.configuration.getRememberingColumns().foreach(rememberingColumn => {
-      val columnIndex = model.library.columns.indexOf(rememberingColumn)
+    library.configuration.getRememberingColumns().foreach(rememberingColumn => {
+      val columnIndex = library.columns.indexOf(rememberingColumn)
       newBook.setValue(columnIndex, previousBook.getValue(columnIndex))
       Log.info("LibraryController.newPreviousBook remembering col " + columnIndex + " val:" + previousBook.getValue(columnIndex))
     })
