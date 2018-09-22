@@ -64,7 +64,7 @@ class IdaLibraryTest extends AbstractUiTest {
   }
 
   @Test //  @SuppressFBWarnings(value = "RV_RETURN_VALUE_IGNORED_BAD_PRACTICE", justification = "test cleanup")
-  def testLoadAndSave(): Unit = {
+  def testLoadAndSaveAs(): Unit = {
     val file: File = new LibraryFileBuilder()
       .withSheet(ExcelHandler.BOOKS)
       .withColumns("column1", "column2")
@@ -81,7 +81,7 @@ class IdaLibraryTest extends AbstractUiTest {
     } finally file.delete()
     val file2: File = new File(System.currentTimeMillis() + ".xls")
     try {
-      library.save(file2)
+      library.saveAs(file2)
       ExcelAssert.assertExcelCell(
         file2,
         ExcelHandler.BOOKS,

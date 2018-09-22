@@ -6,24 +6,15 @@ import eu.eyan.util.string.StringPlus.StringPlusImplicit
 
 object IdaLibrary {
 
-  // TODO - tabs for more libraries
-  // TODO - tabok bezárása
-  // TODO - changed * for the libs and by close show not saved and so on.
-  // TODO - Fájl menü library betöltése -> Könyvtár vagy fájl
-  // TODO - Fájl menü library mentése -> Könyvtár vagy fájl
   // TODO - menu - Help - about, write email, ötlet, javaslat,
   // TODO - menu - Help - seg<tség a konfigurációhoz
   // TODO - menü gombok több köztes hely
-  // TODO - Mentés -> kiválasztás nélkül
-  // TODO - Mentés másként -> legyen menjen oda ahol van
-  // TODO - Töltés: menjen oda ahonnan a legutolsót töltötte
-  // TODO - program indítás: emlékezzen az összes nyitott fájlra mint a npp -> registry
-  // TODO - új könyv: isbn legyen az alap
-  // TODO - új könyv: fentre rendezve minden
-  // TODO - új könyv: ha lehet jframe maximalizálva
-  // TODO - új könyv: mentés gomb kicsi
   // TODO - mentse el a legutolsó kiválsztott webcamet
   // TODO - több webcam kiesik bejön -> legyen rendesen kezelve hibaüzenetekkel(?)
+	// TODO - új könyv: isbn legyen az alap
+	// TODO - új könyv: fentre rendezve minden
+	// TODO - új könyv: ha lehet jframe maximalizálva
+	// TODO - új könyv: mentés gomb kicsi
   // TODO - új könyv: képek ha nincs, akkor is kép hogy nincs
   // TODO - új könyv: képek címfelirat
   // TODO - új könyv: képek fentre rendezve
@@ -33,10 +24,10 @@ object IdaLibrary {
   // TODO - új könyv: kép Katt átnevezése
   // TODO - új könyv: kép legördülöö vagy autocomplete, frissítse a képet
   // TODO - új könyv: fent - nem kell a címsorban
+	// TODO - új könyv - escape close ha nincs változás
+	// TODO - új könyv - escape kérdés ha változás
   // TODO - képek: több ktárba, mert több ezer fájl lehetséges
   // TODO - könyv szerkesztése címsor az összes megjelenített oszlop
-  // TODO - új könyv - escape close ha nincs változás
-  // TODO - új könyv - escape kérdés ha változás
   // TODO - könyv szerkesztése - escape close ha nincs változás
   // TODO - könyv szerkesztése - escape kérdés ha változás
   // TODO - könyv szerkesztése - autocomplete törlés szebb ikon

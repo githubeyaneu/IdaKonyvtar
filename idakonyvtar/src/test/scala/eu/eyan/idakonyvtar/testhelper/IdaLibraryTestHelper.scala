@@ -84,10 +84,15 @@ class IdaLibraryTestHelper extends TestPlus {
 
   def assertTableCell(col: Int, row: Int, content: String) = assertThat(frame.table().contents()(row - 1)(col - 1)).isEqualTo(content)
 
-  def save(file: File): Unit = {
+  def save: Unit = {
     clickMenu("File")
     clickMenu("Save")
-    frame.fileChooser().selectFile(file).approve()
+  }
+
+  def saveAs(file: File): Unit = {
+		  clickMenu("File")
+		  clickMenu("Save as")
+		  frame.fileChooser().selectFile(file).approve()
   }
 
   def clickNewButton = frame.button("Új book hozzáadása").click()

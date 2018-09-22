@@ -32,16 +32,26 @@ import javax.swing.JFileChooser
 import javax.swing.JOptionPane
 import javax.swing.ListSelectionModel
 import rx.lang.scala.subjects.BehaviorSubject
+import eu.eyan.util.swing.WithComponent
+import eu.eyan.util.rx.lang.scala.subjects.BehaviorSubjectPlus.BehaviorSubjectImplicit
+import eu.eyan.idakonyvtar.text.TextsIda
 
-class LibraryController(file: File) {
-	private val bookTable = new BookTable
-	private val highlightRenderer = new HighlightRenderer
+class LibraryController(val file: File) extends WithComponent {
+  override def toString = s"LibraryController[file=$file, nrOfBooks=${numberOfBooks.get}, isBookSelected=${isBookSelected.get}]"
+  def getComponent = component
+  private val bookTable = new BookTable
+  private val highlightRenderer = new HighlightRenderer
   private val books: SelectionInList[Book] = new SelectionInList[Book]()
-  private var library: Library = null  // TODO /* var, because of loading other library */
+  private var library: Library = null // TODO /* var, because of loading other library */
   private var loadedFile: File = null
+  private val texts = new TextsIda
 
   val isBookSelected = BehaviorSubject(false)
   val numberOfBooks = BehaviorSubject(books.getList.size)
+  books.onListData(numberOfBooks.onNext(books.getList.size))
+  val isDirty = BehaviorSubject(false)
+  def dirty = isDirty.onNext(true)
+  def notDirty = isDirty.onNext(false)
 
   val component = new JPanelWithFrameLayout()
     .withBorders
@@ -59,7 +69,6 @@ class LibraryController(file: File) {
   bookTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
 
   bookTable.onDoubleClick(editBook)
-  books.onListData(numberOfBooks.onNext(books.getList.size))
   bookTable.onValueChanged(isBookSelected.onNext(bookTable.getSelectedRow >= 0))
 
   def filter(textToFilter: String) = {
@@ -67,7 +76,7 @@ class LibraryController(file: File) {
     highlightRenderer.setHighlightText(textToFilter)
   }
 
-	  def deleteBook(parent: Component) = {
+  def deleteBook(parent: Component) = {
     if (JOptionPane.OK_OPTION == JOptionPane.showOptionDialog( // TODO DialogHelper.yesNo
       parent,
       "Biztosan törölni akarod?",
@@ -77,13 +86,14 @@ class LibraryController(file: File) {
       null,
       Array("Igen", "Nem"),
       "Nem")) {
+
       val selectionIndex = books.getSelectionIndex
       books.getList.remove(selectionIndex)
       books.fireIntervalRemoved(selectionIndex, selectionIndex)
+      dirty
     }
   }
-	  
-	  
+
   private def resetTableModel() = {
     if (books.getSize > 0)
       bookTable.setEmptyText("Ilyen szűrőfeltételekkel nem található book.")
@@ -105,25 +115,21 @@ class LibraryController(file: File) {
     resetTableModel()
   }
 
-  def loadLibrary = new JFileChooser()
-    .withCurrentDirectory(".")
-    .withDialogTitle("Töltés")
-    .withApproveButtonText("Töltés")
-    .withFileFilter("xls", "Excel97 fájlok")
-    .showAndHandleResult(component /* JFrame*/ , selectedFile => {
-      Log.info("selected file: " + selectedFile)
-      readLibrary(selectedFile)
-    })
+  def saveLibrary = {
+    Log.info("Save " + file)
+    try {
+      ExcelHandler.saveLibrary(file, library)
+      notDirty
+    } catch { case le: LibraryException => Log.error(le) }
+  }
 
-  def saveLibrary = new JFileChooser(new File("."))
-    .withDialogTitle("Mentés")
-    .withApproveButtonText("Mentés")
-    .withFileFilter("xls", "Excel97 fájlok")
-    .showAndHandleResult(component /* JFrame*/ , selectedFile => {
-      Log.info("Save " + selectedFile)
-      try ExcelHandler.saveLibrary(selectedFile, library)
-      catch { case le: LibraryException => Log.error(le) }
-    })
+  def saveAsLibrary(newFile: File) = {
+    Log.info("SaveAs " + file)
+    try {
+      if (newFile.exists && DialogHelper.yesNo(null, texts.SaveAsOverwriteConfirmText(newFile), texts.SaveAsOverwriteConfirmWindowTitle, texts.SaveAsOverwriteYes, texts.SaveAsOverwriteNo))
+        ExcelHandler.saveLibrary(newFile, library)
+    } catch { case le: LibraryException => Log.error(le) }
+  }
 
   def createNewBook = {
     val bookController = new BookController
@@ -137,11 +143,12 @@ class LibraryController(file: File) {
       true,
       loadedFile))
 
-    if (editorDialog.isOk()) {
+    if (editorDialog.isOk) {
       saveImages(bookController.getOutput)
       books.getList.add(0, bookController.getOutput)
       savePreviousBook(bookController.getOutput)
       books.fireIntervalAdded(0, 0)
+      dirty
     }
   }
 
@@ -160,10 +167,11 @@ class LibraryController(file: File) {
         false,
         loadedFile))
 
-    if (editorDialog.isOk()) {
+    if (editorDialog.isOk) {
       saveImages(bookController.getOutput)
       books.getList.set(selectedBookIndex, bookController.getOutput)
-      books.fireSelectedContentsChanged()
+      books.fireSelectedContentsChanged
+      dirty
     }
   }
 

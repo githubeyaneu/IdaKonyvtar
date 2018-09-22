@@ -83,11 +83,11 @@ class BookEditorTestHelper(robot: Robot) {
   }
 
   def clickSave(): Unit = {
-    dialog.button(DialogHelper.SAVE).click()
+    dialog.button("Mentés").click()
   }
 
   def clickCancel(): Unit = {
-    dialog.button(DialogHelper.CANCEL).click()
+    dialog.button("Mégsem").click()
   }
 
   def cleanUp(): Unit = {

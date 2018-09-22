@@ -31,11 +31,18 @@ import eu.eyan.util.awt.ComponentPlus.ComponentPlusImplicit
 import eu.eyan.util.swing.JDialogPlus.JdialogPlusImplicit
 import eu.eyan.util.text.Text
 import eu.eyan.util.swing.JButtonPlus.JButtonImplicit
+import eu.eyan.util.swing.Alert
+import javax.swing.UIManager
+import javax.swing.JFileChooser
+import eu.eyan.util.swing.JFileChooserPlus.JFileChooserImplicit
+import java.io.File
+import eu.eyan.util.text.TextsDialogYes
+import eu.eyan.util.text.TextsDialogYesNo
+import eu.eyan.util.text.TextsDialogFileChooser
+import eu.eyan.util.text.TextsDialogYesNoCancel
 
 object DialogHelper {
 
-  val CANCEL = "Mégsem"
-  val SAVE = "Mentés"
 
   /**
    * Blockiert!!!
@@ -91,13 +98,17 @@ object DialogHelper {
     val panel = new JPanelWithFrameLayout().withSeparators.newColumn("pref:grow")
 
     panel.newColumn
-    panel.addButton(SAVE).name(SAVE).onAction({ dialogController.onOk(); dialog.setOk(true); dialog.dispose() })
+    panel.addButton("Mentés").name("Mentés").onAction({ dialogController.onOk(); dialog.setOk(true); dialog.dispose() })
 
     panel.newColumn
-    panel.addButton(CANCEL).name(CANCEL).onAction({ dialogController.onCancel(); dialog.dispose() })
+    panel.addButton("Mégsem").name("Mégsem").onAction({ dialogController.onCancel(); dialog.dispose() })
     panel
   }
 
+  def yes(texts: TextsDialogYes):Option[String] = yes(texts.text, texts.title, texts.yes)
+  def yes(text: Text, title: Text, yes: Text) = Alert.alertOptions(title.get, text.get, Array(yes.get))
+    
+  def yesNo(parent: Component, texts: TextsDialogYesNo):Boolean = yesNo(parent, texts.text, texts.title, texts.yes, texts.no)
   def yesNo(parent: Component, question: Text, dialogTitle: Text, yes: Text, no: Text) =
     Text.combineAndExecute("question" -> question, "title" -> dialogTitle, "yes" -> yes, "no" -> no)(texts =>
       JOptionPane.showOptionDialog(
@@ -109,4 +120,36 @@ object DialogHelper {
         null,
         Array[Object](texts("yes"), texts("no")),
         texts("no")) == JOptionPane.OK_OPTION)
+
+  trait  DialogResult
+  case object YES extends DialogResult 
+  case object NO extends DialogResult
+  case object CANCEL extends DialogResult
+  
+  def yesNoCancel(parent: Component, texts: TextsDialogYesNoCancel):DialogResult = yesNoCancel(parent, texts.text, texts.title, texts.yes, texts.no, texts.cancel)
+  def yesNoCancel(parent: Component, text: Text, title: Text, yes: Text, no: Text, cancel: Text):DialogResult =
+    Text.combineAndExecute("question" -> text, "title" -> title, "yes" -> yes, "no" -> no, "cancel" -> cancel)(texts => {
+      val result = JOptionPane.showOptionDialog(
+        parent,
+        texts("question"),
+        texts("title"),
+        JOptionPane.YES_NO_CANCEL_OPTION,
+        JOptionPane.QUESTION_MESSAGE,
+        null,
+        Array[Object](texts("yes"), texts("no"), texts("cancel")),
+        texts("cancel"))
+      if(result == JOptionPane.OK_OPTION) YES
+      else if(result == JOptionPane.NO_OPTION) NO
+      else CANCEL
+    })
+    
+    def fileChooser(parent: Component, currentDir:File, fileFilter: String, texts: TextsDialogFileChooser, action: File => Unit) = {
+      UIManager.put("FileChooser.cancelButtonText", texts.cancel)
+      new JFileChooser()
+        .withCurrentDirectory(currentDir)
+        .withDialogTitle(texts.title.get)
+        .withApproveButtonText(texts.approve.get)
+        .withFileFilter(fileFilter, texts.fileFilterText.get)
+        .showAndHandleResult(parent, action)
+  }
 }

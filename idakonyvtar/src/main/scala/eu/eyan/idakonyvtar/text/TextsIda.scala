@@ -15,17 +15,21 @@ import eu.eyan.util.swing.Alert
 import javax.swing.JComboBox
 import eu.eyan.util.text.Texts
 import eu.eyan.util.registry.RegistryGroup
+import java.io.File
+import eu.eyan.util.text.TextsDialogYesNoCancel
+import eu.eyan.util.text.TextsDialogYes
+import eu.eyan.util.text.TextsDialogYesNo
+import eu.eyan.util.text.TextsDialogFileChooser
+import eu.eyan.util.text.TextsButton
 
 class TextsIda extends Texts {
-	lazy val languageInRegistry = IdaLibrary.registryValue(classOf[TextsIda].getName)
-	def initialLanguage = languageInRegistry.read
-	language.subscribe(_.foreach(languageInRegistry.save))
-
+  lazy val languageInRegistry = IdaLibrary.registryValue(classOf[TextsIda].getName)
+  def initialLanguage = languageInRegistry.read
+  language.subscribe(_.foreach(languageInRegistry.save))
 
   lazy val translationsXls = "translations.xls".toResourceFile.get
   lazy val translationsTable = ExcelHandler.readExcel(translationsXls, "translations")
   lazy val languages = translationsTable.row(0).drop(2).filter(_.nonEmpty).toArray
-
 
   def getTextTranslation(technicalName: String, language: Option[String]) = {
     Log.debug(s"TechnicalName=$technicalName, language=$language")
@@ -36,41 +40,82 @@ class TextsIda extends Texts {
     val rowIndex = translationsTable.rowIndex(technicalName)
     Log.debug("technicalName row " + rowIndex)
 
-    val colAndRow = for (a <- translationColumnIndex; b <-rowIndex) yield (a,b)
+    val colAndRow = for (a <- translationColumnIndex; b <- rowIndex) yield (a, b)
     val translation = colAndRow.map(translationsTable.cells.get).flatten
     Log.debug("translation " + translation)
 
     translation
   }
 
+  protected object IdaText {
+    def apply(technicalName: String, args: Observable[Any]*) = new IdaText(technicalName, args: _*)
+  }
 
-  protected class IdaText(private val technicalName: String, private val args: Observable[Any]*) extends Text(BehaviorSubject(noTranslation(technicalName)), args: _*) {
-	  def optionGetOrElse(orElse: String)(option: Option[String]) = option.getOrElse(orElse)
+  protected class IdaText(private val technicalName: String, private val args: Observable[Any]*) extends Text(noTranslation(technicalName), args: _*) {
+    def optionGetOrElse(orElse: String)(option: Option[String]) = option.getOrElse(orElse)
     val translateText = translate(technicalName)(_)
     val translated = language map translateText
     val validTranslationObs = translated map optionGetOrElse(noTranslation(technicalName))
-    validTranslationObs subscribe template
+    validTranslationObs subscribe templateObservable
   }
 
   case object IdaLibraryTitleSingular extends IdaText("IdaLibraryTitleSingular")
-  case object IdaLibraryTitlePlural { def apply(nrOfBooks: Observable[Int]) = new IdaText("IdaLibraryTitlePlural", nrOfBooks) }
+  case object IdaLibraryTitlePlural { def apply(nrOfBooks: Observable[Int]) = IdaText("IdaLibraryTitlePlural", nrOfBooks) }
   case object IdaLibraryTitleEmpty extends IdaText("IdaLibraryTitleEmpty")
   case object IdaLibraryTitleIcon extends IdaText("IdaLibraryTitleIcon")
   case object MenuFile extends IdaText("MenuFile")
   case object MenuFileLoad extends IdaText("MenuFileLoad")
   case object MenuFileLoadIcon extends IdaText("MenuFileLoadIcon")
+
   case object LoadFileWindowTitle extends IdaText("LoadFileWindowTitle")
   case object LoadFileWindowFileType extends IdaText("LoadFileWindowFileType")
+  case object LoadFileWindowLoadButton extends IdaText("LoadFileWindowLoadButton")
+  case object LoadFileWindowCancelButton extends IdaText("LoadFileWindowCancelButton")
+  case object LoadFileTexts extends TextsDialogFileChooser(LoadFileWindowTitle, LoadFileWindowLoadButton, LoadFileWindowCancelButton, LoadFileWindowFileType)
+
   case object MenuFileSave extends IdaText("MenuFileSave")
   case object MenuFileSaveIcon extends IdaText("MenuFileSaveIcon")
   case object SaveFileWindowTitle extends IdaText("SaveFileWindowTitle")
   case object SaveFileWindowFileType extends IdaText("SaveFileWindowFileType")
+  case object SaveFileWindowSaveButton extends IdaText("SaveFileWindowSaveButton")
+  case object SaveFileWindowCancelButton extends IdaText("SaveFileWindowCancelButton")
+  case object MenuFileSaveAs extends IdaText("MenuFileSaveAs")
+  case object MenuFileSaveAsIcon extends IdaText("MenuFileSaveAsIcon")
+
+  case object SaveAsFileWindowTitle extends IdaText("SaveAsFileWindowTitle")
+  case object SaveAsFileWindowFileType extends IdaText("SaveAsFileWindowFileType")
+  case object SaveAsFileWindowSaveButton extends IdaText("SaveAsFileWindowSaveButton")
+  case object SaveAsFileWindowCancelButton extends IdaText("SaveAsFileWindowCancelButton")
+  case object SaveAsFileTexts extends TextsDialogFileChooser(SaveAsFileWindowTitle, SaveAsFileWindowSaveButton, SaveAsFileWindowCancelButton, SaveAsFileWindowFileType)
+
+  case object SaveAsOverwriteConfirmText { def apply(filename: File) = IdaText("SaveAsOverwriteConfirmText", BehaviorSubject(filename)) }
+  case object SaveAsOverwriteConfirmWindowTitle extends IdaText("SaveAsOverwriteConfirmWindowTitle")
+  case object SaveAsOverwriteYes extends IdaText("SaveAsOverwriteYes")
+  case object SaveAsOverwriteNo extends IdaText("SaveAsOverwriteNo")
+
+  case object CloseLibraryWindowConfirmQuestion { def apply(filename: String) = IdaText("CloseLibraryWindowConfirmQuestion", BehaviorSubject(filename)) }
+  case object CloseLibraryWindowTitle { def apply(filename: String) = IdaText("CloseLibraryWindowTitle", BehaviorSubject(filename)) }
+  case object CloseLibraryWindowYes extends IdaText("CloseLibraryWindowYes")
+  case object CloseLibraryWindowNo extends IdaText("CloseLibraryWindowNo")
+  case object CloseLibraryWindowCancel extends IdaText("CloseLibraryWindowCancel")
+  case object CloseLibraryWindowTexts { def apply(filename: String) = new TextsDialogYesNoCancel(CloseLibraryWindowConfirmQuestion(filename), CloseLibraryWindowTitle(filename), CloseLibraryWindowYes, CloseLibraryWindowNo, CloseLibraryWindowCancel) }
+
+  case object ExitSaveLibraryWindowConfirmQuestion { def apply(filename: String) = IdaText("ExitSaveLibraryWindowConfirmQuestion", BehaviorSubject(filename)) }
+  case object ExitSaveLibraryWindowTitle { def apply(filename: String) = IdaText("ExitSaveLibraryWindowTitle", BehaviorSubject(filename)) }
+  case object ExitSaveLibraryWindowYes extends IdaText("ExitSaveLibraryWindowYes")
+  case object ExitSaveLibraryWindowNo extends IdaText("ExitSaveLibraryWindowNo")
+  case object ExitSaveLibraryWindowCancel extends IdaText("ExitSaveLibraryWindowCancel")
+  case object ExitSaveLibraryTexts { def apply(filename: String) = new TextsDialogYesNoCancel(ExitSaveLibraryWindowConfirmQuestion(filename), ExitSaveLibraryWindowTitle(filename), ExitSaveLibraryWindowYes, ExitSaveLibraryWindowNo, ExitSaveLibraryWindowCancel) }
+
   case object MenuFileExit extends IdaText("MenuFileExit")
   case object MenuFileExitIcon extends IdaText("MenuFileExitIcon")
+
   case object ExitWindowTitle extends IdaText("ExitWindowTitle")
   case object ExitWindowConfirmQuestion extends IdaText("ExitWindowConfirmQuestion")
   case object ExitWindowYes extends IdaText("ExitWindowYes")
   case object ExitWindowNo extends IdaText("ExitWindowNo")
+  case object ExitWindowTexts extends TextsDialogYesNo(ExitWindowConfirmQuestion, ExitWindowTitle, ExitWindowYes, ExitWindowNo)
+
   case object MenuLanguages extends IdaText("MenuLanguages")
   case object MenuLanuagesIcon extends IdaText("MenuLanuagesIcon")
   case object MenuDebug extends IdaText("MenuDebug")
@@ -92,9 +137,12 @@ class TextsIda extends Texts {
   case object DebugWindowConsoleErrLabel extends IdaText("DebugWindowConsoleErrLabel")
   case object MenuDebugCopyLogs extends IdaText("MenuDebugCopyLogs")
   case object MenuDebugCopyLogsIcon extends IdaText("MenuDebugCopyLogsIcon")
+
   case object CopyLogsWindowTitle extends IdaText("CopyLogsWindowTitle")
   case object CopyLogsWindowText extends IdaText("CopyLogsWindowText")
   case object CopyLogsWindowButton extends IdaText("CopyLogsWindowButton")
+  case object CopyLogsTexts extends TextsDialogYes(CopyLogsWindowTitle, CopyLogsWindowText, CopyLogsWindowButton)
+
   case object MenuDebugClearRegistry extends IdaText("MenuDebugClearRegistry")
   case object MenuDebugClearRegistryIcon extends IdaText("MenuDebugClearRegistryIcon")
   case object MenuHelp extends IdaText("MenuHelp")
@@ -108,22 +156,18 @@ class TextsIda extends Texts {
   case object EmailErrorEmailBody extends IdaText("EmailErrorEmailBody")
   case object MenuHelpAbout extends IdaText("MenuHelpAbout")
   case object MenuHelpAboutIcon extends IdaText("MenuHelpAboutIcon")
+
   case object AboutWindowTitle extends IdaText("AboutWindowTitle")
   case object AboutWindowText extends IdaText("AboutWindowText")
   case object AboutWindowButton extends IdaText("AboutWindowButton")
+  case object AboutWindowTexts extends TextsDialogYes(AboutWindowTitle, AboutWindowText, AboutWindowButton)
+
   case object ToolbarTitle extends IdaText("ToolbarTitle")
-  case object ToolbarSaveButton extends IdaText("ToolbarSaveButton")
-  case object ToolbarSaveButtonIcon extends IdaText("ToolbarSaveButtonIcon")
-  case object ToolbarSaveButtonTooltip extends IdaText("ToolbarSaveButtonTooltip")
-  case object ToolbarLoadButton extends IdaText("ToolbarLoadButton")
-  case object ToolbarLoadButtonIcon extends IdaText("ToolbarLoadButtonIcon")
-  case object ToolbarLoadButtonTooltip extends IdaText("ToolbarLoadButtonTooltip")
-  case object ToolbarNewBookButton extends IdaText("ToolbarNewBookButton")
-  case object ToolbarNewBookButtonIcon extends IdaText("ToolbarNewBookButtonIcon")
-  case object ToolbarNewBookButtonTooltip extends IdaText("ToolbarNewBookButtonTooltip")
-  case object ToolbarDeleteBookButton extends IdaText("ToolbarDeleteBookButton")
-  case object ToolbarDeleteBookButtonIcon extends IdaText("ToolbarDeleteBookButtonIcon")
-  case object ToolbarDeleteBookButtonTooltip extends IdaText("ToolbarDeleteBookButtonTooltip")
+  case object ToolbarSaveButton extends TextsButton(IdaText("ToolbarSaveButton"), IdaText("ToolbarSaveButtonTooltip"), IdaText("ToolbarSaveButtonIcon"))
+  case object ToolbarLoadButton extends TextsButton(IdaText("ToolbarLoadButton"), IdaText("ToolbarLoadButtonTooltip"), IdaText("ToolbarLoadButtonIcon"))
+  case object ToolbarNewBookButton extends TextsButton(IdaText("ToolbarNewBookButton"), IdaText("ToolbarNewBookButtonTooltip"), IdaText("ToolbarNewBookButtonIcon"))
+  case object ToolbarDeleteBookButton extends TextsButton(IdaText("ToolbarDeleteBookButton"), IdaText("ToolbarDeleteBookButtonTooltip"), IdaText("ToolbarDeleteBookButtonIcon"))
+
   case object DeleteBookWindowTitle extends IdaText("DeleteBookWindowTitle")
   case object DeleteBookWindowQuestion extends IdaText("DeleteBookWindowQuestion")
   case object DeleteBookWindowYes extends IdaText("DeleteBookWindowYes")
