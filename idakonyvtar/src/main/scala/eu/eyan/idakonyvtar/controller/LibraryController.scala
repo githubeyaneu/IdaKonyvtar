@@ -35,11 +35,12 @@ import rx.lang.scala.subjects.BehaviorSubject
 import eu.eyan.util.swing.WithComponent
 import eu.eyan.util.rx.lang.scala.subjects.BehaviorSubjectPlus.BehaviorSubjectImplicit
 import eu.eyan.idakonyvtar.text.TextsIda
+import javax.swing.JScrollPane
 
 class LibraryController(val file: File) extends WithComponent {
   override def toString = s"LibraryController[file=$file, nrOfBooks=${numberOfBooks.get}, isBookSelected=${isBookSelected.get}]"
   def getComponent = component
-  private val bookTable = new BookTable
+  private val bookTable = new BookTable(file.getPath)
   private val highlightRenderer = new HighlightRenderer
   private val books: SelectionInList[Book] = new SelectionInList[Book]()
   private var library: Library = null // TODO /* var, because of loading other library */
@@ -53,12 +54,12 @@ class LibraryController(val file: File) extends WithComponent {
   def dirty = isDirty.onNext(true)
   def notDirty = isDirty.onNext(false)
 
-  val component = new JPanelWithFrameLayout()
+  val component = new JScrollPane(new JPanelWithFrameLayout()
     .withBorders
     .withSeparators
     .newColumnFPG
     .newRowFPG
-    .addInScrollPane(bookTable)
+    .addInScrollPane(bookTable))
 
   readLibrary(file)
   var previousBook: Book = Book(library.columns.size)
@@ -126,7 +127,7 @@ class LibraryController(val file: File) extends WithComponent {
   def saveAsLibrary(newFile: File) = {
     Log.info("SaveAs " + file)
     try {
-      if (newFile.exists && DialogHelper.yesNo(null, texts.SaveAsOverwriteConfirmText(newFile), texts.SaveAsOverwriteConfirmWindowTitle, texts.SaveAsOverwriteYes, texts.SaveAsOverwriteNo))
+      if (newFile.notExists || DialogHelper.yesNo(null, texts.SaveAsOverwriteConfirmText(newFile), texts.SaveAsOverwriteConfirmWindowTitle, texts.SaveAsOverwriteYes, texts.SaveAsOverwriteNo))
         ExcelHandler.saveLibrary(newFile, library)
     } catch { case le: LibraryException => Log.error(le) }
   }

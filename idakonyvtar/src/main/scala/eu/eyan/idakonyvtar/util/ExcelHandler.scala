@@ -23,6 +23,7 @@ import jxl.write.biff.RowsExceededException
 import eu.eyan.util.backup.BackupHelper
 import eu.eyan.log.Log
 import eu.eyan.util.io.FilePlus.FilePlusImplicit
+import java.io.InputStream
 
 object ExcelHandler {
 
@@ -52,6 +53,23 @@ object ExcelHandler {
         yield ((columnIndex, rowIndex),sheet.getCell(columnIndex, rowIndex).getContents)
     workbook.close
     Excel(columnCount, rowCount, table.toMap)
+  }
+
+  def readExcelStream(data: InputStream, sheetName: String) = {
+		  Log.info
+		  val workbook = Workbook.getWorkbook(data, getWorkbookSettings())
+		  
+		  Log.info(s"Sheets: ${workbook.getSheetNames.mkString}")
+		  
+		  val sheet = getSheet(getWorkbookSettings(), workbook, sheetName)
+		  
+		  val columnCount = sheet.getColumns
+		  val rowCount = sheet.getRows
+		  val table = 
+		  for ( columnIndex <- 0 until columnCount; rowIndex <- 0 until rowCount ) 
+			  yield ((columnIndex, rowIndex),sheet.getCell(columnIndex, rowIndex).getContents)
+			  workbook.close
+			  Excel(columnCount, rowCount, table.toMap)
   }
 
   @throws(classOf[LibraryException])

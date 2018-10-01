@@ -55,17 +55,9 @@ class IdaLibraryTest extends AbstractUiTest {
     library.checkTitleWithNumber(4)
   }
 
-  @Test
-  @Ignore
-  def testMenu = {
-    library.clickMenu("ISBN keresés")//TODO: ?? does not exists
-    library.editor.clickCancel
-    library.clickMenu("Fájl")
-  }
-
   @Test //  @SuppressFBWarnings(value = "RV_RETURN_VALUE_IGNORED_BAD_PRACTICE", justification = "test cleanup")
   def testLoadAndSaveAs(): Unit = {
-    val file: File = new LibraryFileBuilder()
+    val file = new LibraryFileBuilder()
       .withSheet(ExcelHandler.BOOKS)
       .withColumns("column1", "column2")
       .withRow("árvíztűrő tükörfúrógép", "ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP")
@@ -73,13 +65,15 @@ class IdaLibraryTest extends AbstractUiTest {
       .withColumns("", ColumnConfigurations.SHOW_IN_TABLE.name, "ko2")
       .withRow("column1", "igen", "")
       .withRow("column2 tükörfúrógép", "nem", "")
-      .save()
+      .save
     try {
       library.load(file)
       library.assertTableCell(1, 1, "árvíztűrő tükörfúrógép")
       library.checkTitleWithNumber(1)
     } finally file.delete()
-    val file2: File = new File(System.currentTimeMillis() + ".xls")
+    
+    val file2 = new File(System.currentTimeMillis() + ".xls")
+    
     try {
       library.saveAs(file2)
       ExcelAssert.assertExcelCell(
@@ -89,7 +83,7 @@ class IdaLibraryTest extends AbstractUiTest {
         2,
         "árvíztűrő tükörfúrógép")
       library.checkTitleWithNumber(1)
-    } finally file2.delete()
+    } finally file2.delete
   }
 
   @Test

@@ -98,7 +98,7 @@ class BookView extends AbstractView {
     }
 
     val panel = new JPanelWithFrameLayout().withSeparators
-    panel.newColumn("f:p").add(rowsPanel)
+    panel.newColumn("f:p:g ").add(rowsPanel)
     panel.newColumn("f:320px").add(imagesPanel)
     panel.newColumn("f:320px").add(webcamPanel)
     panel

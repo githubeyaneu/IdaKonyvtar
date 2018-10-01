@@ -28,7 +28,8 @@ class TextsIda extends Texts {
   language.subscribe(_.foreach(languageInRegistry.save))
 
   lazy val translationsXls = "translations.xls".toResourceFile.get
-  lazy val translationsTable = ExcelHandler.readExcel(translationsXls, "translations")
+  val translationsXlsInputStream = ClassLoader.getSystemResourceAsStream("translations.xls")
+  lazy val translationsTable = ExcelHandler.readExcelStream(translationsXlsInputStream, "translations")
   lazy val languages = translationsTable.row(0).drop(2).filter(_.nonEmpty).toArray
 
   def getTextTranslation(technicalName: String, language: Option[String]) = {
@@ -141,7 +142,7 @@ class TextsIda extends Texts {
   case object CopyLogsWindowTitle extends IdaText("CopyLogsWindowTitle")
   case object CopyLogsWindowText extends IdaText("CopyLogsWindowText")
   case object CopyLogsWindowButton extends IdaText("CopyLogsWindowButton")
-  case object CopyLogsTexts extends TextsDialogYes(CopyLogsWindowTitle, CopyLogsWindowText, CopyLogsWindowButton)
+  case object CopyLogsTexts extends TextsDialogYes(CopyLogsWindowText, CopyLogsWindowTitle, CopyLogsWindowButton)
 
   case object MenuDebugClearRegistry extends IdaText("MenuDebugClearRegistry")
   case object MenuDebugClearRegistryIcon extends IdaText("MenuDebugClearRegistryIcon")
@@ -160,7 +161,7 @@ class TextsIda extends Texts {
   case object AboutWindowTitle extends IdaText("AboutWindowTitle")
   case object AboutWindowText extends IdaText("AboutWindowText")
   case object AboutWindowButton extends IdaText("AboutWindowButton")
-  case object AboutWindowTexts extends TextsDialogYes(AboutWindowTitle, AboutWindowText, AboutWindowButton)
+  case object AboutWindowTexts extends TextsDialogYes(AboutWindowText, AboutWindowTitle, AboutWindowButton)
 
   case object ToolbarTitle extends IdaText("ToolbarTitle")
   case object ToolbarSaveButton extends TextsButton(IdaText("ToolbarSaveButton"), IdaText("ToolbarSaveButtonTooltip"), IdaText("ToolbarSaveButtonIcon"))

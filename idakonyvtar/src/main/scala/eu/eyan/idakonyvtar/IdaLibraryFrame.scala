@@ -86,7 +86,7 @@ class IdaLibraryFrame private () {
 
     lastLoadedFiles.readMore.foreach(loadLibraries)
     loadLibraryFromFile(fileToOpen)
-    def loadLibraries(fileList: Array[String]): Unit = fileList.map(_.asFile).foreach(loadLibraryFromFile)
+    def loadLibraries(fileList: Array[String]): Unit = fileList.map(_.asFile).filter(_.exists).foreach(loadLibraryFromFile)
     def loadLibraryFromFile(file: File): Unit = loadLibrary(new LibraryController(file))
     def loadLibrary(libraryController: LibraryController): Unit = {
       val alreadyOpen = tabs.items.find(_.file == libraryController.file)

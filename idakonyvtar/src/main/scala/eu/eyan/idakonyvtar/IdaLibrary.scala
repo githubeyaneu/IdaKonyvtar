@@ -6,6 +6,7 @@ import eu.eyan.util.string.StringPlus.StringPlusImplicit
 
 object IdaLibrary {
 
+  // TODO - oszlop méret régen ment
   // TODO - menu - Help - about, write email, ötlet, javaslat,
   // TODO - menu - Help - seg<tség a konfigurációhoz
   // TODO - menü gombok több köztes hely
