@@ -3,9 +3,11 @@ package eu.eyan.idakonyvtar
 import eu.eyan.log.Log
 import eu.eyan.util.registry.RegistryGroup
 import eu.eyan.util.string.StringPlus.StringPlusImplicit
+import eu.eyan.idakonyvtar.text.TechnicalTextsIda._
 
 object IdaLibrary {
 
+  // TODO - oszlop méret régen ment
   // TODO - menu - Help - about, write email, ötlet, javaslat,
   // TODO - menu - Help - seg<tség a konfigurációhoz
   // TODO - menü gombok több köztes hely
@@ -43,11 +45,8 @@ object IdaLibrary {
   protected val registryGroup = RegistryGroup(classOf[IdaLibrary].getName)
   def registryValue(parameterName: String) = registryGroup.registryValue(parameterName)
   
-  // TODO: how to handle it? maven etc...
-  def VERSION = "1.1.2"
-  
   def main(args: Array[String]): Unit = {
-    val fileToOpen = args.lift(0).getOrElse("library.xls").asFileOrResource.get
+    val fileToOpen = args.lift(0).getOrElse(LIBRARYXLS).asFileOrResource.get
 
     Log.activateDebugLevel
     Log.info("Resource -> File: " + fileToOpen)

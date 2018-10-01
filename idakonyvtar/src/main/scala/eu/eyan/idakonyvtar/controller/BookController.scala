@@ -63,7 +63,7 @@ class BookController extends IDialogController[BookControllerInput, Book] {
   def getView = view.getComponent
 
   def getTitle =
-    if (model.columns.indexOf("Szerző") >= 0)
+    if (model.columns.indexOf("Cím") >= 0)
       "Könyv adatainak szerkesztése - " + model.book.getValue(model.columns.indexOf("Cím"))
     else
       "Könyv adatainak szerkesztése"

@@ -40,6 +40,8 @@ import eu.eyan.util.text.TextsDialogYes
 import eu.eyan.util.text.TextsDialogYesNo
 import eu.eyan.util.text.TextsDialogFileChooser
 import eu.eyan.util.text.TextsDialogYesNoCancel
+import eu.eyan.util.swing.JDialogPlus.JdialogPlusImplicit
+import java.awt.GraphicsEnvironment
 
 object DialogHelper {
 
@@ -68,15 +70,14 @@ object DialogHelper {
     dialog.add(addScrollableInBorders(panel))
     dialog.setTitle(controller.getTitle)
     dialog.setResizable(true)
-    dialog.addWindowListener(new WindowAdapter() {
-      override def windowClosing(e: WindowEvent) = super.windowClosed(e)
-    })
+    dialog.addWindowListener(new WindowAdapter() { override def windowClosing(e: WindowEvent) = super.windowClosed(e) })//TODO needed?
 
     controller.initBindings
     dialog.pack
     dialog.positionToCenter
     controller.addResizeListener(dialog)
-    dialog.setSize(1200, 768)
+    dialog.maximize
+    
     // blockiert:
     dialog.setVisible(true)
     if (parentWindow != null) parentWindow.invalidate()
@@ -144,7 +145,7 @@ object DialogHelper {
     })
     
     def fileChooser(parent: Component, currentDir:File, fileFilter: String, texts: TextsDialogFileChooser, action: File => Unit) = {
-      UIManager.put("FileChooser.cancelButtonText", texts.cancel)
+      UIManager.put("FileChooser.cancelButtonText", texts.cancel.get)
       new JFileChooser()
         .withCurrentDirectory(currentDir)
         .withDialogTitle(texts.title.get)

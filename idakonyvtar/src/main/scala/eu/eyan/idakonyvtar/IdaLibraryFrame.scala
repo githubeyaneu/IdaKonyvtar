@@ -34,6 +34,8 @@ import javax.swing.JFrame
 import javax.swing.JToolBar
 import rx.lang.scala.Subscription
 import rx.lang.scala.subjects.BehaviorSubject
+import eu.eyan.idakonyvtar.text.TechnicalTextsIda._
+import scala.io.Codec
 
 object IdaLibraryFrame {
   def apply(fileToOpen: File) = new IdaLibraryFrame().startLibrary(fileToOpen)
@@ -43,7 +45,7 @@ class IdaLibraryFrame private () {
 
   private val texts = new TextsIda
 
-  private def selectLanguageByDialog(languages: Array[String]) = Alert.alertOptions("Language selection", "Please select your language!", languages)
+  private def selectLanguageByDialog(languages: Array[String]) = Alert.alertOptions(LANGUAGE_SELECTION, PLEASE_SELECT_YOUR_LANGUAGE, languages)
 
   private def confirmExit(frame: JFrame) = askToSaveIfDirty(frame, tabs.items.toList)
 
@@ -63,11 +65,11 @@ class IdaLibraryFrame private () {
 
   private def showAbout: Unit = DialogHelper.yes(texts.AboutWindowTexts)
 
-  private def writeEmail = Desktop.getDesktop.mail(new URI("mailto:idalibrary@eyan.hu?subject=IdaLibrary%20error&body=" + URLEncoder.encode(getAllLogs, "utf-8").replace("\\+", "%20")))
+  private def writeEmail = Desktop.getDesktop.mail(new URI(WRITE_EMAIL + URLEncoder.encode(getAllLogs, UTF8).replace(PLUS_AS_REGEX, SPACE_URL_ENCODED)))
 
-  private val lastLoadDirectoryRegistry = IdaLibrary.registryValue("lastLoadDirectory")
+  private val lastLoadDirectoryRegistry = IdaLibrary.registryValue(LAST_LOAD_DIRECTORY)
 
-  private val lastLoadedFiles = IdaLibrary.registryValue("lastLoadedFiles")
+  private val lastLoadedFiles = IdaLibrary.registryValue(LAST_LOADED_FILES)
 
   private val tabs = new JTabbedPanePlus[LibraryController]()
 
@@ -79,22 +81,22 @@ class IdaLibraryFrame private () {
 
   private val isBookOpen = BehaviorSubject(false)
 
-  val filterText = BehaviorSubject("")
+  val filterText = BehaviorSubject(EMPTY_STRING)
 
   def startLibrary(fileToOpen: File) = {
     if (texts.initialLanguage.isEmpty) selectLanguageByDialog(texts.languages).foreach(texts.onLanguageSelected)
 
     lastLoadedFiles.readMore.foreach(loadLibraries)
     loadLibraryFromFile(fileToOpen)
-    def loadLibraries(fileList: Array[String]): Unit = fileList.map(_.asFile).foreach(loadLibraryFromFile)
+    def loadLibraries(fileList: Array[String]): Unit = fileList.map(_.asFile).filter(_.exists).foreach(loadLibraryFromFile)
     def loadLibraryFromFile(file: File): Unit = loadLibrary(new LibraryController(file))
     def loadLibrary(libraryController: LibraryController): Unit = {
       val alreadyOpen = tabs.items.find(_.file == libraryController.file)
       if (alreadyOpen.nonEmpty) tabs.setSelectedComponent(alreadyOpen.get.getComponent)
       else {
-        def dirtyToText(dirty: Boolean) = if (dirty) " *" else "  "
+        def dirtyToText(dirty: Boolean) = if (dirty) DIRTY else NOT_DIRTY
         val dirtyText = libraryController.isDirty.map(dirtyToText)
-        tabs.addTab(libraryController, new Text(libraryController.file.withoutExtension.getName + "%s", dirtyText), libraryController.file.toString, closeLibrary _)
+        tabs.addTab(libraryController, new Text(libraryController.file.withoutExtension.getName + PARAM, dirtyText), libraryController.file.toString, closeLibrary _)
         val files = tabs.items.map(_.file.toString)
         Log.info(files)
         lastLoadedFiles.saveMore(files.toArray)
@@ -114,7 +116,8 @@ class IdaLibraryFrame private () {
       lastLoadDirectoryRegistry.save(selectedFile.getParent)
       loadLibrary(new LibraryController(selectedFile))
     }
-    def chooseFileToLoad: Unit = DialogHelper.fileChooser(null, lastLoadDirectoryRegistry.read.getOrElse(".").asFile, "xls", texts.LoadFileTexts, loadFile)
+
+    def chooseFileToLoad: Unit = DialogHelper.fileChooser(null, lastLoadDirectoryRegistry.read.getOrElse(LOCAL_DIR).asFile, XLS, texts.LoadFileTexts, loadFile)
 
     def saveLibrary: Unit = tabs.getActiveTab.foreach(_.saveLibrary)
 
@@ -123,7 +126,7 @@ class IdaLibraryFrame private () {
       library.saveAsLibrary(selectedFile)
       loadLibraryFromFile(selectedFile)
     }
-    def chooseFileToSaveAsLibrary(library: LibraryController) = DialogHelper.fileChooser(null, library.file, "xls", texts.SaveAsFileTexts, librarySaveAs(library))
+    def chooseFileToSaveAsLibrary(library: LibraryController) = DialogHelper.fileChooser(null, library.file, XLS, texts.SaveAsFileTexts, librarySaveAs(library))
     def saveAsActiveLibrary = tabs.getActiveTab.foreach(chooseFileToSaveAsLibrary)
 
     def createNewBook(library: LibraryController) = library.createNewBook
@@ -135,13 +138,29 @@ class IdaLibraryFrame private () {
 
     def deleteBookOnActiveTab(evt: ActionEvent) = tabs.getActiveTab.foreach(_.deleteBook(evt.getSource.asInstanceOf[Component]))
 
-    val jToolBar = new JToolBar("Alapfunkciók")
-    jToolBar.addButton(texts.ToolbarSaveButton).name("Library mentése").onAction(saveLibrary).enabled(isBookOpen)
-    jToolBar.addButton(texts.ToolbarLoadButton).name("Library betöltése").onAction(chooseFileToLoad)
-    jToolBar.addButton(texts.ToolbarNewBookButton).name("Új book hozzáadása").onAction(createNewBookInActiveLibrary).enabled(isBookOpen)
-    jToolBar.addButton(texts.ToolbarDeleteBookButton).name("Book törlése").onActionPerformedEvent(deleteBookOnActiveTab).enabled(isBookSelected)
+    tabs.activeTab.subscribe(onNewActiveTab _)
+    def onNewActiveTab(controller: Option[LibraryController]): Unit = {
+      Log.debug(controller)
+      numberOfBooksSubscription.foreach(_.unsubscribe)
+      isBookSelectedSubscription.foreach(_.unsubscribe)
+      if (controller.isEmpty) {
+        numberOfBooks.onNext(0)
+        isBookSelected.onNext(false)
+        isBookOpen.onNext(false)
+      } else {
+        numberOfBooksSubscription = Some(controller.get.numberOfBooks.subscribe(numberOfBooks))
+        isBookSelectedSubscription = Some(controller.get.isBookSelected.subscribe(isBookSelected))
+        isBookOpen.onNext(true)
+      }
+    }
+
+    val jToolBar = new JToolBar(BASIC_FUNCTIONS)
+    jToolBar.addButton(texts.ToolbarSaveButton).name(SAVE_LIBRARY).onAction(saveLibrary).enabled(isBookOpen)
+    jToolBar.addButton(texts.ToolbarLoadButton).name(LOAD_LIBRARY).onAction(chooseFileToLoad)
+    jToolBar.addButton(texts.ToolbarNewBookButton).name(ADD_NEW_BOOK).onAction(createNewBookInActiveLibrary).enabled(isBookOpen)
+    jToolBar.addButton(texts.ToolbarDeleteBookButton).name(DELETE_BOOK).onActionPerformedEvent(deleteBookOnActiveTab).enabled(isBookSelected)
     jToolBar.addLabel(texts.ToolbarFilterLabel)
-    jToolBar.addTextField(5, "", "filter").widthSet(200).onTextChanged(filterText).onHierarchyChangedEvent(_.getComponent.requestFocusInWindow)
+    jToolBar.addTextField(5, EMPTY_STRING, FILTER).widthSet(200).onTextChanged(filterText).onHierarchyChangedEvent(_.getComponent.requestFocusInWindow)
 
     new JFrame()
       .name(classOf[IdaLibrary].getName)
@@ -166,20 +185,5 @@ class IdaLibraryFrame private () {
       .positionToCenter
       .maximize
 
-    tabs.activeTab.subscribe(onNewActiveTab _)
-    def onNewActiveTab(controller: Option[LibraryController]): Unit = {
-      Log.debug(controller)
-      numberOfBooksSubscription.foreach(_.unsubscribe)
-      isBookSelectedSubscription.foreach(_.unsubscribe)
-      if (controller.isEmpty) {
-        numberOfBooks.onNext(0)
-        isBookSelected.onNext(false)
-        isBookOpen.onNext(false)
-      } else {
-        numberOfBooksSubscription = Some(controller.get.numberOfBooks.subscribe(numberOfBooks))
-        isBookSelectedSubscription = Some(controller.get.isBookSelected.subscribe(isBookSelected))
-        isBookOpen.onNext(true)
-      }
-    }
   }
 }
