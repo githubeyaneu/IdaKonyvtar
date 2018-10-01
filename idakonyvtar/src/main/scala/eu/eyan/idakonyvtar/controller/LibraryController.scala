@@ -37,6 +37,9 @@ import eu.eyan.util.scala.Try
 import eu.eyan.util.scala.TryCatch
 import eu.eyan.util.scala.TryCatchThrowable
 import eu.eyan.idakonyvtar.text.TechnicalTextsIda._
+import eu.eyan.util.swing.WithComponent
+import eu.eyan.util.rx.lang.scala.subjects.BehaviorSubjectPlus.BehaviorSubjectImplicit
+import eu.eyan.idakonyvtar.text.TextsIda
 import javax.swing.JScrollPane
 
 class LibraryController(val file: File) extends WithComponent {
