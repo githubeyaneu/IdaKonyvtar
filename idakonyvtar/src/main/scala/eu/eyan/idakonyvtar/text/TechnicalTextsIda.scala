@@ -18,6 +18,7 @@ object TechnicalTextsIda {
   
   val LAST_LOAD_DIRECTORY = "lastLoadDirectory"
   val LAST_LOADED_FILES = "lastLoadedFiles"
+  val LAST_ACTIVE_FILE = "lastActiveFile"
   
   val EMPTY_STRING = ""
   

@@ -9,7 +9,7 @@ import java.io.File
 import java.net.URI
 import java.net.URLEncoder
 
-import eu.eyan.idakonyvtar.controller.LibraryController
+import eu.eyan.idakonyvtar.controller.LibraryEditor
 import eu.eyan.idakonyvtar.text.TextsIda
 import eu.eyan.idakonyvtar.util.DialogHelper
 import eu.eyan.idakonyvtar.util.DialogHelper.NO

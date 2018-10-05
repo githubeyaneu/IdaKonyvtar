@@ -2,6 +2,7 @@ package eu.eyan.idakonyvtar.util;
 
 import java.io.File
 import java.io.IOException
+import java.io.InputStream
 import java.nio.charset.Charset
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -9,10 +10,12 @@ import java.util.Date
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.FilenameUtils
 
-import eu.eyan.idakonyvtar.IdaLibrary
 import eu.eyan.idakonyvtar.model.Book
 import eu.eyan.idakonyvtar.model.ColumnKonfiguration
 import eu.eyan.idakonyvtar.model.Library
+import eu.eyan.idakonyvtar.text.TechnicalTextsIda
+import eu.eyan.log.Log
+import eu.eyan.util.backup.BackupHelper
 import jxl.Workbook
 import jxl.WorkbookSettings
 import jxl.read.biff.BiffException
@@ -20,11 +23,6 @@ import jxl.write.Label
 import jxl.write.WritableCellFormat
 import jxl.write.WriteException
 import jxl.write.biff.RowsExceededException
-import eu.eyan.util.backup.BackupHelper
-import eu.eyan.log.Log
-import eu.eyan.util.io.FilePlus.FilePlusImplicit
-import eu.eyan.idakonyvtar.text.TechnicalTextsIda
-import java.io.InputStream
 
 object ExcelHandler {
 
@@ -32,45 +30,44 @@ object ExcelHandler {
   val BOOKS = "Könyvek"
   val ERROR_TEXT = "Nem sikerült a mentés."
 
-  case class Excel(val columns: Int, val rows: Int, val cells: Map[(Int, Int), String]){
-    def row(rowIndex: Int) = for(columnIndex <- 0 until columns) yield cells((columnIndex, rowIndex)) 
-		def column(columnIndex: Int) = for(rowIndex <- 0 until rows) yield cells((columnIndex, rowIndex))
+  case class Excel(val columns: Int, val rows: Int, val cells: Map[(Int, Int), String]) {
+    def row(rowIndex: Int) = for (columnIndex <- 0 until columns) yield cells((columnIndex, rowIndex))
+    def column(columnIndex: Int) = for (rowIndex <- 0 until rows) yield cells((columnIndex, rowIndex))
     def rowIndex(firstRowContent: String) = column(0).zipWithIndex.filter(_._1 == firstRowContent).map(_._2).lift(0)
     def columnIndex(firstColumnContent: String) = row(0).zipWithIndex.filter(_._1 == firstColumnContent).map(_._2).lift(0)
   }
-  
+
   def readExcel(file: File, sheetName: String) = {
     Log.info(s"$file exists: ${file.exists}")
     val workbook = Workbook.getWorkbook(file, getWorkbookSettings())
 
     Log.info(s"Sheets: ${workbook.getSheetNames.mkString}")
-    
+
     val sheet = getSheet(getWorkbookSettings(), workbook, sheetName)
 
     val columnCount = sheet.getColumns
     val rowCount = sheet.getRows
-    val table = 
-      for ( columnIndex <- 0 until columnCount; rowIndex <- 0 until rowCount ) 
-        yield ((columnIndex, rowIndex),sheet.getCell(columnIndex, rowIndex).getContents)
+    val table =
+      for (columnIndex <- 0 until columnCount; rowIndex <- 0 until rowCount)
+        yield ((columnIndex, rowIndex), sheet.getCell(columnIndex, rowIndex).getContents)
     workbook.close
     Excel(columnCount, rowCount, table.toMap)
   }
 
   def readExcelStream(data: InputStream, sheetName: String) = {
-		  Log.info
-		  val workbook = Workbook.getWorkbook(data, getWorkbookSettings())
-		  
-		  Log.info(s"Sheets: ${workbook.getSheetNames.mkString}")
-		  
-		  val sheet = getSheet(getWorkbookSettings(), workbook, sheetName)
-		  
-		  val columnCount = sheet.getColumns
-		  val rowCount = sheet.getRows
-		  val table = 
-		  for ( columnIndex <- 0 until columnCount; rowIndex <- 0 until rowCount ) 
-			  yield ((columnIndex, rowIndex),sheet.getCell(columnIndex, rowIndex).getContents)
-			  workbook.close
-			  Excel(columnCount, rowCount, table.toMap)
+    Log.info
+    val workbook = Workbook.getWorkbook(data, getWorkbookSettings())
+
+    Log.info(s"Sheets: ${workbook.getSheetNames.mkString}")
+
+    val sheet = getSheet(getWorkbookSettings(), workbook, sheetName)
+    val columnCount = sheet.getColumns
+    val rowCount = sheet.getRows
+    val table = for (columnIndex <- 0 until columnCount; rowIndex <- 0 until rowCount) yield ((columnIndex, rowIndex), sheet.getCell(columnIndex, rowIndex).getContents)
+
+    workbook.close
+
+    Excel(columnCount, rowCount, table.toMap)
   }
 
   @throws(classOf[LibraryException])
@@ -91,7 +88,7 @@ object ExcelHandler {
 
       val colConfig = new ColumnKonfiguration(configTable)
 
-      val columns = for { actualColumn <- 0 until booksSheet.getColumns() } yield booksSheet.getCell(actualColumn, 0).getContents()
+      val columns = (for { actualColumn <- 0 until booksSheet.getColumns() } yield booksSheet.getCell(actualColumn, 0).getContents()).toList
 
       val books = for { actualRow <- 1 until booksSheet.getRows() } yield {
         val book = Book(booksSheet.getColumns())
@@ -102,15 +99,15 @@ object ExcelHandler {
         book
       }
 
-      val library = new Library(colConfig, columns)
+      val library = new Library(file, colConfig, columns)
       for { book <- books } library.books.add(book)
       libraryWorkbook.close
-      
+
       library
     } catch {
       case e: BiffException => throw new LibraryException("Biff Hiba a beolvasásnál " + e.getLocalizedMessage());
-      case e: IOException   => throw new LibraryException("Hiba a beolvasásnál " + e.getLocalizedMessage());
-      case e: Exception     => throw new LibraryException(e.getLocalizedMessage());
+      case e: IOException   => throw new LibraryException("IO hiba a beolvasásnál " + e.getLocalizedMessage());
+      case t: Throwable     => throw new LibraryException(t.getLocalizedMessage());
     }
   }
 

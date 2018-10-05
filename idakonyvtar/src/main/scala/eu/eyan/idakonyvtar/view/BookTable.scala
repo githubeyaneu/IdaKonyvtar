@@ -1,71 +1,53 @@
 package eu.eyan.idakonyvtar.view;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
+import java.awt.Color
+import java.awt.Graphics
+import java.awt.Graphics2D
 
-import org.jdesktop.swingx.JXTable;
-import javax.swing.event.ListSelectionEvent
-import java.awt.event.MouseAdapter
-import javax.swing.event.TableColumnModelListener
-import javax.swing.event.ChangeEvent
-import javax.swing.event.TableColumnModelEvent
-import java.awt.event.MouseEvent
-import eu.eyan.util.swing.JTablePlus.JTableImplicit
-import eu.eyan.util.swing.SwingPlus
+import org.jdesktop.swingx.JXTable
+
+import com.jgoodies.binding.adapter.SingleListSelectionAdapter
+import com.jgoodies.binding.list.SelectionInList
+
 import eu.eyan.idakonyvtar.IdaLibrary
-import javax.swing.table.TableModel
-import eu.eyan.util.swing.JComponentPlus.JComponentImplicit
-import javax.swing.JTable
+import eu.eyan.idakonyvtar.model.ColumnKonfiguration
 import eu.eyan.log.Log
+import eu.eyan.util.swing.HighlightRenderer
+import eu.eyan.util.swing.JComponentPlus.JComponentImplicit
+import eu.eyan.util.swing.JTablePlus.JTableImplicit
+import eu.eyan.util.swing.SpecialCharacterRowFilter
+import eu.eyan.util.swing.WithComponent
+import javax.swing.JScrollPane
+import javax.swing.ListSelectionModel
+import javax.swing.table.TableModel
+import com.jgoodies.binding.adapter.AbstractTableAdapter
+import eu.eyan.idakonyvtar.model.Book
+import eu.eyan.util.registry.RegistryValue
+import rx.lang.scala.Observable
+import rx.lang.scala.subjects.BehaviorSubject
+import eu.eyan.util.rx.lang.scala.ObservablePlus.ObservableImplicit
+import eu.eyan.util.awt.Graphics2DPlus.Graphics2DImplicit
+import eu.eyan.util.swing.JXTableWithEmptyText
+import eu.eyan.util.swing.Col
+import eu.eyan.util.swing.Row
+import eu.eyan.util.swing.JTableModelPlus
 
-class BookTable(nameOfLibrary:String) extends JXTable {
-  var emptyText = "Sajnos nem található könyv."
-  var lastWidths = ""
-  val columnInReg = IdaLibrary.registryValue("columnWidths "+nameOfLibrary)
-  //  setAutoResizeMode(JTable.AUTO_RESIZE_OFF)
+class BookTable(nameOfLibrary: String, columnNames: List[String], books: SelectionInList[_], cellValueGetter: (Row, Col) => String) extends WithComponent /*extends JXTable*/ {
+  def getComponent = scrollPane // FIXME... use another
+  def getSelectedIndex = table.convertRowIndexToModel(table.getSelectedRow)
+  def onSelectionChanged(action: Int => Unit) = table.onValueChanged(action(table.getSelectedRow))
+  def onLineDoubleClicked(action: => Unit) = table.onDoubleClick(action)
+  def setAllColumnFilter(textToFilter: String) = { table.setRowFilter(new SpecialCharacterRowFilter(textToFilter)); highlightRenderer.setHighlightText(textToFilter) }
+  def setEmptyText(text: String) = emptyText.onNext(text)
 
-  override protected def paintComponent(g: Graphics) = {
-    super.paintComponent(g)
-    if (getRowCount() == 0) {
-      val g2d = g.asInstanceOf[Graphics2D]
-      g2d.setColor(Color.BLACK)
-      val TEXT_X = 10
-      val TEXT_Y = 20
-      g2d.drawString(emptyText, TEXT_X, TEXT_Y)
-    }
-  }
+  private val emptyText = BehaviorSubject("Sajnos nem található könyv.")
+  private val highlightRenderer = new HighlightRenderer
+  private val columnWidthsInRegistry = IdaLibrary.registryValue(nameOfLibrary + "_columnWidths ")
+  private val table = new JXTableWithEmptyText(emptyText).rememberColumnWidhts(columnWidthsInRegistry)
+  private val scrollPane = new JScrollPane(table)
 
-  def setEmptyText(emptyText: String) = this.emptyText = emptyText
-  def columns = for (i <- 0 until getColumnCount) yield getColumn(i)
-
-  this.getTableHeader.onMouseReleased({
-    Log.debug(""+getWidth)
-    columnInReg.save(lastWidths)
-  })
-
-  this onColumnMarginChanged columnWidthChanged
-  def columnWidthChanged = if (getWidth > 0) {
-    lastWidths = columns.map(_.getWidth).map(_ * 100 / getWidth).mkString(",")
-  }
-
-  override def setModel(dataModel: TableModel) = { super.setModel(dataModel); updateColumnWidths }
-
-  this onComponentResized updateColumnWidths
-
-  def updateColumnWidths = {
-    if (columnInReg != null && getWidth > 0)
-      columnInReg.read.foreach(widthPercents => {
-        val colPercents = widthPercents.split(",").map(_.toInt)
-        Log.info(getWidth + "")
-        Log.info(colPercents.mkString(","))
-        if (colPercents.size == getColumnCount())
-          for (i <- 0 until getColumnCount) {
-            val width = getWidth * colPercents(i) / 100
-            Log.debug(i + " " + width + " ")
-            getColumn(i).setPreferredWidth(width)
-          }
-      })
-  }
-
+  table.setSelectionModel(new SingleListSelectionAdapter(books.getSelectionIndexHolder))
+  table.setModel(new JTableModelPlus(books, columnNames, cellValueGetter))
+  table.setDefaultRenderer(classOf[Object], highlightRenderer)
+  table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
 }
