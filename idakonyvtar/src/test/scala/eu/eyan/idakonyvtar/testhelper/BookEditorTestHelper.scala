@@ -22,7 +22,6 @@ import org.fest.swing.fixture.DialogFixture
 
 import eu.eyan.idakonyvtar.util.DialogHelper
 
-import eu.eyan.idakonyvtar.view.BookView
 
 import eu.eyan.testutil.swing.fixture.AutocompleteFixture
 
@@ -49,8 +48,8 @@ class BookEditorTestHelper(robot: Robot) {
   dialog.target.toFront()
 
   def requireIsbnNotPresent(): Unit = {
-    requireLabelNotPresent(dialog, BookView.ISBN_LABEL)
-    requireTextBoxNotPresent(dialog, BookView.ISBN_TEXT)
+    requireLabelNotPresent(dialog, "isbnLabel")
+    requireTextBoxNotPresent(dialog, "isbnText")
   }
 
   private def requireTextBoxNotPresent(container: ContainerFixture[_],
@@ -74,8 +73,8 @@ class BookEditorTestHelper(robot: Robot) {
   }
 
   def requireIsbnPresent(): Unit = {
-    dialog.label(BookView.ISBN_LABEL).requireVisible()
-    dialog.textBox(BookView.ISBN_TEXT).requireVisible()
+    dialog.label("isbnLabel").requireVisible()
+    dialog.textBox("isbnText").requireVisible()
   }
 
   def setNormalText(textBoxNév: String, szöveg: String): Unit = {

@@ -31,6 +31,7 @@ import eu.eyan.util.swing.JXTableWithEmptyText
 import eu.eyan.util.swing.Col
 import eu.eyan.util.swing.Row
 import eu.eyan.util.swing.JTableModelPlus
+import javax.swing.ListModel
 
 class BookTable(nameOfLibrary: String, columnNames: List[String], books: SelectionInList[_], cellValueGetter: (Row, Col) => String) extends WithComponent /*extends JXTable*/ {
   def getComponent = scrollPane // FIXME... use another
@@ -47,7 +48,7 @@ class BookTable(nameOfLibrary: String, columnNames: List[String], books: Selecti
   private val scrollPane = new JScrollPane(table)
 
   table.setSelectionModel(new SingleListSelectionAdapter(books.getSelectionIndexHolder))
-  table.setModel(new JTableModelPlus(books, columnNames, cellValueGetter))
+  table.setModel(new JTableModelPlus(books.asInstanceOf[ListModel[_]], columnNames, cellValueGetter))
   table.setDefaultRenderer(classOf[Object], highlightRenderer)
   table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
 }

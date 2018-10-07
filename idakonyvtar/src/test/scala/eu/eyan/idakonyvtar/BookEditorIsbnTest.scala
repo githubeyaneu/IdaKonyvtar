@@ -15,7 +15,6 @@ import eu.eyan.idakonyvtar.model.ColumnConfigurations
 import eu.eyan.idakonyvtar.model.ColumnKonfiguration
 import eu.eyan.idakonyvtar.testhelper.BookEditorTestHelper
 import eu.eyan.idakonyvtar.util.DialogHelper
-import eu.eyan.idakonyvtar.view.BookView
 import eu.eyan.testutil.video.VideoRunner
 import javax.swing.SwingUtilities
 
@@ -93,7 +92,7 @@ class BookEditorIsbnTest extends AbstractUiTest {
   @Test
   def testIsbnRead(): Unit = {
     bookEditor.requireIsbnPresent()
-    bookEditor.setNormalText(BookView.ISBN_TEXT, "9789631193701")
+    bookEditor.setNormalText("isbnText", "9789631193701")
     bookEditor.keyboard(KeyEvent.VK_ENTER)
     bookEditor.requireNormalText("cim", "Abigél")
   }
