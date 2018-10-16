@@ -48,53 +48,53 @@ import javax.swing.JLabel
 import javax.swing.JOptionPane
 import javax.swing.JPanel
 import javax.swing.JTextField
+import eu.eyan.idakonyvtar.text.TechnicalTextsIda._
 
-class BookController (
-    val book: Book,
-    val columns: List[String],
-    val columnConfiguration: ColumnKonfiguration,
-    val bookList: List[Book],
-    val isbnEnabled: Boolean = false,
-    val loadedFile: File
-) extends IDialogController[BookControllerInput, Book] {
-  val SPACE = " "
-    val ISBN_TEXT = "isbnText";
-  val ISBN_LABEL = "isbnLabel";
-  
-  def addRow(layout: FormLayout, spec: String): Int = {
-    spec.split(",").foreach(row => layout.appendRow(RowSpec.decode(row)))
-    spec.split(",").length
+class BookController(
+  private val book:                Book,
+  private val columns:             List[String],
+  private val columnConfiguration: ColumnKonfiguration,
+  private val bookList:            List[Book],
+  private val isbnEnabled:         Boolean             = false,
+  private val loadedFile:          File)
+  extends IDialogController[BookControllerInput, Book] {
+
+  def onOk = stopWebcam
+
+  def onCancel = stopWebcam
+
+  def getOutput = book
+
+  def getComponentForFocus = isbnText
+
+  def addResizeListener(window: Window) = this.resizeListeners.add(window)
+
+  def getView = view
+
+  def getTitle =
+    if (columns.indexOf("Cím") >= 0) "Könyv adatainak szerkesztése - " + book.getValue(columns.indexOf("Cím"))
+    else "Könyv adatainak szerkesztése"
+
+  def initData(model: BookControllerInput) = {}
+
+  def initBindings() = {
+    initFieldsActionBindings
+    isbnText.addActionListener(isbnSearch())
   }
 
+  private val TEXTFIELD_DEFAULT_SIZE = 20
+  private val editors: MutableList[Component] = MutableList()
+  private val images: MutableList[JLabel] = MutableList()
+  private val isbnSearchLabel = new JLabel()
+  private val isbnText = new JTextField()
+  private val webcamPanel = new JPanelWithFrameLayout
+  private val view = createViewComponent
+  private val resizeListeners: java.util.List[Window] = newArrayList()
 
-
-  val TEXTFIELD_DEFAULT_SIZE = 20
-  val SEPARATOR_PREF = "3dlu, pref"
-
-  val editors: MutableList[Component] = MutableList()
-  val images: MutableList[JLabel] = MutableList()
-  val isbnSearchLabel = new JLabel()
-  val isbnText = new JTextField()
-
-//  var columns: List[String] = null
-//  def setColumns(columns: List[String]) = this.columns = columns
-//
-//  var isbnEnabled: Boolean = false
-//  def setIsbnEnabled(isbnEnabled: Boolean): Unit = this.isbnEnabled = isbnEnabled
-//
-//  var columnConfiguration: ColumnKonfiguration = null
-//  def setColumnConfiguration(columnConfiguration: ColumnKonfiguration) = this.columnConfiguration = columnConfiguration
-
-  var webcamPanel = new JPanelWithFrameLayout 
-
-
-  
-  private  def createViewComponent(): Component = {
+  private def createViewComponent(): Component = {
     val rowsPanel = new JPanelWithFrameLayout().withSeparators
     rowsPanel.newColumn.newColumn("pref:grow")
     val imagesPanel = new JPanelWithFrameLayout().name("imagesPanel").withSeparators.newColumn("320px")
-
-    
 
     if (isbnEnabled) {
       rowsPanel.newRow.span.addSeparatorWithTitle("Isbn")
@@ -142,47 +142,21 @@ class BookController (
     panel.newColumn("f:320px").add(webcamPanel)
     panel
   }
-  
-  
-  val view = createViewComponent
-  
-  var model: BookControllerInput = null
-  val resizeListeners: java.util.List[Window] = newArrayList()
-
-  def getView = view
-
-  def getTitle =
-    if (model.columns.indexOf("Cím") >= 0)
-      "Könyv adatainak szerkesztése - " + model.book.getValue(model.columns.indexOf("Cím"))
-    else
-      "Könyv adatainak szerkesztése"
-
-  def initData(model: BookControllerInput) = {
-    this.model = model
-//    setColumns(model.columns)
-//    setIsbnEnabled(model.isbnEnabled)
-//    setColumnConfiguration(model.columnConfiguration)
-  }
-
-  def initBindings() = {
-    initFieldsActionBindings
-    isbnText.addActionListener(isbnSearch())
-  }
 
   private def initFieldsActionBindings = {
-    for { columnIndex <- 0 until model.columns.size() } {
-      val columnName = model.columns.get(columnIndex)
-      val autoComplete = model.columnConfiguration.isTrue(columnName, ColumnConfigurations.AUTOCOMPLETE)
-      val multi = model.columnConfiguration.isTrue(columnName, ColumnConfigurations.MULTIFIELD)
-      val picture = model.columnConfiguration.isTrue(columnName, ColumnConfigurations.PICTURE)
+    for { columnIndex <- 0 until columns.size() } {
+      val columnName = columns.get(columnIndex)
+      val autoComplete = columnConfiguration.isTrue(columnName, ColumnConfigurations.AUTOCOMPLETE)
+      val multi = columnConfiguration.isTrue(columnName, ColumnConfigurations.MULTIFIELD)
+      val picture = columnConfiguration.isTrue(columnName, ColumnConfigurations.PICTURE)
 
       if (picture) {
-        if (model.book.values(columnIndex) != "") {
-          val dir = model.loadedFile.getParentFile
-          val imagesDir = (model.loadedFile.getAbsolutePath + ".images").asDir
-          val imageFile = (imagesDir.getAbsolutePath + "\\" + model.book.values(columnIndex)).asFile
+        if (book.values(columnIndex) != "") {
+          val dir = loadedFile.getParentFile
+          val imagesDir = (loadedFile.getAbsolutePath + ".images").asDir
+          val imageFile = (imagesDir.getAbsolutePath + "\\" + book.values(columnIndex)).asFile
           val image = ImageIO.read(imageFile)
-          model.book.images.put(columnIndex, image)
+          book.images.put(columnIndex, image)
         }
 
         val panel = editors(columnIndex).asInstanceOf[JPanel]
@@ -190,40 +164,40 @@ class BookController (
         val button = panel.getComponents.filter(_.getName == "click")(0).asInstanceOf[JButton]
         val look = images.filter(_.getName == "look" + columnName)(0)
         //val look = panel.getComponents.filter(_.getName == "look")(0).asInstanceOf[JLabel]
-        //look.onMouseClicked(if (model.book.images.contains(columnIndex)) look.setIcon(new ImageIcon(model.book.images(columnIndex))))
-        if (model.book.images.contains(columnIndex)) look.setIcon(new ImageIcon(model.book.images(columnIndex).getScaledInstance(320, 240, Image.SCALE_DEFAULT)))
-        Bindings.bind(text, new BookFieldValueModel(columnIndex, model.book))
+        //look.onMouseClicked(if (book.images.contains(columnIndex)) look.setIcon(new ImageIcon(book.images(columnIndex))))
+        if (book.images.contains(columnIndex)) look.setIcon(new ImageIcon(book.images(columnIndex).getScaledInstance(320, 240, Image.SCALE_DEFAULT)))
+        Bindings.bind(text, new BookFieldValueModel(columnIndex, book))
         button.onClicked({
-          model.book.images.put(columnIndex, WebCam.getImage)
-          model.book.values(columnIndex) = ""
-          look.setIcon(new ImageIcon(model.book.images(columnIndex).getScaledInstance(320, 240, Image.SCALE_DEFAULT)))
+          book.images.put(columnIndex, WebCam.getImage)
+          book.values(columnIndex) = ""
+          look.setIcon(new ImageIcon(book.images(columnIndex).getScaledInstance(320, 240, Image.SCALE_DEFAULT)))
         })
 
       } else if (autoComplete) {
-        val columnList = BookHelper.getColumnList(model.bookList, columnIndex)
+        val columnList = BookHelper.getColumnList(bookList, columnIndex)
         if (multi) {
-          Log.debug("mac " + columnIndex + SPACE + columnList)
+          Log.debug("mac " + columnIndex + " " + columnList)
           //          val mmcombo: MultiFieldJComboBox = view.editors(columnIndex).asInstanceOf[MultiFieldJComboBox]
           //          mmcombo.setAutoCompleteList(columnList)
           val mmcombo = editors(columnIndex).asInstanceOf[MultiFieldAutocomplete]
           mmcombo.setAutoCompleteList(columnList)
-          multiFieldBind(mmcombo, new BookFieldValueModel(columnIndex, model.book))
+          multiFieldBind(mmcombo, new BookFieldValueModel(columnIndex, book))
         } else {
-          Log.debug("ac " + columnIndex + SPACE + columnList)
+          Log.debug("ac " + columnIndex + " " + columnList)
           //        val comboBox: JComboBox[_] = view.editors(columnIndex).asInstanceOf[JComboBox[_]]
-          //        val adapter = new ComboBoxAdapter[String](columnList, new BookFieldValueModel(columnIndex, model.book))
+          //        val adapter = new ComboBoxAdapter[String](columnList, new BookFieldValueModel(columnIndex, book))
           //        Bindings.bind(comboBox, adapter)
           //        AutoCompleteDecorator.decorate(comboBox)
           val autocomplete = editors(columnIndex).asInstanceOf[JTextFieldAutocomplete]
           autocomplete.setAutocompleteList(columnList)
-          Bindings.bind(autocomplete, new BookFieldValueModel(columnIndex, model.book))
+          Bindings.bind(autocomplete, new BookFieldValueModel(columnIndex, book))
         }
       } else {
         if (multi) {
           val mmc: MultiFieldJTextField = editors(columnIndex).asInstanceOf[MultiFieldJTextField]
-          multiFieldBind(mmc, new BookFieldValueModel(columnIndex, model.book))
+          multiFieldBind(mmc, new BookFieldValueModel(columnIndex, book))
         } else {
-          Bindings.bind(editors(columnIndex).asInstanceOf[JTextField], new BookFieldValueModel(columnIndex, model.book))
+          Bindings.bind(editors(columnIndex).asInstanceOf[JTextField], new BookFieldValueModel(columnIndex, book))
         }
       }
     }
@@ -232,7 +206,7 @@ class BookController (
   }
 
   private def multiFieldBind(mmc: MultiField[String, _], bookFieldValueModel: BookFieldValueModel) = {
-    Log.debug(mmc.getName + SPACE + bookFieldValueModel)
+    Log.debug(mmc.getName + " " + bookFieldValueModel)
     bookFieldValueModel.addValueChangeListener(new PropertyChangeListener {
       override def propertyChange(evt: PropertyChangeEvent) =
         if (evt.getNewValue() != evt.getOldValue()) {
@@ -279,15 +253,15 @@ class BookController (
   }
 
   private def prozessIsbnData(marcsFromOszk: List[Marc]) =
-    model.columns.foreach(column => {
+    columns.foreach(column => {
       try {
-        val marcCodesFromColumns = model.columnConfiguration.getMarcCodes(column)
+        val marcCodesFromColumns = columnConfiguration.getMarcCodes(column)
         val values = for {
           marcFromOszk <- marcsFromOszk
           marcFromColumn <- marcCodesFromColumns if (isMarcsApply(marcFromOszk, marcFromColumn))
         } yield marcFromOszk.value
         Log.info("BookController.prozessIsbnData " + values.mkString("\r\n    "))
-        model.book.setValue(model.columns.indexOf(column), values.mkString(", "))
+        book.setValue(columns.indexOf(column), values.mkString(", "))
       } catch {
         case e: Exception =>
           e.printStackTrace()
@@ -304,28 +278,15 @@ class BookController (
       (marcFromColumn.marc3.equals("") || marcFromOszk.marc3.equalsIgnoreCase(marcFromColumn.marc3))
   }
 
-
-
-  def startWebcam = {
-	  Log.info("start webcam")
+  private def startWebcam = {
+    Log.info("start webcam")
     val webcam = WebCam.startWebcam
     if (webcam.nonEmpty) {
-    	webcamPanel.newRow.add(webcam.get.picker)
+      webcamPanel.newRow.add(webcam.get.picker)
       webcamPanel.newRow.add(webcam.get.panel)
-    }
-    else webcamPanel.add(new JLabel("No Webcam"))
+    } else webcamPanel.add(new JLabel("No Webcam"))
   }
-  def stopWebcam = { }
-
-  def onOk = {stopWebcam}
-
-  def onCancel = {stopWebcam}
-
-  def getOutput = model.book
-
-  def getComponentForFocus(): Component = isbnText
-
-  def addResizeListener(window: Window) = this.resizeListeners.add(window)
+  private def stopWebcam = {}
 
   private def fireResizeEvent() = resizeListeners.foreach(_.pack)
 

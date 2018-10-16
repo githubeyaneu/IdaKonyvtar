@@ -6,6 +6,8 @@ import eu.eyan.util.string.StringPlus.StringPlusImplicit
 import eu.eyan.idakonyvtar.text.TechnicalTextsIda._
 import eu.eyan.idakonyvtar.text.TextsIda
 
+// TODO - bookediting in scrollpane - multi editor - add many new lines - scrollpane gets not bigger 
+// TODO - bookediting in scrollpane - multi editor - add many new lines - autocomplete popup does not goes with component when scrolling 
 // TODO - remember the position of every frame/dialog
 // TODO - open dialogs in the same window as parent
 // TODO - both of these two: open/start frame only in visible display!
@@ -47,18 +49,20 @@ import eu.eyan.idakonyvtar.text.TextsIda
 class IdaLibrary
 
 object IdaLibrary {
-  def registryValue(parameterName: String) = registryGroup.registryValue(parameterName)
-
   def main(args: Array[String]): Unit = {
     val fileToOpen = args.lift(0).map(_.asFileOrResource).flatten
 
     Log.activateDebugLevel
     Log.info("Resource -> File: " + fileToOpen)
 
-    IdaLibraryFrame(fileToOpen)
+    new IdaLibraryFrame(fileToOpen)
   }
   
+  def registryValue(parameterName: String) = registryGroup.registryValue(parameterName)
+  
+  def texts = textsIda
 
   private val registryGroup = RegistryGroup(classOf[IdaLibrary].getName)
-  val texts = new TextsIda
+  
+  private val textsIda = new TextsIda
 }

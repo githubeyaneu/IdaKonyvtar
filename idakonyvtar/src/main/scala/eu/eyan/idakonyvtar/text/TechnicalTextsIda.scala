@@ -44,4 +44,7 @@ object TechnicalTextsIda {
   val FILTER = "filter"
 
   val ERROR_AT_READING_LIBRARY = "Hiba a beolvasáskor"
+  
+  val ISBN_TEXT = "isbnText"
+  val ISBN_LABEL = "isbnLabel"
 }

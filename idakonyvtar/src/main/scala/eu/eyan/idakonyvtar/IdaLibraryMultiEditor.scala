@@ -110,12 +110,10 @@ class IdaLibraryMultiEditor extends WithComponent {
 
   private def dirtyToText(dirty: Boolean) = if (dirty) DIRTY else NOT_DIRTY
 
-  private def closeLibrary(libraryController: LibraryEditor): Unit = {
-    if (libraryController.isDirtyObservable.get) {
-      val res = DialogHelper.yesNoCancel(null, texts.CloseLibraryWindowTexts(libraryController.file.getName))
-      if (res == YES) { libraryController.saveLibrary; tabbedPane.removeTab(libraryController) }
-      else if (res == NO) tabbedPane.removeTab(libraryController)
-      else { /* cancel -> do nothing */ }
-    } else tabbedPane.removeTab(libraryController)
-  }
+  private def closeLibrary(libraryController: LibraryEditor): Unit = if (libraryController.isDirtyObservable.get) {
+    val res = DialogHelper.yesNoCancel(null, texts.CloseLibraryWindowTexts(libraryController.file.getName))
+    if (res == YES) { libraryController.saveLibrary; tabbedPane.removeTab(libraryController) }
+    else if (res == NO) tabbedPane.removeTab(libraryController)
+    else { /* cancel -> do nothing */ }
+  } else tabbedPane.removeTab(libraryController)
 }

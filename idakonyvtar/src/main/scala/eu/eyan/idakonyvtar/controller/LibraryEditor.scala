@@ -64,10 +64,10 @@ class LibraryEditor(val library: Library) extends WithComponent {
   private val columnIndicesToShow = columnNamesAndIndexesToShow.unzip._2 // TODO move to Library...???
 
   private val numberOfBooks = BehaviorSubject(books.getList.size)
-  private val hasBooks = numberOfBooks.distinctUntilChanged.map(_>0)
+  private val hasBooks = numberOfBooks.distinctUntilChanged.map(_ > 0)
   private val tableEmptyText = hasBooks.ifElse(texts.NoResultAfterFilter, texts.EmptyLibrary)
-  
-  private val bookTable = new BookTable(file.getPath, columnNames, books, cellValue,tableEmptyText)
+
+  private val bookTable = new BookTable(file.getPath, columnNames, books, cellValue, tableEmptyText)
 
   private val isBookSelected = BehaviorSubject(false)
   private val isDirty = BehaviorSubject(false)
@@ -95,9 +95,8 @@ class LibraryEditor(val library: Library) extends WithComponent {
   private def dirty = isDirty.onNext(true)
   private def notDirty = isDirty.onNext(false)
 
-
   private def deleteBookWithDialog = {
-    if(DialogHelper.yesNo(getComponent, texts.DeleteBookWindowTexts)) {
+    if (DialogHelper.yesNo(getComponent, texts.DeleteBookWindowTexts)) {
       val selectionIndex = books.getSelectionIndex
       books.getList.remove(selectionIndex)
       books.fireIntervalRemoved(selectionIndex, selectionIndex)
@@ -126,10 +125,9 @@ class LibraryEditor(val library: Library) extends WithComponent {
     val isbnEnabled = true
     val loadedFile = file
 
-    val bookControllerInput = new BookControllerInput(book, columns, columnConfiguration, bookList, isbnEnabled, loadedFile)
     val bookController = new BookController(book, columns, columnConfiguration, bookList, isbnEnabled, loadedFile)
 
-    val editorDialog = DialogHelper.startModalDialog(component, bookController, bookControllerInput)
+    val editorDialog = DialogHelper.startModalDialog(component, bookController)
 
     if (editorDialog.isOk) {
       saveImages(bookController.getOutput)
@@ -150,10 +148,9 @@ class LibraryEditor(val library: Library) extends WithComponent {
     val isbnEnabled = false
     val loadedFile = file
 
-    val bookControllerInput = new BookControllerInput(Book(books.getList.get(selectedBookIndex)), library.columns.toList, library.configuration, library.books.toList, false, file)
     val bookController = new BookController(book, columns, columnConfiguration, bookList, isbnEnabled, loadedFile)
 
-    val editorDialog = DialogHelper.startModalDialog(component, bookController, bookControllerInput)
+    val editorDialog = DialogHelper.startModalDialog(component, bookController)
 
     if (editorDialog.isOk) {
       saveImages(bookController.getOutput)

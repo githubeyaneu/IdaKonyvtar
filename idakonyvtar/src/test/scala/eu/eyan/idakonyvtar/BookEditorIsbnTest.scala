@@ -72,15 +72,8 @@ class BookEditorIsbnTest extends AbstractUiTest {
       bookList,
       true,
       null)
-    val bookControllerInput: BookControllerInput = new BookControllerInput(
-      book,
-      columns,
-      columnConfig,
-      bookList,
-      true,
-      null)
     SwingUtilities.invokeLater(() =>
-      DialogHelper.startModalDialog(null, bookController, bookControllerInput))
+      DialogHelper.startModalDialog(null, bookController))
     bookEditor = new BookEditorTestHelper(
       BasicRobot.robotWithCurrentAwtHierarchy())
     VideoRunner.setComponentToRecord(bookEditor.getComponentToRecord)

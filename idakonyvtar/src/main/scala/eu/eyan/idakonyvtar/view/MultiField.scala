@@ -72,7 +72,6 @@ abstract class MultiField[INPUT, EDITOR <: Component](columnName: String) extend
     counter = counter + 1
 
     revalidate
-    AwtHelper.tryToEnlargeWindow(SwingUtilities.windowForComponent(this))
   }
 
   def fieldEdited(source: EDITOR) = {
