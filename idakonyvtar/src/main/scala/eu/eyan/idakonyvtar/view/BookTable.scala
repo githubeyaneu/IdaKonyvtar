@@ -33,15 +33,13 @@ import eu.eyan.util.swing.Row
 import eu.eyan.util.swing.JTableModelPlus
 import javax.swing.ListModel
 
-class BookTable(nameOfLibrary: String, columnNames: List[String], books: SelectionInList[_], cellValueGetter: (Row, Col) => String) extends WithComponent /*extends JXTable*/ {
+class BookTable(nameOfLibrary: String, columnNames: List[String], books: SelectionInList[_], cellValueGetter: (Row, Col) => String, emptyText: Observable[String]) extends WithComponent {
   def getComponent = scrollPane // FIXME... use another
   def getSelectedIndex = table.convertRowIndexToModel(table.getSelectedRow)
   def onSelectionChanged(action: Int => Unit) = table.onValueChanged(action(table.getSelectedRow))
   def onLineDoubleClicked(action: => Unit) = table.onDoubleClick(action)
   def setAllColumnFilter(textToFilter: String) = { table.setRowFilter(new SpecialCharacterRowFilter(textToFilter)); highlightRenderer.setHighlightText(textToFilter) }
-  def setEmptyText(text: String) = emptyText.onNext(text)
 
-  private val emptyText = BehaviorSubject("Sajnos nem található könyv.")
   private val highlightRenderer = new HighlightRenderer
   private val columnWidthsInRegistry = IdaLibrary.registryValue(nameOfLibrary + "_columnWidths ")
   private val table = new JXTableWithEmptyText(emptyText).rememberColumnWidhts(columnWidthsInRegistry)

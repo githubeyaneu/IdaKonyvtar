@@ -173,6 +173,8 @@ class TextsIda extends Texts {
   case object DeleteBookWindowQuestion extends IdaText("DeleteBookWindowQuestion")
   case object DeleteBookWindowYes extends IdaText("DeleteBookWindowYes")
   case object DeleteBookWindowNo extends IdaText("DeleteBookWindowNo")
+  case object DeleteBookWindowTexts extends TextsDialogYesNo(DeleteBookWindowQuestion, DeleteBookWindowTitle, DeleteBookWindowYes, DeleteBookWindowNo)
+  
   case object ToolbarFilterLabel extends IdaText("ToolbarFilterLabel")
   case object EmptyLibrary extends IdaText("EmptyLibrary")
   case object NoResultAfterFilter extends IdaText("NoResultAfterFilter")

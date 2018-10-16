@@ -24,6 +24,7 @@ import eu.eyan.util.string.StringPlus.StringPlusImplicit
 import eu.eyan.util.scala.Try
 import eu.eyan.idakonyvtar.util.ExcelHandler
 import eu.eyan.util.rx.lang.scala.ObservablePlus.ObservableImplicit
+import eu.eyan.idakonyvtar.text.TechnicalTextsIda
 
 class IdaLibraryMultiEditor extends WithComponent {
   def getComponent = tabbedPane
@@ -36,7 +37,7 @@ class IdaLibraryMultiEditor extends WithComponent {
   def loadLibrary(file: File) = loadLibraryFromFile(file)
   def getActiveEditor = activeEditor
 
-  private val texts = new TextsIda
+  private val texts = IdaLibrary.texts
   private val lastLoadDirectoryRegistry = IdaLibrary.registryValue(LAST_LOAD_DIRECTORY)
   private val lastLoadedFiles = IdaLibrary.registryValue(LAST_LOADED_FILES)
   private val lastActiveFile = IdaLibrary.registryValue(LAST_ACTIVE_FILE)
@@ -51,13 +52,13 @@ class IdaLibraryMultiEditor extends WithComponent {
   lastActiveFile.read.foreach(path => findControllerToFile(path.asFile).foreach(activateTab))
   activeEditor.subscribe(saveActiveEditor _)
 
-  private def saveActiveEditor(editor: Option[LibraryEditor]) = lastActiveFile.save(editor.map(_.file.toString).getOrElse(""))
+  private def saveActiveEditor(editor: Option[LibraryEditor]) = lastActiveFile.save(editor.map(_.file.toString).getOrElse(EMPTY_STRING))
 
   private def saveLastLoadedFiles(editors: List[LibraryEditor]) = lastLoadedFiles.saveMore(editors.map(_.file.toString).toArray)
 
   private def getActiveTab = tabbedPane.getActiveTab
 
-  private def askToSaveIfDirty(frame: JFrame, tabs: List[LibraryEditor]): Boolean = {
+  private def askToSaveIfDirty(frame: JFrame, tabs: List[LibraryEditor]): Boolean =
     if (tabs.nonEmpty) {
       if (tabs.head.isDirtyObservable.get) {
         val res = DialogHelper.yesNoCancel(null, texts.ExitSaveLibraryTexts(tabs.head.file.getName))
@@ -66,7 +67,6 @@ class IdaLibraryMultiEditor extends WithComponent {
         else false
       } else askToSaveIfDirty(frame, tabs.tail)
     } else true
-  }
 
   private def deleteBook(library: LibraryEditor) = library deleteBook
 
@@ -75,7 +75,7 @@ class IdaLibraryMultiEditor extends WithComponent {
   private def chooseFileToSaveAsLibrary(fileOnSuccess: File => Unit)(library: LibraryEditor) = DialogHelper.fileChooser(null, library.file, XLS, texts.SaveAsFileTexts, librarySaveAs(library, fileOnSuccess))
   private def librarySaveAs(library: LibraryEditor, fileOnSuccess: File => Unit)(selectedFile: File) = {
     val res = library.saveAsLibrary(selectedFile)
-    if(res) fileOnSuccess(selectedFile)
+    if (res) fileOnSuccess(selectedFile)
   }
 
   private def saveLibrary(library: LibraryEditor) = library saveLibrary

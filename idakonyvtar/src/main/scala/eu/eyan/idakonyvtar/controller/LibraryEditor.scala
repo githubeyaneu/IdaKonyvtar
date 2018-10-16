@@ -33,11 +33,18 @@ import eu.eyan.idakonyvtar.model.ColumnKonfiguration
 import eu.eyan.idakonyvtar.model.Library
 import eu.eyan.util.swing.Col
 import eu.eyan.util.swing.Row
+import rx.lang.scala.Observable
+import eu.eyan.util.rx.lang.scala.ObservablePlus
+import eu.eyan.util.text.Texts
+import eu.eyan.util.text.Text
+import eu.eyan.idakonyvtar.IdaLibrary
+import eu.eyan.idakonyvtar.text.TechnicalTextsIda._
+import eu.eyan.util.rx.lang.scala.ObservablePlus.ObservableImplicitBoolean
 
 class LibraryEditor(val library: Library) extends WithComponent {
   override def toString = s"LibraryController[file=${library.file}, nrOfBooks=${numberOfBooks.get}, isBookSelected=${isBookSelected.get}]"
   def getComponent = component
-  
+
   def createNewBook = createNewBookInDialog
   def saveAsLibrary(newFile: File) = checkAndSaveAsLibrary(newFile)
   def saveLibrary = checkAndSaveLibrary
@@ -48,6 +55,7 @@ class LibraryEditor(val library: Library) extends WithComponent {
   def isBookSelectedObservable = isBookSelected.distinctUntilChanged
   def isDirtyObservable = isDirty.distinctUntilChanged
 
+  private val texts = IdaLibrary.texts
   private val books = new SelectionInList[Book]()
   private val previousBook = Book(library.columns.size)
 
@@ -55,11 +63,13 @@ class LibraryEditor(val library: Library) extends WithComponent {
   private val columnNames = columnNamesAndIndexesToShow.unzip._1
   private val columnIndicesToShow = columnNamesAndIndexesToShow.unzip._2 // TODO move to Library...???
 
-  private val bookTable = new BookTable(file.getPath, columnNames, books, cellValue)
-
-  private val texts = new TextsIda
-  private val isBookSelected = BehaviorSubject(false)
   private val numberOfBooks = BehaviorSubject(books.getList.size)
+  private val hasBooks = numberOfBooks.distinctUntilChanged.map(_>0)
+  private val tableEmptyText = hasBooks.ifElse(texts.NoResultAfterFilter, texts.EmptyLibrary)
+  
+  private val bookTable = new BookTable(file.getPath, columnNames, books, cellValue,tableEmptyText)
+
+  private val isBookSelected = BehaviorSubject(false)
   private val isDirty = BehaviorSubject(false)
 
   private val component = new JPanelWithFrameLayout()
@@ -70,39 +80,24 @@ class LibraryEditor(val library: Library) extends WithComponent {
     .add(bookTable.getComponent)
 
   books.onListData(numberOfBooks.onNext(books.getList.size))
-  
+
   bookTable.onLineDoubleClicked(editBook)
   bookTable.onSelectionChanged(selectedRow => isBookSelected.onNext(selectedRow >= 0))
 
-  numberOfBooks.distinctUntilChanged.subscribe(refreshErrorMessage _)
   books.getList.clear
   books.setList(library.books)
 
   private def columnToShowFilter(col: Col) = library.configuration.isTrue(library.columns(col.index), ColumnConfigurations.SHOW_IN_TABLE)
 
-  private def cellValue(row: Row, col: Col) = books.getElementAt(row.index).getValue(columnIndicesToShow(col.index)) 
+  private def cellValue(row: Row, col: Col) = books.getElementAt(row.index).getValue(columnIndicesToShow(col.index))
   private def columnToShowFilter(columnIndex: Int) = library.configuration.isTrue(library.columns(columnIndex), ColumnConfigurations.SHOW_IN_TABLE)
 
   private def dirty = isDirty.onNext(true)
   private def notDirty = isDirty.onNext(false)
 
-  private def refreshErrorMessage(nrOfBooks: Int) = { //TODO rename
-    Log.info(nrOfBooks + "")
-    if (nrOfBooks > 0) bookTable.setEmptyText("Ilyen szűrőfeltételekkel nem található book.")
-    else bookTable.setEmptyText("Nincs book a listában.")
-  }
 
   private def deleteBookWithDialog = {
-    if (JOptionPane.OK_OPTION == JOptionPane.showOptionDialog( // TODO DialogHelper.yesNo
-      getComponent,
-      "Biztosan törölni akarod?",
-      "Törlés megerősítése",
-      JOptionPane.YES_NO_OPTION,
-      JOptionPane.QUESTION_MESSAGE,
-      null,
-      Array("Igen", "Nem"),
-      "Nem")) {
-
+    if(DialogHelper.yesNo(getComponent, texts.DeleteBookWindowTexts)) {
       val selectionIndex = books.getSelectionIndex
       books.getList.remove(selectionIndex)
       books.fireIntervalRemoved(selectionIndex, selectionIndex)
@@ -119,13 +114,20 @@ class LibraryEditor(val library: Library) extends WithComponent {
     Log.info("SaveAs " + file)
     def confirmOverwrite = DialogHelper.yesNo(null, texts.SaveAsOverwriteConfirmText(newFile), texts.SaveAsOverwriteConfirmWindowTitle, texts.SaveAsOverwriteYes, texts.SaveAsOverwriteNo)
     var success = false
-    Try { if (newFile.notExists || confirmOverwrite) {ExcelHandler.saveLibrary(newFile, library); success = true} }
+    Try { if (newFile.notExists || confirmOverwrite) { ExcelHandler.saveLibrary(newFile, library); success = true } }
     success
   }
 
   private def createNewBookInDialog = {
-    val bookControllerInput = new BookControllerInput(newPreviousBook(library.columns.size), library.columns.toList, library.configuration, books.getList.toList, true, file)
-    val bookController = new BookController
+    val book = newPreviousBook(library.columns.size)
+    val columns = library.columns.toList
+    val columnConfiguration = library.configuration
+    val bookList = books.getList.toList
+    val isbnEnabled = true
+    val loadedFile = file
+
+    val bookControllerInput = new BookControllerInput(book, columns, columnConfiguration, bookList, isbnEnabled, loadedFile)
+    val bookController = new BookController(book, columns, columnConfiguration, bookList, isbnEnabled, loadedFile)
 
     val editorDialog = DialogHelper.startModalDialog(component, bookController, bookControllerInput)
 
@@ -141,8 +143,15 @@ class LibraryEditor(val library: Library) extends WithComponent {
   private def editBook = {
     val selectedBookIndex = bookTable.getSelectedIndex
 
+    val book = Book(books.getList.get(selectedBookIndex))
+    val columns = library.columns.toList
+    val columnConfiguration = library.configuration
+    val bookList = books.getList.toList
+    val isbnEnabled = false
+    val loadedFile = file
+
     val bookControllerInput = new BookControllerInput(Book(books.getList.get(selectedBookIndex)), library.columns.toList, library.configuration, library.books.toList, false, file)
-    val bookController = new BookController
+    val bookController = new BookController(book, columns, columnConfiguration, bookList, isbnEnabled, loadedFile)
 
     val editorDialog = DialogHelper.startModalDialog(component, bookController, bookControllerInput)
 
@@ -162,12 +171,12 @@ class LibraryEditor(val library: Library) extends WithComponent {
       val imageName = book.getValue(i)
       val columnName = columns(i)
       val isPictureField = columnConfiguration.isTrue(columnName, ColumnConfigurations.PICTURE)
-      if (imageName == "" && book.images.contains(i)) {
+      if (imageName == EMPTY_STRING && book.images.contains(i)) {
         val dir = file.getParentFile
-        val imagesDir = (file.getAbsolutePath + ".images").asDir
+        val imagesDir = (file.getAbsolutePath + IMAGES_DIR_POSTFIX).asDir
         if (!imagesDir.exists) imagesDir.mkdir
-        val imageFile = (imagesDir.getAbsolutePath + "\\IMG.JPG").asFile.generateNewNameIfExists()
-        ImageIO.write(book.images.get(i).get, "JPG", imageFile)
+        val imageFile = (imagesDir.getAbsolutePath + DEFAULT_IMAGE_NAME).asFile.generateNewNameIfExists()
+        ImageIO.write(book.images.get(i).get, IMAGE_EXTENSION, imageFile)
         book.values(i) = imageFile.getName
       } else {
         // do nothing image already there

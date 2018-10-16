@@ -21,6 +21,9 @@ object TechnicalTextsIda {
   val LAST_ACTIVE_FILE = "lastActiveFile"
   
   val EMPTY_STRING = ""
+  val IMAGES_DIR_POSTFIX = ".images"
+  val DEFAULT_IMAGE_NAME = "\\IMG.JPG"
+  val IMAGE_EXTENSION = "JPG"
   
   val DIRTY = " *"
   val NOT_DIRTY = "  "

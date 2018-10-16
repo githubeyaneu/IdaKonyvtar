@@ -62,7 +62,12 @@ class BookEditorTest extends AbstractUiTest {
         .withValue(1, "abd")
         .withValue(3, "abd")
         .build())
-    bookController = new BookController()
+    bookController = new BookController(book,
+      columns,
+      columnConfiguration,
+      bookList,
+      false,
+      null)
     val bookControllerInput: BookControllerInput = new BookControllerInput(
       book,
       columns,

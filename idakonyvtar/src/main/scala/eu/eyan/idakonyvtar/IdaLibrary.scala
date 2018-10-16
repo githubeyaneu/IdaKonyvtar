@@ -4,6 +4,7 @@ import eu.eyan.log.Log
 import eu.eyan.util.registry.RegistryGroup
 import eu.eyan.util.string.StringPlus.StringPlusImplicit
 import eu.eyan.idakonyvtar.text.TechnicalTextsIda._
+import eu.eyan.idakonyvtar.text.TextsIda
 
 // TODO - remember the position of every frame/dialog
 // TODO - open dialogs in the same window as parent
@@ -46,7 +47,6 @@ import eu.eyan.idakonyvtar.text.TechnicalTextsIda._
 class IdaLibrary
 
 object IdaLibrary {
-  protected val registryGroup = RegistryGroup(classOf[IdaLibrary].getName)
   def registryValue(parameterName: String) = registryGroup.registryValue(parameterName)
 
   def main(args: Array[String]): Unit = {
@@ -57,4 +57,8 @@ object IdaLibrary {
 
     IdaLibraryFrame(fileToOpen)
   }
+  
+
+  private val registryGroup = RegistryGroup(classOf[IdaLibrary].getName)
+  val texts = new TextsIda
 }

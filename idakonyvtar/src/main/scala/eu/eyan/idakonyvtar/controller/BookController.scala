@@ -1,80 +1,62 @@
 package eu.eyan.idakonyvtar.controller;
 
 import java.awt.Component
+import java.awt.Image
 import java.awt.Window
-import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import java.beans.PropertyChangeEvent
 import java.beans.PropertyChangeListener
-import java.util.List
+import java.io.File
+
 import scala.collection.JavaConversions.asScalaBuffer
 import scala.collection.JavaConversions.seqAsJavaList
-import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator
+import scala.collection.mutable.MutableList
+
 import com.google.common.collect.Lists.newArrayList
 import com.google.common.io.Resources
 import com.jgoodies.binding.adapter.Bindings
-import com.jgoodies.binding.adapter.ComboBoxAdapter
+import com.jgoodies.forms.layout.FormLayout
+import com.jgoodies.forms.layout.RowSpec
+
 import eu.eyan.idakonyvtar.controller.input.BookControllerInput
 import eu.eyan.idakonyvtar.model.Book
 import eu.eyan.idakonyvtar.model.BookFieldValueModel
 import eu.eyan.idakonyvtar.model.ColumnConfigurations
+import eu.eyan.idakonyvtar.model.ColumnKonfiguration
 import eu.eyan.idakonyvtar.oszk.Marc
 import eu.eyan.idakonyvtar.oszk.OszkKereso
 import eu.eyan.idakonyvtar.oszk.OszkKeresoException
 import eu.eyan.idakonyvtar.util.BookHelper
 import eu.eyan.idakonyvtar.util.LibraryException
+import eu.eyan.idakonyvtar.util.WebCam
 import eu.eyan.idakonyvtar.view.MultiField
 import eu.eyan.idakonyvtar.view.MultiFieldAutocomplete
 import eu.eyan.idakonyvtar.view.MultiFieldJTextField
 import eu.eyan.log.Log
-import eu.eyan.util.swing.JTextFieldAutocomplete
-import javax.swing.ImageIcon
-import javax.swing.JOptionPane
-import javax.swing.JTextField
-import javax.swing.SwingUtilities
-import eu.eyan.log.Log
-import eu.eyan.idakonyvtar.view.MultiFieldAutocomplete
-import eu.eyan.util.swing.JTextFieldAutocomplete
 import eu.eyan.util.awt.AwtHelper
-import eu.eyan.util.swing.SwingPlus
-import javax.swing.JPanel
-import javax.swing.JButton
-import eu.eyan.util.swing.JButtonPlus.JButtonImplicit
-import java.awt.Image
-import eu.eyan.idakonyvtar.util.WebCam
-import javax.swing.JLabel
-import eu.eyan.util.swing.JLabelPlus.JLabelImplicit
-import eu.eyan.util.string.StringPlus.StringPlusImplicit
-import eu.eyan.util.io.FilePlus.FilePlusImplicit
-import javax.imageio.ImageIO
-import java.lang.Thread.UncaughtExceptionHandler
-import com.github.sarxos.webcam.WebcamPicker
-import com.github.sarxos.webcam.WebcamPanel
-import com.github.sarxos.webcam.WebcamResolution
-import com.github.sarxos.webcam.WebcamResolution
-import scala.collection.mutable.MutableList
-import eu.eyan.idakonyvtar.model.ColumnKonfiguration
-import eu.eyan.util.swing.JPanelWithFrameLayout
-import scala.collection.mutable.MutableList
-import com.jgoodies.forms.builder.PanelBuilder
-import com.jgoodies.forms.factories.CC
-import com.jgoodies.forms.layout.FormLayout
-import eu.eyan.idakonyvtar.model.ColumnConfigurations
-import eu.eyan.idakonyvtar.model.ColumnKonfiguration
-import eu.eyan.util.swing.JTextFieldAutocomplete
-import javax.swing.JLabel
-import javax.swing.JTextField
-import eu.eyan.util.swing.JPanelWithFrameLayout
 import eu.eyan.util.awt.ComponentPlus.ComponentPlusImplicit
-import eu.eyan.log.Log
-import com.github.sarxos.webcam.WebcamPanel
-import com.github.sarxos.webcam.WebcamPicker
-import com.github.sarxos.webcam.WebcamResolution
-import java.lang.Thread.UncaughtExceptionHandler
+import eu.eyan.util.string.StringPlus.StringPlusImplicit
+import eu.eyan.util.swing.JButtonPlus.JButtonImplicit
+import eu.eyan.util.swing.JLabelPlus.JLabelImplicit
+import eu.eyan.util.swing.JPanelWithFrameLayout
+import eu.eyan.util.swing.JTextFieldAutocomplete
+import eu.eyan.util.swing.SwingPlus
+import javax.imageio.ImageIO
+import javax.swing.ImageIcon
+import javax.swing.JButton
+import javax.swing.JLabel
+import javax.swing.JOptionPane
 import javax.swing.JPanel
-import com.jgoodies.forms.layout.RowSpec
+import javax.swing.JTextField
 
-class BookController extends IDialogController[BookControllerInput, Book] {
+class BookController (
+    val book: Book,
+    val columns: List[String],
+    val columnConfiguration: ColumnKonfiguration,
+    val bookList: List[Book],
+    val isbnEnabled: Boolean = false,
+    val loadedFile: File
+) extends IDialogController[BookControllerInput, Book] {
   val SPACE = " "
     val ISBN_TEXT = "isbnText";
   val ISBN_LABEL = "isbnLabel";
@@ -94,14 +76,14 @@ class BookController extends IDialogController[BookControllerInput, Book] {
   val isbnSearchLabel = new JLabel()
   val isbnText = new JTextField()
 
-  var columns: List[String] = null
-  def setColumns(columns: List[String]) = this.columns = columns
-
-  var isbnEnabled: Boolean = false
-  def setIsbnEnabled(isbnEnabled: Boolean): Unit = this.isbnEnabled = isbnEnabled
-
-  var columnConfiguration: ColumnKonfiguration = null
-  def setColumnConfiguration(columnConfiguration: ColumnKonfiguration) = this.columnConfiguration = columnConfiguration
+//  var columns: List[String] = null
+//  def setColumns(columns: List[String]) = this.columns = columns
+//
+//  var isbnEnabled: Boolean = false
+//  def setIsbnEnabled(isbnEnabled: Boolean): Unit = this.isbnEnabled = isbnEnabled
+//
+//  var columnConfiguration: ColumnKonfiguration = null
+//  def setColumnConfiguration(columnConfiguration: ColumnKonfiguration) = this.columnConfiguration = columnConfiguration
 
   var webcamPanel = new JPanelWithFrameLayout 
 
@@ -177,9 +159,9 @@ class BookController extends IDialogController[BookControllerInput, Book] {
 
   def initData(model: BookControllerInput) = {
     this.model = model
-    setColumns(model.columns)
-    setIsbnEnabled(model.isbnEnabled)
-    setColumnConfiguration(model.columnConfiguration)
+//    setColumns(model.columns)
+//    setIsbnEnabled(model.isbnEnabled)
+//    setColumnConfiguration(model.columnConfiguration)
   }
 
   def initBindings() = {
