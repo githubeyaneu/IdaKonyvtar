@@ -127,12 +127,12 @@ class LibraryEditor(val library: Library) extends WithComponent {
 
     val bookController = new BookController(book, columns, columnConfiguration, bookList, isbnEnabled, loadedFile)
 
-    val editorDialog = DialogHelper.startModalDialog(component, bookController)
+    val output = DialogHelper.yesNoEditor(component, bookController.getComponent, texts.NewBookWindowTitle, texts.NewBookSaveButton, texts.NewBookCancelButton)
 
-    if (editorDialog.isOk) {
-      saveImages(bookController.getOutput)
-      books.getList.add(0, bookController.getOutput)
-      savePreviousBook(bookController.getOutput)
+    if (output){
+      saveImages(book)
+      books.getList.add(0, book)
+      savePreviousBook(book)
       books.fireIntervalAdded(0, 0)
       dirty
     }
@@ -150,11 +150,16 @@ class LibraryEditor(val library: Library) extends WithComponent {
 
     val bookController = new BookController(book, columns, columnConfiguration, bookList, isbnEnabled, loadedFile)
 
-    val editorDialog = DialogHelper.startModalDialog(component, bookController)
+    
+    val titleFieldName = texts.ConfigTitleFieldName
+    val titleColumnIndex = titleFieldName.map(columns.indexOf)
+    val bookTitle = titleColumnIndex.map(columnIndex => if(-1 < columnIndex) book.getValue(columnIndex) else EMPTY_STRING)
 
-    if (editorDialog.isOk) {
-      saveImages(bookController.getOutput)
-      books.getList.set(selectedBookIndex, bookController.getOutput)
+    val output = DialogHelper.yesNoEditor(component, bookController.getComponent, texts.EditBookWindowTitle(bookTitle), texts.EditBookSaveButton, texts.EditBookCancelButton)
+
+    if (output){
+      saveImages(book)
+      books.getList.set(selectedBookIndex, book)
       books.fireSelectedContentsChanged
       dirty
     }

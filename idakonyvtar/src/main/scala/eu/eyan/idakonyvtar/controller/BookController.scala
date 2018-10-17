@@ -49,6 +49,7 @@ import javax.swing.JOptionPane
 import javax.swing.JPanel
 import javax.swing.JTextField
 import eu.eyan.idakonyvtar.text.TechnicalTextsIda._
+import eu.eyan.util.swing.WithComponent
 
 class BookController(
   private val book:                Book,
@@ -56,31 +57,9 @@ class BookController(
   private val columnConfiguration: ColumnKonfiguration,
   private val bookList:            List[Book],
   private val isbnEnabled:         Boolean             = false,
-  private val loadedFile:          File)
-  extends IDialogController[BookControllerInput, Book] {
+  private val loadedFile:          File) {
 
-  def onOk = stopWebcam
-
-  def onCancel = stopWebcam
-
-  def getOutput = book
-
-  def getComponentForFocus = isbnText
-
-  def addResizeListener(window: Window) = this.resizeListeners.add(window)
-
-  def getView = view
-
-  def getTitle =
-    if (columns.indexOf("Cím") >= 0) "Könyv adatainak szerkesztése - " + book.getValue(columns.indexOf("Cím"))
-    else "Könyv adatainak szerkesztése"
-
-  def initData(model: BookControllerInput) = {}
-
-  def initBindings() = {
-    initFieldsActionBindings
-    isbnText.addActionListener(isbnSearch())
-  }
+  def getComponent = view
 
   private val TEXTFIELD_DEFAULT_SIZE = 20
   private val editors: MutableList[Component] = MutableList()
@@ -90,6 +69,9 @@ class BookController(
   private val webcamPanel = new JPanelWithFrameLayout
   private val view = createViewComponent
   private val resizeListeners: java.util.List[Window] = newArrayList()
+
+  initFieldsActionBindings
+  isbnText.addActionListener(isbnSearch())
 
   private def createViewComponent(): Component = {
     val rowsPanel = new JPanelWithFrameLayout().withSeparators
@@ -101,6 +83,8 @@ class BookController(
       rowsPanel.newRow
       rowsPanel.add(isbnSearchLabel.name(ISBN_LABEL))
       rowsPanel.nextColumn.add(isbnText.name(ISBN_TEXT))
+
+      isbnText.onHierarchyChanged(isbnText.requestFocusInWindow)
     }
 
     rowsPanel.newRow.span.addSeparatorWithTitle("Adatok")
@@ -286,9 +270,8 @@ class BookController(
       webcamPanel.newRow.add(webcam.get.panel)
     } else webcamPanel.add(new JLabel("No Webcam"))
   }
-  private def stopWebcam = {}
 
-  private def fireResizeEvent() = resizeListeners.foreach(_.pack)
+  private def fireResizeEvent() = {} //resizeListeners.foreach(_.pack)
 
   private def getMultiFieldList(value: String): List[String] = value.split(BookHelper.LISTA_SEPARATOR_REGEX).filter(!_.isEmpty()).toList
 }

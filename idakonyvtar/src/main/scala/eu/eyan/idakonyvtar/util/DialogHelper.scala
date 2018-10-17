@@ -45,67 +45,40 @@ import java.awt.GraphicsEnvironment
 import eu.eyan.util.swing.JPanelPlus.JPanelImplicit
 import eu.eyan.util.awt.ContainerPlus.ContainerPlusImplicit
 import eu.eyan.util.swing.JComponentPlus.JComponentImplicit
+import eu.eyan.idakonyvtar.text.TechnicalTextsIda._
+import eu.eyan.util.swing.WithComponent
+import javax.swing.JDialog
 
 object DialogHelper {
 
-  /**
-   * Blocks as a modal dialog!!!
-   *
-   * @param parent
-   * @param controller
-   * @param input
-   * @return
-   */
-  def startModalDialog[INPUT, OUTPUT](parent: Component, controller: IDialogController[INPUT, OUTPUT]): OkCancelDialog = {
-    controller.initBindings
-    val parentWindow: Window = if (parent == null) null else SwingUtilities.windowForComponent(parent)
+  private class JDialogWithYesNoButtons(owner: Component, content: Component, yesText: Text, noText: Text) extends JDialog(owner.windowForComponent) {
+    def hasYesSelected = clickOnYes
 
-    val buttonsPanel = new JPanelWithFrameLayout().withSeparators
-    val saveButton = buttonsPanel.newColumn.addButton("Mentés").name("Mentés")
-    val cancelButton = buttonsPanel.newColumn.addButton("Mégsem").name("Mégsem")
+    private var clickOnYes = false
+    private val yesNoButtonsPanel = new JPanelWithFrameLayout().withSeparators
+    yesNoButtonsPanel.newColumn.addButton(yesText).name(SAVE_BUTTON_NAME).onAction { clickOnYes = true; this.dispose }
+    yesNoButtonsPanel.newColumn.addButton(noText).name(CANCEL_BUTTON_NAME).onAction(this.dispose)
 
-    val panel =
-      new JPanelWithFrameLayout().withSeparators.withBorders
-        .newColumnScrollable
-        .newRow("pref").addFluent(buttonsPanel)
-        .newRowScrollable
-        .addFluent(controller.getView.inScrollPane)
+    private val buttonsAndContent = new JPanelWithFrameLayout().withSeparators.withBorders
+      .newColumnScrollable
+      .newRow.addFluent(yesNoButtonsPanel)
+      .newRowScrollable.addFluentInScrollPane(content)
 
-    val dialog =
-      new OkCancelDialog(parentWindow)
-        .locationRelativeTo(parent)
-        .modal
-        .title(controller.getTitle)
-        .resizeable
-        .addFluent(panel)
+    add(buttonsAndContent)
+  }
 
-    //    dialog.addWindowListener(new WindowAdapter() { override def windowClosing(e: WindowEvent) = super.windowClosed(e) }) //TODO needed?
-
-    controller.addResizeListener(dialog)
-    saveButton.onAction({ controller.onOk(); dialog.setOk(true); dialog.dispose() })
-    cancelButton.onAction({ controller.onCancel(); dialog.dispose() })
-
-    // blockiert:
-    dialog
+  /** Blocks as a modal dialog!!! */
+  def yesNoEditor(owner: Component, content: Component, title: Text, yesText: Text, noText: Text) =
+    new JDialogWithYesNoButtons(owner, content, yesText, noText)
+      .locationRelativeTo(owner)
+      .modal
+      .title(title)
+      .resizeable
       .packFluent
       .positionToCenter
       .maximize
       .visible // blocks !!! for jdialog
-
-    if (parentWindow != null) parentWindow.invalidate()
-
-    dialog
-  }
-
-  //  def addScrollableInBorders(component: Component): Component = {
-  //    val layout = new FormLayout("3dlu,pref:grow,3dlu", "3dlu,pref:grow,3dlu")
-  //    val panel = new JPanel(layout)
-  //    val COL_ROW_MIDDLE = 2
-  //    panel.add(component, CC.xy(COL_ROW_MIDDLE, COL_ROW_MIDDLE))
-  //    val scrollPane = new JScrollPane(panel)
-  //    scrollPane.setBorder(null)
-  //    scrollPane
-  //  }
+      .hasYesSelected
 
   def yes(texts: TextsDialogYes): Option[String] = yes(texts.text, texts.title, texts.yes)
   def yes(text: Text, title: Text, yes: Text) = Alert.alertOptions(title.get, text.get, Array(yes.get))

@@ -35,6 +35,7 @@ object Book {
   }
 }
 
+//TODO: make it (?) immutable
 class Book(val values: MutableList[String], val images: Map[Int, BufferedImage]   ) extends Model {
   def setValue(columnIndex: Int, value: String) = {
     val oldValue: String = this.values(columnIndex);

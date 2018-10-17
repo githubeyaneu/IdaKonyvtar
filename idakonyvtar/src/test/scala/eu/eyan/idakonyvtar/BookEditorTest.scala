@@ -18,6 +18,7 @@ import eu.eyan.idakonyvtar.util.DialogHelper
 import eu.eyan.log.Log
 import eu.eyan.testutil.video.VideoRunner
 import javax.swing.SwingUtilities
+import eu.eyan.util.text.Text
 
 object BookEditorTest {
 
@@ -33,12 +34,13 @@ class BookEditorTest extends AbstractUiTest {
 
   private var bookController: BookController = _
 
+  private val columns: List[String] = List("szimpla", "ac", "mm", "mmac")
+  
+  private val book: Book = new Book.Builder(columns.size).withValue(0, "Érték1").build()
+  
   @Before
   def setUp(): Unit = {
     Log.activateInfoLevel
-    val columns: List[String] = List("szimpla", "ac", "mm", "mmac")
-    val book: Book =
-      new Book.Builder(columns.size).withValue(0, "Érték1").build()
     val columnConfiguration: ColumnKonfiguration =
       new ColumnKonfiguration.Builder(3, columns.size + 1)
         .withRow(
@@ -69,7 +71,7 @@ class BookEditorTest extends AbstractUiTest {
       false,
       null)
     SwingUtilities.invokeLater(() =>
-      DialogHelper.startModalDialog(null, bookController))
+      DialogHelper.yesNoEditor(null, bookController.getComponent, new Text("title"), new Text("save"), new Text("cancel")))
     bookEditor = new BookEditorTestHelper(
       BasicRobot.robotWithCurrentAwtHierarchy())
     VideoRunner.setComponentToRecord(bookEditor.getComponentToRecord)
@@ -87,7 +89,7 @@ class BookEditorTest extends AbstractUiTest {
   def testNormalField(): Unit = {
     bookEditor.setNormalText("szimpla", "szimpla")
     bookEditor.clickSave()
-    assertThat(bookController.getOutput.getValue(0)).isEqualTo("szimpla")
+    assertThat(book.getValue(0)).isEqualTo("szimpla")
   }
 
   @Test
@@ -95,7 +97,7 @@ class BookEditorTest extends AbstractUiTest {
     bookEditor.setNormalText("ac", "a")
     bookEditor.keyboard(KeyEvent.VK_ESCAPE)
     bookEditor.clickSave()
-    assertThat(bookController.getOutput.getValue(1)).isEqualTo("a")
+    assertThat(book.getValue(1)).isEqualTo("a")
   }
 
   @Test
@@ -104,7 +106,7 @@ class BookEditorTest extends AbstractUiTest {
     bookEditor.keyboard(KeyEvent.VK_DELETE)
     bookEditor.keyboard(KeyEvent.VK_ESCAPE)
     bookEditor.clickSave()
-    assertThat(bookController.getOutput.getValue(1)).isEqualTo("a")
+    assertThat(book.getValue(1)).isEqualTo("a")
   }
 
   @Test
@@ -117,7 +119,7 @@ class BookEditorTest extends AbstractUiTest {
     bookEditor.multifieldDelete("mm", 2)
     bookEditor.requireDeleteDisabled("mm", 4)
     bookEditor.clickSave
-    assertThat(bookController.getOutput.getValue(2)).isEqualTo("ab + c")
+    assertThat(book.getValue(2)).isEqualTo("ab + c")
   }
 
   @Test
@@ -136,7 +138,7 @@ class BookEditorTest extends AbstractUiTest {
     bookEditor.enterNormalText("mmac4", "a")
     bookEditor.autocomplete("mmac4").pressEscape
     bookEditor.clickSave
-    assertThat(bookController.getOutput.getValue(3)).isEqualTo("ab + c + a")
+    assertThat(book.getValue(3)).isEqualTo("ab + c + a")
   }
 
   @Test

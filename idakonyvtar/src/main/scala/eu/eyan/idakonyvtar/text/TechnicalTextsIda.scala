@@ -21,6 +21,7 @@ object TechnicalTextsIda {
   val LAST_ACTIVE_FILE = "lastActiveFile"
   
   val EMPTY_STRING = ""
+  val COLON_SPACE = ": "
   val IMAGES_DIR_POSTFIX = ".images"
   val DEFAULT_IMAGE_NAME = "\\IMG.JPG"
   val IMAGE_EXTENSION = "JPG"
@@ -47,4 +48,7 @@ object TechnicalTextsIda {
   
   val ISBN_TEXT = "isbnText"
   val ISBN_LABEL = "isbnLabel"
+  
+  val SAVE_BUTTON_NAME = "Save"
+  val CANCEL_BUTTON_NAME = "Cancel"
 }

@@ -197,5 +197,8 @@ class TextsIda extends Texts {
   case object AutocompleteFieldDeleteButton extends IdaText("AutocompleteFieldDeleteButton")
   case object WebcamTakeImageButton extends IdaText("WebcamTakeImageButton")
   case object ShowImageWindowTitle extends IdaText("ShowImageWindowTitle")
-  case object EditBookWindowTitle extends IdaText("EditBookWindowTitle")
+  case object EditBookWindowTitle  { def apply(bookTitle: Observable[String]) = IdaText("EditBookWindowTitle", bookTitle) }
+  case object EditBookSaveButton extends IdaText("EditBookSaveButton")
+  case object EditBookCancelButton extends IdaText("EditBookCancelButton")
+  case object ConfigTitleFieldName extends IdaText("ConfigTitleFieldName")
 }

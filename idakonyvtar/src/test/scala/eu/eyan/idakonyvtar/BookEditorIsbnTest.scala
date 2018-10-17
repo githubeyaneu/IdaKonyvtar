@@ -17,6 +17,8 @@ import eu.eyan.idakonyvtar.testhelper.BookEditorTestHelper
 import eu.eyan.idakonyvtar.util.DialogHelper
 import eu.eyan.testutil.video.VideoRunner
 import javax.swing.SwingUtilities
+import eu.eyan.idakonyvtar.text.TextsIda
+import eu.eyan.util.text.Text
 
 
 object BookEditorIsbnTest {
@@ -72,8 +74,9 @@ class BookEditorIsbnTest extends AbstractUiTest {
       bookList,
       true,
       null)
+    
     SwingUtilities.invokeLater(() =>
-      DialogHelper.startModalDialog(null, bookController))
+      DialogHelper.yesNoEditor(null, bookController.getComponent, new Text("title"), new Text("save"), new Text("cancel")))
     bookEditor = new BookEditorTestHelper(
       BasicRobot.robotWithCurrentAwtHierarchy())
     VideoRunner.setComponentToRecord(bookEditor.getComponentToRecord)
