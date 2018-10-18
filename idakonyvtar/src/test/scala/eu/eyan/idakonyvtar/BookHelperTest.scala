@@ -7,7 +7,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 import eu.eyan.idakonyvtar.model.Book
-import eu.eyan.idakonyvtar.util.BookHelper
 import eu.eyan.util.random.RandomPlus
 import eu.eyan.testutil.ScalaEclipseJunitRunner
 import eu.eyan.idakonyvtar.text.TechnicalTextsIda

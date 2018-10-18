@@ -65,7 +65,7 @@ object BookController {
 }
 class BookController(
   private val book:                Book,
-  private val columns:             List[String],//TODO refact
+  private val columns:             List[String], //TODO refact
   private val columnConfiguration: ColumnKonfiguration,
   private val bookList:            List[Book],
   private val isbnEnabled:         Boolean             = false,
@@ -78,31 +78,36 @@ class BookController(
   private val isbnSearchLabel = new JLabel()
   private val isbnText = new JTextField()
   private val webcamPanel = new JPanelWithFrameLayout
-  private val view = createViewComponent
   private val resizeListeners: java.util.List[Window] = newArrayList()
 
-  private def createViewComponent(): Component = {
-    val rowsPanel = new JPanelWithFrameLayout().withSeparators
-    rowsPanel.newColumn.newColumn("pref:grow")
-    val imagesPanel = new JPanelWithFrameLayout().name("imagesPanel").withSeparators.newColumn("320px")
+  val fieldsPanel = new JPanelWithFrameLayout().withSeparators.newColumn.newColumn("pref:grow")
+
+  val picturePanel = new JPanelWithFrameLayout().withSeparators.newColumn("320px")
+
+  val view = new JPanelWithFrameLayout().withSeparators
+    .newColumn("f:p:g ").addFluent(fieldsPanel)
+    .newColumn("f:320px").addFluent(picturePanel)
+    .newColumn("f:320px").addFluent(webcamPanel)
+
+
     startWebcam
 
     if (isbnEnabled) {
-      rowsPanel.newRow.span.addSeparatorWithTitle("Isbn")
-      rowsPanel.newRow
-      rowsPanel.add(isbnSearchLabel.name(ISBN_LABEL))
-      rowsPanel.nextColumn.add(isbnText.name(ISBN_TEXT))
+      fieldsPanel.newRow.span.addSeparatorWithTitle("Isbn")
+      fieldsPanel.newRow
+      fieldsPanel.add(isbnSearchLabel.name(ISBN_LABEL))
+      fieldsPanel.nextColumn.add(isbnText.name(ISBN_TEXT))
 
       isbnText onHierarchyChanged isbnText.requestFocusInWindow
       isbnText onActionPerformed isbnSearch
     }
 
-    rowsPanel.newRow.span.addSeparatorWithTitle("Adatok")
+    fieldsPanel.newRow.span.addSeparatorWithTitle("Adatok")
 
     for { columnIndex <- 0 until columns.size } {
       val columnName = columns(columnIndex)
       Log.debug(s"column $columnName")
-      rowsPanel.newRow.addLabel(columnName)
+      fieldsPanel.newRow.addLabel(columnName)
 
       val isMultiEditorField = columnConfiguration.isTrue(columnName, ColumnConfigurations.MULTIFIELD)
       val isAutocompleteField = columnConfiguration.isTrue(columnName, ColumnConfigurations.AUTOCOMPLETE)
@@ -111,14 +116,13 @@ class BookController(
       val editor: Component =
         if (isPictureField) {
           //TODO WTF spagetti:
-          imagesPanel.newRow.addLabel(columnName)
-          val imageLabel = imagesPanel.newRow.addLabel("").name("look" + columnName)
-          
+          picturePanel.newRow.addLabel(columnName)
+          val imageLabel = picturePanel.newRow.addLabel("").name("look" + columnName)
+
           val imgNameAndBtn = JPanelWithFrameLayout()
           val textField = imgNameAndBtn.newColumn.addTextField("", TEXTFIELD_DEFAULT_SIZE).name("picturePath")
           val button = imgNameAndBtn.newColumn.addButton("katt").name("click")
 
-          
           def refreshImage = imageLabel.setIcon(new ImageIcon(book.images(columnIndex).getScaledInstance(320, 240, Image.SCALE_DEFAULT)))
           if (book.images.contains(columnIndex)) refreshImage
           button.onClicked({
@@ -136,18 +140,10 @@ class BookController(
         else bindTextField(new JTextField(TEXTFIELD_DEFAULT_SIZE), new BookFieldValueModel(columnIndex, book))
 
       editor.setName(columnName)
-      rowsPanel.nextColumn.add(editor)
+      fieldsPanel.nextColumn.add(editor)
       editors += editor
     }
 
-    val panel = new JPanelWithFrameLayout().withSeparators
-    panel.newColumn("f:p:g ").add(rowsPanel)
-    panel.newColumn("f:320px").add(imagesPanel)
-    panel.newColumn("f:320px").add(webcamPanel)
-
-    panel
-
-  }
 
   private def bindTextField(tf: JTextField, bookFieldValueModel: BookFieldValueModel) = {
     Bindings.bind(tf, bookFieldValueModel)

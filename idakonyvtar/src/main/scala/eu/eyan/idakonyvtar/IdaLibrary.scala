@@ -63,6 +63,6 @@ object IdaLibrary {
   def texts = textsIda
 
   private val registryGroup = RegistryGroup(classOf[IdaLibrary].getName)
-  
+  // must come after
   private val textsIda = new TextsIda
 }
