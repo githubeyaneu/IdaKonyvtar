@@ -88,19 +88,19 @@ object ExcelHandler {
 
       val colConfig = new ColumnKonfiguration(configTable)
 
-      val columns = (for { actualColumn <- 0 until booksSheet.getColumns() } yield booksSheet.getCell(actualColumn, 0).getContents()).toList
+      val columns = (for { actualColumn <- 0 until booksSheet.getColumns() } yield booksSheet.getCell(actualColumn, 0).getContents()).toList.filter(_.nonEmpty)
 
       val books = for { actualRow <- 1 until booksSheet.getRows() } yield {
         val book = Book(booksSheet.getColumns())
         for (actualColumn <- 0 until booksSheet.getColumns()) {
           val contents = booksSheet.getCell(actualColumn, actualRow).getContents()
-          book.setValue(actualColumn, contents)
+          book.setValue(actualColumn)(contents)
         }
         book
       }
 
       val library = new Library(file, colConfig, columns)
-      for { book <- books } library.books.add(book)
+      for { book <- books } library.addBook(book)
       libraryWorkbook.close
 
       library
@@ -124,7 +124,7 @@ object ExcelHandler {
   }
 
   @throws(classOf[LibraryException])
-  def saveLibrary(targetFile: File, library: Library) = {
+  def saveLibrary(targetFile: File, library: Library):Boolean = {
     if (targetFile.exists())
       if (targetFile.isFile())
         try {
@@ -141,10 +141,10 @@ object ExcelHandler {
       val booksSheet = workbook.createSheet(BOOKS, 0)
       for { columnIndex <- 0 until library.columns.size } {
         booksSheet.addCell(new Label(columnIndex, 0, library.columns(columnIndex)))
-        for (bookIndex <- 0 until library.books.size()) {
+        for (bookIndex <- 0 until library.booksSize) {
           val cellFormat = new WritableCellFormat()
           cellFormat.setWrap(true)
-          booksSheet.addCell(new Label(columnIndex, bookIndex + 1, library.books.get(bookIndex).getValue(columnIndex), cellFormat))
+          booksSheet.addCell(new Label(columnIndex, bookIndex + 1, library.bookAtIndex(bookIndex).getValue(columnIndex), cellFormat))
         }
       }
       val columnConfigurationSheet = workbook.createSheet(COLUMN_CONFIGURATION, 1)
@@ -154,10 +154,12 @@ object ExcelHandler {
 
       workbook.write
       workbook.close
+      true
     } catch {
       case e: IOException           => throw new LibraryException(ERROR_TEXT, e)
       case e: RowsExceededException => throw new LibraryException(ERROR_TEXT, e)
       case e: WriteException        => throw new LibraryException(ERROR_TEXT, e)
+      false
     }
   }
 

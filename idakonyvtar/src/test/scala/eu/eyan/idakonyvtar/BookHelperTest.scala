@@ -10,6 +10,8 @@ import eu.eyan.idakonyvtar.model.Book
 import eu.eyan.idakonyvtar.util.BookHelper
 import eu.eyan.util.random.RandomPlus
 import eu.eyan.testutil.ScalaEclipseJunitRunner
+import eu.eyan.idakonyvtar.text.TechnicalTextsIda
+import eu.eyan.idakonyvtar.controller.BookController
 
 @RunWith(classOf[ScalaEclipseJunitRunner])
 class BookHelperTest {
@@ -27,7 +29,7 @@ class BookHelperTest {
     def books2(r: Int) = new RandomPlus(r)
       .nextReadableStrings(2000, 10, 20)
       .sliding(2, 2)
-      .map { x => new Book(MutableList(x(0) + BookHelper.LISTA_SEPARATOR + x(1)), null) }
+      .map { x => new Book(MutableList(x(0) + TechnicalTextsIda.MULTIFIELD_SEPARATOR+ x(1)), null) }
       .toList
 
     def allBooks(r: Int) = (books(r).++(books2(r))).toList
@@ -36,7 +38,7 @@ class BookHelperTest {
     for {i <- 1 to 10} {
       val b = shuffledBooks(i)
       val start = System.currentTimeMillis
-      BookHelper.getColumnList(b, 0)
+      BookController.getColumnList(b, 0)
       val end = System.currentTimeMillis
       sum = sum + end - start
     }

@@ -51,4 +51,7 @@ object TechnicalTextsIda {
   
   val SAVE_BUTTON_NAME = "Save"
   val CANCEL_BUTTON_NAME = "Cancel"
+  
+  val MULTIFIELD_SEPARATOR = " + "
+  val MULTIFIELS_SEPARATOR_REGEX = MULTIFIELD_SEPARATOR.replace("+", "\\+")
 }

@@ -27,7 +27,7 @@ object Book {
 
     def withValue(columnIndex: Int, value: String): Builder = {
       Log.debug(columnIndex + " " + value)
-      book.setValue(columnIndex, value)
+      book.setValue(columnIndex)(value)
       this
     }
 
@@ -37,7 +37,7 @@ object Book {
 
 //TODO: make it (?) immutable
 class Book(val values: MutableList[String], val images: Map[Int, BufferedImage]   ) extends Model {
-  def setValue(columnIndex: Int, value: String) = {
+  def setValue(columnIndex: Int)(value: String) = {
     val oldValue: String = this.values(columnIndex);
     if (value != null) {
       values(columnIndex) = value

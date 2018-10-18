@@ -50,7 +50,20 @@ import javax.swing.JPanel
 import javax.swing.JTextField
 import eu.eyan.idakonyvtar.text.TechnicalTextsIda._
 import eu.eyan.util.swing.WithComponent
+import eu.eyan.util.swing.JTextFieldPlus.JTextFieldPlusImplicit
 
+object BookController {
+  def getColumnList(bookList: Seq[Book], columnIndex: Int) = bookList
+    .map(_.getValue(columnIndex)) // get the values of the column
+    .filter(_ != null) // only not nulls
+    .map(s => if (s.contains(MULTIFIELD_SEPARATOR)) s.split(MULTIFIELS_SEPARATOR_REGEX) else Array(s)) // get all values if multifield
+    .flatten // take the whole list
+    .++:(List("")) // empty is always the default option
+    .map(_.trim)
+    // .distinct //do distinct in ac
+    //      .sortWith((s1: String, s2: String) => COLLATOR.compare(s1, s2) < 0) //autocomplete does sorting
+    .toList
+}
 class BookController(
   private val book:                Book,
   private val columns:             List[String],
@@ -70,13 +83,12 @@ class BookController(
   private val view = createViewComponent
   private val resizeListeners: java.util.List[Window] = newArrayList()
 
-  initFieldsActionBindings
-  isbnText.addActionListener(isbnSearch())
-
+  
   private def createViewComponent(): Component = {
     val rowsPanel = new JPanelWithFrameLayout().withSeparators
     rowsPanel.newColumn.newColumn("pref:grow")
     val imagesPanel = new JPanelWithFrameLayout().name("imagesPanel").withSeparators.newColumn("320px")
+    startWebcam
 
     if (isbnEnabled) {
       rowsPanel.newRow.span.addSeparatorWithTitle("Isbn")
@@ -84,13 +96,14 @@ class BookController(
       rowsPanel.add(isbnSearchLabel.name(ISBN_LABEL))
       rowsPanel.nextColumn.add(isbnText.name(ISBN_TEXT))
 
-      isbnText.onHierarchyChanged(isbnText.requestFocusInWindow)
+      isbnText onHierarchyChanged isbnText.requestFocusInWindow
+      isbnText onActionPerformed isbnSearch
     }
 
     rowsPanel.newRow.span.addSeparatorWithTitle("Adatok")
 
-    for { i <- 0 until columns.size } {
-      val columnName = columns(i)
+    for { columnIndex <- 0 until columns.size } {
+      val columnName = columns(columnIndex)
       Log.debug(s"column $columnName")
       rowsPanel.newRow.addLabel(columnName)
 
@@ -100,19 +113,59 @@ class BookController(
 
       val editor: Component =
         if (isPictureField) {
+          //TODO WTF spagetti:
           val panel = JPanelWithFrameLayout()
           imagesPanel.newRow.addLabel(columnName)
           val imageLabel = imagesPanel.newRow.addLabel("").name("look" + columnName)
           images += imageLabel
           panel.newColumn.addTextField("", TEXTFIELD_DEFAULT_SIZE).name("picturePath")
           panel.newColumn.addButton("katt").name("click")
+
+          if (book.values(columnIndex) != "") {
+            val dir = loadedFile.getParentFile
+            val imagesDir = (loadedFile.getAbsolutePath + ".images").asDir
+            val imageFile = (imagesDir.getAbsolutePath + "\\" + book.values(columnIndex)).asFile
+            val image = ImageIO.read(imageFile)
+            book.images.put(columnIndex, image)
+          }
+
+          val text = panel.getComponents.filter(_.getName == "picturePath")(0).asInstanceOf[JTextField]
+          val button = panel.getComponents.filter(_.getName == "click")(0).asInstanceOf[JButton]
+          val look = images.filter(_.getName == "look" + columnName)(0)
+          if (book.images.contains(columnIndex)) look.setIcon(new ImageIcon(book.images(columnIndex).getScaledInstance(320, 240, Image.SCALE_DEFAULT)))
+          Bindings.bind(text, new BookFieldValueModel(columnIndex, book))
+          button.onClicked({
+            book.images.put(columnIndex, WebCam.getImage)
+            book.values(columnIndex) = ""
+            look.setIcon(new ImageIcon(book.images(columnIndex).getScaledInstance(320, 240, Image.SCALE_DEFAULT)))
+          })
+
           panel
         } else if (isAutocompleteField) {
-          if (isMultiEditorField) new MultiFieldAutocomplete(columnName, "Autocomplete", "Nincs találat")
-          else new JTextFieldAutocomplete().setHintText("Autocomplete")
+          val columnList = BookController.getColumnList(bookList, columnIndex)
+          if (isMultiEditorField) {
+            val mfac = new MultiFieldAutocomplete(columnName, "Autocomplete", "Nincs találat")
+            Log.debug("mac " + columnIndex + " " + columnList)
+            mfac.setAutoCompleteList(columnList)
+            multiFieldBind(mfac, new BookFieldValueModel(columnIndex, book))
+            mfac
+          } else {
+            val ac = new JTextFieldAutocomplete().setHintText("Autocomplete")
+            Log.debug("ac " + columnIndex + " " + columnList)
+            ac.setAutocompleteList(columnList)
+            Bindings.bind(ac, new BookFieldValueModel(columnIndex, book))
+            ac
+          }
         } else {
-          if (isMultiEditorField) new MultiFieldJTextField(columnName)
-          else new JTextField(TEXTFIELD_DEFAULT_SIZE)
+          if (isMultiEditorField) {
+            val mtf = new MultiFieldJTextField(columnName)
+            multiFieldBind(mtf, new BookFieldValueModel(columnIndex, book))
+            mtf
+          } else {
+            val tf = new JTextField(TEXTFIELD_DEFAULT_SIZE)
+            Bindings.bind(tf, new BookFieldValueModel(columnIndex, book))
+            tf
+          }
         }
 
       editor.setName(columnName)
@@ -124,69 +177,10 @@ class BookController(
     panel.newColumn("f:p:g ").add(rowsPanel)
     panel.newColumn("f:320px").add(imagesPanel)
     panel.newColumn("f:320px").add(webcamPanel)
+
+
     panel
-  }
 
-  private def initFieldsActionBindings = {
-    for { columnIndex <- 0 until columns.size() } {
-      val columnName = columns.get(columnIndex)
-      val autoComplete = columnConfiguration.isTrue(columnName, ColumnConfigurations.AUTOCOMPLETE)
-      val multi = columnConfiguration.isTrue(columnName, ColumnConfigurations.MULTIFIELD)
-      val picture = columnConfiguration.isTrue(columnName, ColumnConfigurations.PICTURE)
-
-      if (picture) {
-        if (book.values(columnIndex) != "") {
-          val dir = loadedFile.getParentFile
-          val imagesDir = (loadedFile.getAbsolutePath + ".images").asDir
-          val imageFile = (imagesDir.getAbsolutePath + "\\" + book.values(columnIndex)).asFile
-          val image = ImageIO.read(imageFile)
-          book.images.put(columnIndex, image)
-        }
-
-        val panel = editors(columnIndex).asInstanceOf[JPanel]
-        val text = panel.getComponents.filter(_.getName == "picturePath")(0).asInstanceOf[JTextField]
-        val button = panel.getComponents.filter(_.getName == "click")(0).asInstanceOf[JButton]
-        val look = images.filter(_.getName == "look" + columnName)(0)
-        //val look = panel.getComponents.filter(_.getName == "look")(0).asInstanceOf[JLabel]
-        //look.onMouseClicked(if (book.images.contains(columnIndex)) look.setIcon(new ImageIcon(book.images(columnIndex))))
-        if (book.images.contains(columnIndex)) look.setIcon(new ImageIcon(book.images(columnIndex).getScaledInstance(320, 240, Image.SCALE_DEFAULT)))
-        Bindings.bind(text, new BookFieldValueModel(columnIndex, book))
-        button.onClicked({
-          book.images.put(columnIndex, WebCam.getImage)
-          book.values(columnIndex) = ""
-          look.setIcon(new ImageIcon(book.images(columnIndex).getScaledInstance(320, 240, Image.SCALE_DEFAULT)))
-        })
-
-      } else if (autoComplete) {
-        val columnList = BookHelper.getColumnList(bookList, columnIndex)
-        if (multi) {
-          Log.debug("mac " + columnIndex + " " + columnList)
-          //          val mmcombo: MultiFieldJComboBox = view.editors(columnIndex).asInstanceOf[MultiFieldJComboBox]
-          //          mmcombo.setAutoCompleteList(columnList)
-          val mmcombo = editors(columnIndex).asInstanceOf[MultiFieldAutocomplete]
-          mmcombo.setAutoCompleteList(columnList)
-          multiFieldBind(mmcombo, new BookFieldValueModel(columnIndex, book))
-        } else {
-          Log.debug("ac " + columnIndex + " " + columnList)
-          //        val comboBox: JComboBox[_] = view.editors(columnIndex).asInstanceOf[JComboBox[_]]
-          //        val adapter = new ComboBoxAdapter[String](columnList, new BookFieldValueModel(columnIndex, book))
-          //        Bindings.bind(comboBox, adapter)
-          //        AutoCompleteDecorator.decorate(comboBox)
-          val autocomplete = editors(columnIndex).asInstanceOf[JTextFieldAutocomplete]
-          autocomplete.setAutocompleteList(columnList)
-          Bindings.bind(autocomplete, new BookFieldValueModel(columnIndex, book))
-        }
-      } else {
-        if (multi) {
-          val mmc: MultiFieldJTextField = editors(columnIndex).asInstanceOf[MultiFieldJTextField]
-          multiFieldBind(mmc, new BookFieldValueModel(columnIndex, book))
-        } else {
-          Bindings.bind(editors(columnIndex).asInstanceOf[JTextField], new BookFieldValueModel(columnIndex, book))
-        }
-      }
-    }
-
-    startWebcam
   }
 
   private def multiFieldBind(mmc: MultiField[String, _], bookFieldValueModel: BookFieldValueModel) = {
@@ -203,35 +197,29 @@ class BookController(
 
     mmc.addPropertyChangeListener(new PropertyChangeListener {
       override def propertyChange(evt: PropertyChangeEvent) =
-        bookFieldValueModel.setValue(mmc.getValues().filter(_ != null).mkString(BookHelper.LISTA_SEPARATOR))
+        bookFieldValueModel.setValue(mmc.getValues().filter(_ != null).mkString(MULTIFIELD_SEPARATOR))
     })
   }
 
-  private def isbnSearch(): ActionListener = AwtHelper.onActionPerformed { e =>
-    {
-      if (e.getSource() == isbnText) {
-        isbnText.selectAll()
-        isbnSearchLabel.setText("Keresés")
-        isbnSearchLabel.setIcon(new ImageIcon(Resources.getResource("icons/search.gif")))
-        editors.foreach(_.setEnabled(false))
+  private def isbnSearch() = {
+    isbnText.selectAll()
+    isbnSearchLabel.setText("Keresés")
+    isbnSearchLabel.setIcon(new ImageIcon(Resources.getResource("icons/search.gif")))
+    editors.foreach(_.setEnabled(false))
 
-        SwingPlus.invokeLater {
-          {
-            try {
-              val marcsToIsbn = OszkKereso.getMarcsToIsbn(isbnText.getText().replaceAll("ö", "0"))
-              prozessIsbnData(marcsToIsbn)
-            } catch {
-              case e: OszkKeresoException =>
-                Log.error(e)
-                isbnSearchLabel.setText("Nincs találat")
-                isbnSearchLabel.setIcon(new ImageIcon(Resources.getResource("icons/error.gif")))
-            } finally {
-              editors.foreach(_.setEnabled(true))
-              fireResizeEvent
-            }
-          }
+    SwingPlus.invokeLater {
+      {
+        try {
+          val marcsToIsbn = OszkKereso.getMarcsToIsbn(isbnText.getText().replaceAll("ö", "0"))
+          prozessIsbnData(marcsToIsbn)
+        } catch {
+          case e: OszkKeresoException =>
+            Log.error(e)
+            isbnSearchLabel.setText("Nincs találat")
+            isbnSearchLabel.setIcon(new ImageIcon(Resources.getResource("icons/error.gif")))
+        } finally {
+          editors.foreach(_.setEnabled(true))
         }
-        fireResizeEvent
       }
     }
   }
@@ -245,7 +233,7 @@ class BookController(
           marcFromColumn <- marcCodesFromColumns if (isMarcsApply(marcFromOszk, marcFromColumn))
         } yield marcFromOszk.value
         Log.info("BookController.prozessIsbnData " + values.mkString("\r\n    "))
-        book.setValue(columns.indexOf(column), values.mkString(", "))
+        book.setValue(columns.indexOf(column))(values.mkString(", "))
       } catch {
         case e: Exception =>
           e.printStackTrace()
@@ -271,7 +259,5 @@ class BookController(
     } else webcamPanel.add(new JLabel("No Webcam"))
   }
 
-  private def fireResizeEvent() = {} //resizeListeners.foreach(_.pack)
-
-  private def getMultiFieldList(value: String): List[String] = value.split(BookHelper.LISTA_SEPARATOR_REGEX).filter(!_.isEmpty()).toList
+  private def getMultiFieldList(value: String): List[String] = value.split(MULTIFIELS_SEPARATOR_REGEX).filter(!_.isEmpty()).toList
 }

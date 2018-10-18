@@ -18,7 +18,7 @@ class BookFieldValueModel(columnIndex: Int, model: Book) extends ValueModel with
 
   def setValue(newValue: Object) = {
     Log.debug(newValue.toString)
-    model.setValue(columnIndex, newValue.asInstanceOf[String])
+    model.setValue(columnIndex)(newValue.asInstanceOf[String])
   }
 
   def addValueChangeListener(listener: PropertyChangeListener) = listeners += listener

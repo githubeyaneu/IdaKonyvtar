@@ -94,6 +94,11 @@ class TextsIda extends Texts {
   case object SaveAsOverwriteYes extends IdaText("SaveAsOverwriteYes")
   case object SaveAsOverwriteNo extends IdaText("SaveAsOverwriteNo")
 
+  case object SaveErrorWindowText extends IdaText("SaveErrorWindowText")
+  case object SaveErrorWindowTitle extends IdaText("SaveErrorWindowTitle")
+  case object SaveErrorWindowButton extends IdaText("SaveErrorWindowButton")
+  case object SaveErrorTexts extends TextsDialogYes(SaveErrorWindowText, SaveErrorWindowTitle, SaveErrorWindowButton)
+
   case object CloseLibraryWindowConfirmQuestion { def apply(filename: String) = IdaText("CloseLibraryWindowConfirmQuestion", BehaviorSubject(filename)) }
   case object CloseLibraryWindowTitle { def apply(filename: String) = IdaText("CloseLibraryWindowTitle", BehaviorSubject(filename)) }
   case object CloseLibraryWindowYes extends IdaText("CloseLibraryWindowYes")
