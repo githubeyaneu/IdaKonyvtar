@@ -38,7 +38,7 @@ class BookHelperTest {
     for {i <- 1 to 10} {
       val b = shuffledBooks(i)
       val start = System.currentTimeMillis
-      BookController.getColumnList(b, 0)
+      BookController.listForAutocomplete(b, 0)
       val end = System.currentTimeMillis
       sum = sum + end - start
     }

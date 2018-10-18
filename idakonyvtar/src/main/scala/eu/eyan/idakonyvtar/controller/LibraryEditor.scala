@@ -114,15 +114,14 @@ class LibraryEditor(val library: Library) extends WithComponent {
       e => { Log.error(e); DialogHelper.yes(texts.SaveErrorTexts); false })
   }
 
+  //TODO case class...
+  private val NO_ISBN = false
+  private val WITH_ISBN = true
+
   private def createNewBookInDialog = {
     val book = newPreviousBook(library.columns.size)
-    val columns = library.columns.toList
-    val columnConfiguration = library.configuration
-    val bookList = books.getList.toList
-    val isbnEnabled = true
-    val loadedFile = file
 
-    val bookController = new BookController(book, columns, columnConfiguration, bookList, isbnEnabled, loadedFile)
+    val bookController = new BookController(book, columns, columnConfiguration, books.getList.toList, WITH_ISBN, file)
 
     val output = DialogHelper.yesNoEditor(component, bookController.getComponent, texts.NewBookWindowTitle, texts.NewBookSaveButton, texts.NewBookCancelButton)
 
@@ -139,13 +138,15 @@ class LibraryEditor(val library: Library) extends WithComponent {
     val selectedBookIndex = bookTable.getSelectedIndex
 
     val book = Book(books.getList.get(selectedBookIndex))
-    val columns = library.columns.toList
-    val columnConfiguration = library.configuration
-    val bookList = books.getList.toList
-    val isbnEnabled = false
-    val loadedFile = file
 
-    val bookController = new BookController(book, columns, columnConfiguration, bookList, isbnEnabled, loadedFile)
+    //TODO spagetti and refaactor the columns...
+    for {
+      columnIndex <- 0 until columns.size
+      if (book.values(columnIndex) != "")
+      if columnConfiguration.isTrue(columns(columnIndex), ColumnConfigurations.PICTURE)
+    } book.images.put(columnIndex, loadImage(book.values(columnIndex)))
+
+    val bookController = new BookController(book, columns, columnConfiguration, books.getList.toList, NO_ISBN, file)
 
     val titleFieldName = texts.ConfigTitleFieldName
     val titleColumnIndex = titleFieldName.map(columns.indexOf)
@@ -159,6 +160,17 @@ class LibraryEditor(val library: Library) extends WithComponent {
       books.fireSelectedContentsChanged
       dirty
     }
+  }
+
+  private def columnConfiguration = library.configuration
+  private def columns = library.columns.toList //TODO refact
+
+  private def loadImage(imgName: String) = { //TODO: move to LibEditor
+    val dir = file.getParentFile
+    val imagesDir = (file.getAbsolutePath + ".images").asDir
+    val imageFile = (imagesDir.getAbsolutePath + "\\" + imgName).asFile
+    val image = ImageIO.read(imageFile)
+    image
   }
 
   private def saveImages(book: Book) = for {

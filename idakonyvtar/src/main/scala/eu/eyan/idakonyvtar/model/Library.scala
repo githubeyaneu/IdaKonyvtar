@@ -9,7 +9,8 @@ import scala.collection.mutable.ListBuffer
 class Library(
   val file:          File,
   val configuration: ColumnKonfiguration,
-  val columns:       List[String]) {
+  val columns:       List[String] // TODO:refact
+  ) {
 
   def booksSize = books.size
   def bookAtIndex(index: Int) = books(index)

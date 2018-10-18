@@ -9,7 +9,7 @@ import eu.eyan.util.awt.ComponentPlus.ComponentPlusImplicit
 
 class MultiFieldAutocomplete(columnName: String, hintText: String, noItemsFoundText: String) extends MultiField[String, JTextFieldAutocomplete](columnName) {
 
-  var autocompleteList: List[String] = List()
+  var autocompleteList: List[String] = List() // TODO: move to constructor. ac wo aclist makes no sense
 
   Log.debug(columnName)
 
@@ -29,5 +29,5 @@ class MultiFieldAutocomplete(columnName: String, hintText: String, noItemsFoundT
     Log.debug(editor.getName + " " + value)
   }
 
-  def setAutoCompleteList(autocompleteList: List[String]) = this.autocompleteList = autocompleteList
+  def setAutoCompleteList(autocompleteList: List[String]) = {this.autocompleteList = autocompleteList; this}
 }
