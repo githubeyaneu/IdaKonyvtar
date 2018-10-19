@@ -22,7 +22,7 @@ class LibraryFileBuilder {
   var file: File = new File(System.currentTimeMillis() + ".xls")
 
   try workbook =
-    Workbook.createWorkbook(file, ExcelHandler.getWorkbookSettings)
+    Workbook.createWorkbook(file, ExcelHandler.WORKBOOK_SETTINGS)
   catch {
     case e: IOException => e.printStackTrace()
 

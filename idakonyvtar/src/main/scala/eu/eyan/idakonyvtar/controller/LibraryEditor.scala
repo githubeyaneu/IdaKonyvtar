@@ -31,8 +31,8 @@ import com.jgoodies.binding.adapter.AbstractTableAdapter
 import javax.swing.ListModel
 import eu.eyan.idakonyvtar.model.ColumnKonfiguration
 import eu.eyan.idakonyvtar.model.Library
-import eu.eyan.util.swing.Col
-import eu.eyan.util.swing.Row
+import eu.eyan.util.swing.TableCol
+import eu.eyan.util.swing.TableRow
 import rx.lang.scala.Observable
 import eu.eyan.util.rx.lang.scala.ObservablePlus
 import eu.eyan.util.text.Texts
@@ -87,7 +87,7 @@ class LibraryEditor(val library: Library) extends WithComponent {
   books.getList.clear
   books.setList(library.booksAsJavaList)
 
-  private def cellValue(row: Row, col: Col) = books.getElementAt(row.index).getValue(library.columnIndicesToShow(col.index))
+  private def cellValue(row: TableRow, col: TableCol) = books.getElementAt(row.index).getValue(library.columnIndicesToShow(col.index))
 
   private def dirty = isDirty.onNext(true)
   private def notDirty = isDirty.onNext(false)

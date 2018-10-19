@@ -24,7 +24,7 @@ import eu.eyan.util.string.StringPlus.StringPlusImplicit
 import eu.eyan.util.scala.Try
 import eu.eyan.idakonyvtar.util.ExcelHandler
 import eu.eyan.util.rx.lang.scala.ObservablePlus.ObservableImplicit
-import eu.eyan.idakonyvtar.text.TechnicalTextsIda
+import eu.eyan.idakonyvtar.text.TechnicalTextsIda._
 
 class IdaLibraryMultiEditor extends WithComponent {
   def getComponent = tabbedPane
@@ -95,15 +95,16 @@ class IdaLibraryMultiEditor extends WithComponent {
     else {
       Log.info("Loading library: " + file)
       val library = Try(ExcelHandler.readLibrary(file))
-      // if (columnNamesAndIndexesToShow.size < 1) throw new IllegalArgumentException("Legalább 1 oszlopot meg kell jeleníteni! Az oszlop konfigurációban helyesen kell konfigurálni.") // FIXME: not here...
 
-      if (library.isSuccess) {
+      if (library.isSuccess && library.get.columnNamesAndIndexesToShow.size > 0) {
         val libraryController = new LibraryEditor(library.get)
         val dirtyText = libraryController.isDirtyObservable.map(dirtyToText)
         tabbedPane.addTab(libraryController, new Text(libraryController.file.withoutExtension.getName + PARAM, dirtyText), libraryController.file.toString, closeLibrary _)
       } else {
-        //FIXME error handling
-        //if (library.isFailure) bookTable.setEmptyText(ERROR_AT_READING_LIBRARY + ": " + library.failed.get.getMessage)
+        if (library.isFailure) Log.error(library.failed.get)
+        else Log.error(NO_COLUMNS_FOUND)
+
+        DialogHelper.yes(texts.LoadErrorTexts)
       }
     }
   }

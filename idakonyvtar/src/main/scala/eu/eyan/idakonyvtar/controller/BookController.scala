@@ -198,7 +198,7 @@ class BookController(
         val marcCodesFromColumns = columnConfiguration.getMarcCodes(column)
         val values = for {
           marcFromOszk <- marcsFromOszk
-          marcFromColumn <- marcCodesFromColumns if (isMarcsApply(marcFromOszk, marcFromColumn))
+          marcFromColumn <- marcCodesFromColumns if (isMarcsApply(marcFromOszk, marcFromColumn)) 
         } yield marcFromOszk.value
         Log.info("BookController.prozessIsbnData " + values.mkString("\r\n    "))
         book.setValue(columns.indexOf(column))(values.mkString(", "))

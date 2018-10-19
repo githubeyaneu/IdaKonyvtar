@@ -2,7 +2,7 @@ package eu.eyan.idakonyvtar.model
 
 import com.google.common.collect.Lists
 import java.io.File
-import eu.eyan.util.swing.Col
+import eu.eyan.util.swing.TableCol
 import scala.collection.mutable.MutableList
 import scala.collection.mutable.ListBuffer
 
@@ -21,9 +21,9 @@ class Library(
 
   private val books = ListBuffer[Book]()
 
-  private def columnToShowFilter(col: Col) = configuration.isTrue(columns(col.index), ColumnConfigurations.SHOW_IN_TABLE)
+  private def columnToShowFilter(col: TableCol) = configuration.isTrue(columns(col.index), ColumnConfigurations.SHOW_IN_TABLE)
 
-  val columnNamesAndIndexesToShow = columns.zipWithIndex.filter(x => columnToShowFilter(Col(x._2)))
+  val columnNamesAndIndexesToShow = columns.zipWithIndex.filter(x => columnToShowFilter(TableCol(x._2)))
   val columnNamesToShow = columnNamesAndIndexesToShow.unzip._1
   val columnIndicesToShow = columnNamesAndIndexesToShow.unzip._2 // TODO move to Library...???
 

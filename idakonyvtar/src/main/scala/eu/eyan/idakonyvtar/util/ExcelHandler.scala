@@ -13,7 +13,7 @@ import org.apache.commons.io.FilenameUtils
 import eu.eyan.idakonyvtar.model.Book
 import eu.eyan.idakonyvtar.model.ColumnKonfiguration
 import eu.eyan.idakonyvtar.model.Library
-import eu.eyan.idakonyvtar.text.TechnicalTextsIda
+import eu.eyan.idakonyvtar.text.TechnicalTextsIda._
 import eu.eyan.log.Log
 import eu.eyan.util.backup.BackupHelper
 import jxl.Workbook
@@ -23,73 +23,83 @@ import jxl.write.Label
 import jxl.write.WritableCellFormat
 import jxl.write.WriteException
 import jxl.write.biff.RowsExceededException
+import eu.eyan.util.io.FilePlus.FilePlusImplicit
+import jxl.Sheet
 
 object ExcelHandler {
 
-  val COLUMN_CONFIGURATION = "OszlopKonfiguráció"
-  val BOOKS = "Könyvek"
-  val ERROR_TEXT = "Nem sikerült a mentés."
-
-  case class Excel(val columns: Int, val rows: Int, val cells: Map[(Int, Int), String]) {
-    def row(rowIndex: Int) = for (columnIndex <- 0 until columns) yield cells((columnIndex, rowIndex))
-    def column(columnIndex: Int) = for (rowIndex <- 0 until rows) yield cells((columnIndex, rowIndex))
-    def rowIndex(firstRowContent: String) = column(0).zipWithIndex.filter(_._1 == firstRowContent).map(_._2).lift(0)
-    def columnIndex(firstColumnContent: String) = row(0).zipWithIndex.filter(_._1 == firstColumnContent).map(_._2).lift(0)
-  }
-
-  def readExcel(file: File, sheetName: String) = {
+  def readExcelFromFile(file: File, sheetName: String) = {
     Log.info(s"$file exists: ${file.exists}")
-    val workbook = Workbook.getWorkbook(file, getWorkbookSettings())
-
-    Log.info(s"Sheets: ${workbook.getSheetNames.mkString}")
-
-    val sheet = getSheet(getWorkbookSettings(), workbook, sheetName)
-
-    val columnCount = sheet.getColumns
-    val rowCount = sheet.getRows
-    val table =
-      for (columnIndex <- 0 until columnCount; rowIndex <- 0 until rowCount)
-        yield ((columnIndex, rowIndex), sheet.getCell(columnIndex, rowIndex).getContents)
+    val workbook = Workbook.getWorkbook(file, WORKBOOK_SETTINGS)
+    val excel = workbookSheetToExcel(workbook, sheetName)
     workbook.close
-    Excel(columnCount, rowCount, table.toMap)
+    excel
   }
 
-  def readExcelStream(data: InputStream, sheetName: String) = {
+  def readExcelFromStream(data: InputStream, sheetName: String) = {
     Log.info
-    val workbook = Workbook.getWorkbook(data, getWorkbookSettings())
-
-    Log.info(s"Sheets: ${workbook.getSheetNames.mkString}")
-
-    val sheet = getSheet(getWorkbookSettings(), workbook, sheetName)
-    val columnCount = sheet.getColumns
-    val rowCount = sheet.getRows
-    val table = for (columnIndex <- 0 until columnCount; rowIndex <- 0 until rowCount) yield ((columnIndex, rowIndex), sheet.getCell(columnIndex, rowIndex).getContents)
-
+    val workbook = Workbook.getWorkbook(data, WORKBOOK_SETTINGS)
+    val excel = workbookSheetToExcel(workbook, sheetName)
     workbook.close
+    excel
+  }
 
-    Excel(columnCount, rowCount, table.toMap)
+  def WORKBOOK_SETTINGS = { val ws = new WorkbookSettings(); ws.setEncoding("Cp1252"); ws }
+
+  case class Column(index: Int)
+  case class Row(index: Int)
+  case class Cell(column: Column, row: Row, content: Option[String])
+
+  case class Excel(val columns: IndexedSeq[Column], val rows: IndexedSeq[Row], private val cells: Map[(Column, Row), String]) {
+
+    def firstRowCells = rowCells(Row(0))
+    def firstColumnCells = columnCells(Column(0))
+
+    def rowFromFirstColumn(contentToSearchInFirstColumn: String) = firstColumnCells.filter(_.content == Option(contentToSearchInFirstColumn)).map(_.row).lift(0)
+    def columnFromFirstRow(contentToSearchInFirstRow: String) = firstRowCells.filter(_.content == Option(contentToSearchInFirstRow)).map(_.column).lift(0)
+
+    def getCell(columnRow: (Column, Row)) = Cell(columnRow._1, columnRow._2, cells.get(columnRow))
+        // FIXME refactor to this : cells.get(columnRow).map(value => Cell(columnRow._1, columnRow._2, value))
+    // FIXME: refactor to this: case class Cell(column: Column, row: Row, content: String)
+
+    private def columnCells(column: Column) = rows.map(row => getCell((column, row)))
+    private def rowCells(row: Row) = columns.map(column => getCell((column, row)))
+  }
+
+  private def workbookSheetToExcel(workbook: Workbook, sheetName: String) = {
+    Log.info(s"Sheets: ${workbook.getSheetNames.mkString}")
+    val sheet = getSheet(WORKBOOK_SETTINGS, workbook, sheetName)
+    sheetToExcel(sheet)
+  }
+
+  private def sheetToExcel(sheet: Sheet) = {
+		  val columns = for (columnIndex <- 0 until sheet.getColumns) yield Column(columnIndex)
+		  val rows = for (rowIndex <- 0 until sheet.getRows) yield Row(rowIndex)
+		  val table = for (column <- columns; row <- rows) yield ((column, row), sheet.getCell(column.index, row.index).getContents)
+		  Excel(columns, rows, table.toMap)
   }
 
   @throws(classOf[LibraryException])
   def readLibrary(file: File): Library = {
     try {
       backup(file)
-      val libraryWorkbook = Workbook.getWorkbook(file, getWorkbookSettings())
-      val booksSheet = getSheet(getWorkbookSettings(), libraryWorkbook, BOOKS)
-      val columnConfigSheet = getSheet(getWorkbookSettings(), libraryWorkbook, COLUMN_CONFIGURATION)
+      val libraryWorkbook = Workbook.getWorkbook(file, WORKBOOK_SETTINGS)
+      
+//      val columnConfigSheet = libraryWorkbook.getSheet(1)
+//      val configTable = (
+//        for { col <- 0 until columnConfigSheet.getColumns() }
+//          yield (
+//          for { row <- 0 until columnConfigSheet.getRows() }
+//            yield columnConfigSheet.getCell(col, row).getContents()).toArray).toArray
+//      Log.debug(configTable.map(_.mkString(", ")).mkString("\r\n"))
 
-      val configTable = (
-        for { col <- 0 until columnConfigSheet.getColumns() }
-          yield (
-          for { row <- 0 until columnConfigSheet.getRows() }
-            yield columnConfigSheet.getCell(col, row).getContents()).toArray).toArray
+      sheetToExcel(libraryWorkbook.getSheet(1))
+      
+      val colConfig = new ColumnKonfiguration(sheetToExcel(libraryWorkbook.getSheet(1)))
 
-      Log.debug(configTable.map(_.mkString(", ")).mkString("\r\n"))
-
-      val colConfig = new ColumnKonfiguration(configTable)
-
+      
+      val booksSheet = libraryWorkbook.getSheet(0)
       val columns = (for { actualColumn <- 0 until booksSheet.getColumns() } yield booksSheet.getCell(actualColumn, 0).getContents()).toList.filter(_.nonEmpty)
-
       val books = for { actualRow <- 1 until booksSheet.getRows() } yield {
         val book = Book(booksSheet.getColumns())
         for (actualColumn <- 0 until booksSheet.getColumns()) {
@@ -111,20 +121,14 @@ object ExcelHandler {
     }
   }
 
-  def getWorkbookSettings(): WorkbookSettings = {
-    val ws = new WorkbookSettings()
-    ws.setEncoding("Cp1252")
-    ws
-  }
-
   def getSheet(ws: WorkbookSettings, workbook: Workbook, string: String) = {
     val sheet = workbook.getSheet(new String(string.getBytes(Charset.forName(ws.getEncoding()))))
     if (sheet == null) workbook.getSheet(string)
     else sheet
   }
 
-  @throws(classOf[LibraryException])
-  def saveLibrary(targetFile: File, library: Library):Boolean = {
+  @throws(classOf[Exception])
+  def saveLibrary(targetFile: File, library: Library): Boolean = {
     if (targetFile.exists())
       if (targetFile.isFile())
         try {
@@ -136,47 +140,38 @@ object ExcelHandler {
       else
         throw new LibraryException("A választott cél nem file: " + targetFile)
 
-    try {
-      val workbook = Workbook.createWorkbook(targetFile, getWorkbookSettings())
-      val booksSheet = workbook.createSheet(BOOKS, 0)
-      for { columnIndex <- 0 until library.columns.size } {
-        booksSheet.addCell(new Label(columnIndex, 0, library.columns(columnIndex)))
-        for (bookIndex <- 0 until library.booksSize) {
-          val cellFormat = new WritableCellFormat()
-          cellFormat.setWrap(true)
-          booksSheet.addCell(new Label(columnIndex, bookIndex + 1, library.bookAtIndex(bookIndex).getValue(columnIndex), cellFormat))
-        }
+    val workbook = Workbook.createWorkbook(targetFile, WORKBOOK_SETTINGS)
+    val booksSheet = workbook.createSheet(EXCEL_SHEET_NAME_BOOKS, 0)
+    for { columnIndex <- 0 until library.columns.size } {
+      booksSheet.addCell(new Label(columnIndex, 0, library.columns(columnIndex)))
+      for (bookIndex <- 0 until library.booksSize) {
+        val cellFormat = new WritableCellFormat()
+        cellFormat.setWrap(true)
+        booksSheet.addCell(new Label(columnIndex, bookIndex + 1, library.bookAtIndex(bookIndex).getValue(columnIndex), cellFormat))
       }
-      val columnConfigurationSheet = workbook.createSheet(COLUMN_CONFIGURATION, 1)
-      val table = library.configuration.getTable()
-      for { column <- 0 until table.length; sor <- 0 until table(0).length }
-        columnConfigurationSheet.addCell(new Label(column, sor, table(column)(sor)))
-
-      workbook.write
-      workbook.close
-      true
-    } catch {
-      case e: IOException           => throw new LibraryException(ERROR_TEXT, e)
-      case e: RowsExceededException => throw new LibraryException(ERROR_TEXT, e)
-      case e: WriteException        => throw new LibraryException(ERROR_TEXT, e)
-      false
     }
+    val columnConfigurationSheet = workbook.createSheet(EXCEL_SHEET_NAME_COLUMN_CONFIGURATION, 1)
+    val table = library.configuration.table
+    
+    for { column <- table.columns; row <- table.rows } {
+      val cell = table.getCell((column, row))
+      cell.content.foreach{ content =>
+        columnConfigurationSheet.addCell(new Label(cell.column.index, cell.row.index, content))
+      }
+    	
+    }
+
+    workbook.write
+    workbook.close
+    true
   }
 
-  @throws(classOf[LibraryException])
+  @throws(classOf[Exception])
   private def backup(fileToSave: File) = {
-    val sourceLibrary = FilenameUtils.getFullPath(fileToSave.getAbsolutePath())
-    val sourceFileName = FilenameUtils.getName(fileToSave.getAbsolutePath())
-    val backupLibrary = new File(sourceLibrary + "backup")
-    backupLibrary.mkdirs()
-    val backupFile = new File(
-      backupLibrary.getAbsoluteFile()
-        + File.separator
-        + sourceFileName
-        + "_backup_"
-        + "v" + TechnicalTextsIda.VERSION + "_"
-        + new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss")
-        .format(new Date()) + ".zip");
-    BackupHelper.zipFile(fileToSave, backupFile);
+    val sourceLibrary = FilenameUtils.getFullPath(fileToSave.getAbsolutePath)
+    val sourceFileName = FilenameUtils.getName(fileToSave.getAbsolutePath)
+    val backupDir = new File(sourceLibrary + "backup").mkDirs.getAbsoluteFile.toString
+    val backupFile = new File(BACKUP_FILE_TEMPLATE(backupDir, sourceFileName))
+    BackupHelper.zipFile(fileToSave, backupFile)
   }
 }

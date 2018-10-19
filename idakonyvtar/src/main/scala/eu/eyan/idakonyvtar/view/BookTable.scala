@@ -28,12 +28,12 @@ import rx.lang.scala.subjects.BehaviorSubject
 import eu.eyan.util.rx.lang.scala.ObservablePlus.ObservableImplicit
 import eu.eyan.util.awt.Graphics2DPlus.Graphics2DImplicit
 import eu.eyan.util.swing.JXTableWithEmptyText
-import eu.eyan.util.swing.Col
-import eu.eyan.util.swing.Row
 import eu.eyan.util.swing.JTableModelPlus
 import javax.swing.ListModel
+import eu.eyan.util.swing.TableRow
+import eu.eyan.util.swing.TableCol
 
-class BookTable(nameOfLibrary: String, columnNames: List[String], books: SelectionInList[_], cellValueGetter: (Row, Col) => String, emptyText: Observable[String]) extends WithComponent {
+class BookTable(nameOfLibrary: String, columnNames: List[String], books: SelectionInList[_], cellValueGetter: (TableRow, TableCol) => String, emptyText: Observable[String]) extends WithComponent {
   def getComponent = scrollPane // FIXME... use another
   def getSelectedIndex = table.convertRowIndexToModel(table.getSelectedRow)
   def onSelectionChanged(action: Int => Unit) = table.onValueChanged(action(table.getSelectedRow))

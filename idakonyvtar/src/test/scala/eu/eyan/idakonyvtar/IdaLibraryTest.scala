@@ -58,10 +58,10 @@ class IdaLibraryTest extends AbstractUiTest {
   @Test //  @SuppressFBWarnings(value = "RV_RETURN_VALUE_IGNORED_BAD_PRACTICE", justification = "test cleanup")
   def testLoadAndSaveAs(): Unit = {
     val file = new LibraryFileBuilder()
-      .withSheet(ExcelHandler.BOOKS)
+      .withSheet("books")
       .withColumns("column1", "column2")
       .withRow("árvíztűrő tükörfúrógép", "ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP")
-      .withSheet(ExcelHandler.COLUMN_CONFIGURATION)
+      .withSheet("config")
       .withColumns("", ColumnConfigurations.SHOW_IN_TABLE.name, "ko2")
       .withRow("column1", "igen", "")
       .withRow("column2 tükörfúrógép", "nem", "")
@@ -78,7 +78,7 @@ class IdaLibraryTest extends AbstractUiTest {
       library.saveAs(file2)
       ExcelAssert.assertExcelCell(
         file2,
-        ExcelHandler.BOOKS,
+        "books",
         1,
         2,
         "árvíztűrő tükörfúrógép")

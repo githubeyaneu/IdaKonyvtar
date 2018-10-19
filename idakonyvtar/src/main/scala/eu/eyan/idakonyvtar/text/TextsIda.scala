@@ -21,6 +21,7 @@ import eu.eyan.util.text.TextsDialogYes
 import eu.eyan.util.text.TextsDialogYesNo
 import eu.eyan.util.text.TextsDialogFileChooser
 import eu.eyan.util.text.TextsButton
+import eu.eyan.idakonyvtar.util.ExcelHandler.Row
 
 class TextsIda extends Texts {
   lazy val languageInRegistry = IdaLibrary.registryValue(classOf[TextsIda].getName)
@@ -29,20 +30,20 @@ class TextsIda extends Texts {
 
   lazy val translationsXls = "translations.xls".toResourceFile.get
   val translationsXlsInputStream = ClassLoader.getSystemResourceAsStream("translations.xls")
-  lazy val translationsTable = ExcelHandler.readExcelStream(translationsXlsInputStream, "translations")
-  lazy val languages = translationsTable.row(0).drop(2).filter(_.nonEmpty).toArray
+  lazy val translationsTable = ExcelHandler.readExcelFromStream(translationsXlsInputStream, "translations")
+  lazy val languages = translationsTable.firstRowCells.drop(2).filter(_.content.nonEmpty).map(_.content.get).filter(_.nonEmpty).toArray
 
   def getTextTranslation(technicalName: String, language: Option[String]) = {
     Log.debug(s"TechnicalName=$technicalName, language=$language")
 
-    val translationColumnIndex = translationsTable.columnIndex(language.getOrElse("English"))
+    val translationColumnIndex = translationsTable.columnFromFirstRow(language.getOrElse("English"))
     Log.debug("Language col " + translationColumnIndex)
 
-    val rowIndex = translationsTable.rowIndex(technicalName)
+    val rowIndex = translationsTable.rowFromFirstColumn(technicalName)
     Log.debug("technicalName row " + rowIndex)
 
     val colAndRow = for (a <- translationColumnIndex; b <- rowIndex) yield (a, b)
-    val translation = colAndRow.map(translationsTable.cells.get).flatten
+    val translation = colAndRow.map(translationsTable.getCell).map(_.content).flatten
     Log.debug("translation " + translation)
 
     translation
@@ -98,6 +99,11 @@ class TextsIda extends Texts {
   case object SaveErrorWindowTitle extends IdaText("SaveErrorWindowTitle")
   case object SaveErrorWindowButton extends IdaText("SaveErrorWindowButton")
   case object SaveErrorTexts extends TextsDialogYes(SaveErrorWindowText, SaveErrorWindowTitle, SaveErrorWindowButton)
+  
+  case object LoadErrorWindowText extends IdaText("LoadErrorWindowText")
+  case object LoadErrorWindowTitle extends IdaText("LoadErrorWindowTitle")
+  case object LoadErrorWindowButton extends IdaText("LoadErrorWindowButton")
+  case object LoadErrorTexts extends TextsDialogYes(LoadErrorWindowText, LoadErrorWindowTitle, LoadErrorWindowButton)
 
   case object CloseLibraryWindowConfirmQuestion { def apply(filename: String) = IdaText("CloseLibraryWindowConfirmQuestion", BehaviorSubject(filename)) }
   case object CloseLibraryWindowTitle { def apply(filename: String) = IdaText("CloseLibraryWindowTitle", BehaviorSubject(filename)) }
