@@ -22,7 +22,7 @@ import eu.eyan.idakonyvtar.controller.input.BookControllerInput
 import eu.eyan.idakonyvtar.model.Book
 import eu.eyan.idakonyvtar.model.BookFieldValueModel
 import eu.eyan.idakonyvtar.model.ColumnConfigurations
-import eu.eyan.idakonyvtar.model.ColumnKonfiguration
+import eu.eyan.idakonyvtar.model.FieldConfiguration
 import eu.eyan.idakonyvtar.oszk.Marc
 import eu.eyan.idakonyvtar.oszk.OszkKereso
 import eu.eyan.idakonyvtar.oszk.OszkKeresoException
@@ -66,7 +66,7 @@ object BookController {
 class BookController(
   private val book:                Book,
   private val columns:             List[String], //TODO refact
-  private val columnConfiguration: ColumnKonfiguration,
+  private val columnConfiguration: FieldConfiguration,
   private val bookList:            List[Book],
   private val isbnEnabled:         Boolean             = false,
   private val loadedFile:          File) {
@@ -109,7 +109,7 @@ class BookController(
       Log.debug(s"column $columnName")
       fieldsPanel.newRow.addLabel(columnName)
 
-      val isMultiEditorField = columnConfiguration.isTrue(columnName, ColumnConfigurations.MULTIFIELD)
+      val isMultiEditorField = columnConfiguration.isMulti(columnName)
       val isAutocompleteField = columnConfiguration.isTrue(columnName, ColumnConfigurations.AUTOCOMPLETE)
       val isPictureField = columnConfiguration.isTrue(columnName, ColumnConfigurations.PICTURE)
 

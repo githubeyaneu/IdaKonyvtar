@@ -10,7 +10,7 @@ import com.jgoodies.binding.adapter.SingleListSelectionAdapter
 import com.jgoodies.binding.list.SelectionInList
 
 import eu.eyan.idakonyvtar.IdaLibrary
-import eu.eyan.idakonyvtar.model.ColumnKonfiguration
+import eu.eyan.idakonyvtar.model.FieldConfiguration
 import eu.eyan.log.Log
 import eu.eyan.util.swing.HighlightRenderer
 import eu.eyan.util.swing.JComponentPlus.JComponentImplicit

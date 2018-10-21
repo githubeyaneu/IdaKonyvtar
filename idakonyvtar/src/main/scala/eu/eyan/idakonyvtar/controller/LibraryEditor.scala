@@ -29,7 +29,7 @@ import javax.swing.JOptionPane
 import rx.lang.scala.subjects.BehaviorSubject
 import com.jgoodies.binding.adapter.AbstractTableAdapter
 import javax.swing.ListModel
-import eu.eyan.idakonyvtar.model.ColumnKonfiguration
+import eu.eyan.idakonyvtar.model.FieldConfiguration
 import eu.eyan.idakonyvtar.model.Library
 import eu.eyan.util.swing.TableCol
 import eu.eyan.util.swing.TableRow

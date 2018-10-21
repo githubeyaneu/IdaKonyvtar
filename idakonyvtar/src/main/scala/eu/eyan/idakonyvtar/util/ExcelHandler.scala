@@ -11,7 +11,7 @@ import org.apache.commons.io.FileUtils
 import org.apache.commons.io.FilenameUtils
 
 import eu.eyan.idakonyvtar.model.Book
-import eu.eyan.idakonyvtar.model.ColumnKonfiguration
+import eu.eyan.idakonyvtar.model.FieldConfiguration
 import eu.eyan.idakonyvtar.model.Library
 import eu.eyan.idakonyvtar.text.TechnicalTextsIda._
 import eu.eyan.log.Log
@@ -95,7 +95,7 @@ object ExcelHandler {
 
       sheetToExcel(libraryWorkbook.getSheet(1))
       
-      val colConfig = new ColumnKonfiguration(sheetToExcel(libraryWorkbook.getSheet(1)))
+      val colConfig = new FieldConfiguration(sheetToExcel(libraryWorkbook.getSheet(1)))
 
       
       val booksSheet = libraryWorkbook.getSheet(0)
@@ -151,7 +151,7 @@ object ExcelHandler {
       }
     }
     val columnConfigurationSheet = workbook.createSheet(EXCEL_SHEET_NAME_COLUMN_CONFIGURATION, 1)
-    val table = library.configuration.table
+    val table = library.configuration.configurationTable
     
     for { column <- table.columns; row <- table.rows } {
       val cell = table.getCell((column, row))

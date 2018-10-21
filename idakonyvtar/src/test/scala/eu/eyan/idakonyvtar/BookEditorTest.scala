@@ -12,13 +12,14 @@ import eu.eyan.idakonyvtar.controller.BookController
 import eu.eyan.idakonyvtar.controller.input.BookControllerInput
 import eu.eyan.idakonyvtar.model.Book
 import eu.eyan.idakonyvtar.model.ColumnConfigurations
-import eu.eyan.idakonyvtar.model.ColumnKonfiguration
+import eu.eyan.idakonyvtar.model.FieldConfiguration
 import eu.eyan.idakonyvtar.testhelper.BookEditorTestHelper
 import eu.eyan.idakonyvtar.util.DialogHelper
 import eu.eyan.log.Log
 import eu.eyan.testutil.video.VideoRunner
 import javax.swing.SwingUtilities
 import eu.eyan.util.text.Text
+import eu.eyan.idakonyvtar.text.TechnicalTextsIda
 
 object BookEditorTest {
 
@@ -41,11 +42,11 @@ class BookEditorTest extends AbstractUiTest {
   @Before
   def setUp(): Unit = {
     Log.activateInfoLevel
-    val columnConfiguration: ColumnKonfiguration =
-      new ColumnKonfiguration.Builder(3, columns.size + 1)
+    val columnConfiguration: FieldConfiguration =
+      new FieldConfiguration.Builder(3, columns.size + 1)
         .withRow(
           "",
-          ColumnConfigurations.MULTIFIELD.name,
+          TechnicalTextsIda.CONFIG_NAME_MULTIFIELD,
           ColumnConfigurations.AUTOCOMPLETE.name)
         .withRow(columns(0), "", "")
         .withRow(columns(1), "", "igen")

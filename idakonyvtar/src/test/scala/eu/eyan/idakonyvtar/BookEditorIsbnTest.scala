@@ -12,13 +12,14 @@ import eu.eyan.idakonyvtar.controller.BookController
 import eu.eyan.idakonyvtar.controller.input.BookControllerInput
 import eu.eyan.idakonyvtar.model.Book
 import eu.eyan.idakonyvtar.model.ColumnConfigurations
-import eu.eyan.idakonyvtar.model.ColumnKonfiguration
+import eu.eyan.idakonyvtar.model.FieldConfiguration
 import eu.eyan.idakonyvtar.testhelper.BookEditorTestHelper
 import eu.eyan.idakonyvtar.util.DialogHelper
 import eu.eyan.testutil.video.VideoRunner
 import javax.swing.SwingUtilities
 import eu.eyan.idakonyvtar.text.TextsIda
 import eu.eyan.util.text.Text
+import eu.eyan.idakonyvtar.text.TechnicalTextsIda
 
 
 object BookEditorIsbnTest {
@@ -43,10 +44,10 @@ class BookEditorIsbnTest extends AbstractUiTest {
       List("szimpla", "ac", "mm", "mmac", "cim")
     val book: Book =
       new Book.Builder(columns.size).withValue(0, "Érték1").build()
-    val columnConfig: ColumnKonfiguration =
-      new ColumnKonfiguration.Builder(4, columns.size + 1)
+    val columnConfig: FieldConfiguration =
+      new FieldConfiguration.Builder(4, columns.size + 1)
         .withRow("",
-                 ColumnConfigurations.MULTIFIELD.name,
+                 TechnicalTextsIda.CONFIG_NAME_MULTIFIELD,
                  ColumnConfigurations.AUTOCOMPLETE.name,
                  ColumnConfigurations.MARC_CODE.name)
         .withRow(columns(0), "", "", "")

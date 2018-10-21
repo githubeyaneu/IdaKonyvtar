@@ -71,4 +71,6 @@ object TechnicalTextsIda {
   val EXCEL_SHEET_NAME_BOOKS = "Books"
   
   val NO_COLUMNS_FOUND = "No columns in library"
+  
+  val CONFIG_NAME_MULTIFIELD = "MultiMező"
 }

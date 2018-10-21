@@ -8,7 +8,7 @@ import scala.collection.mutable.ListBuffer
 
 class Library(
   val file:          File,
-  val configuration: ColumnKonfiguration,
+  val configuration: FieldConfiguration,
   val columns:       List[String] // TODO:refact
   ) {
 
