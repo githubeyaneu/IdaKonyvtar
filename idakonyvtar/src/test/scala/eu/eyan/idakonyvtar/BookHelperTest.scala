@@ -15,7 +15,7 @@ import eu.eyan.idakonyvtar.controller.BookController
 @RunWith(classOf[ScalaEclipseJunitRunner])
 class BookHelperTest {
   val TWO = 2
-  val bookA = new Book.Builder(TWO).withValue(0, "A0").withValue(1, "A1").build()
+  val bookA = new BookBuilder(TWO).withValue(0, "A0").withValue(1, "A1").build()
 
   @Test
   def speedColumnList = {

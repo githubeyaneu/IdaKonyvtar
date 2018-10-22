@@ -17,16 +17,15 @@ class Library(
   def addBook(book: Book) = books += book
   def booksAsJavaList = new ListBufferAsJava(books)
   
-  def isPictureField(columnIndex: Int) = configuration.isTrue(columns(columnIndex), ColumnConfigurations.PICTURE)
-
-  private val books = ListBuffer[Book]()
-
-  private def columnToShowFilter(col: TableCol) = configuration.isTrue(columns(col.index), ColumnConfigurations.SHOW_IN_TABLE)
+  def isPictureField(columnIndex: Int) = configuration.isPicture(columns(columnIndex))//TODO why is it needed?
 
   val columnNamesAndIndexesToShow = columns.zipWithIndex.filter(x => columnToShowFilter(TableCol(x._2)))
   val columnNamesToShow = columnNamesAndIndexesToShow.unzip._1
   val columnIndicesToShow = columnNamesAndIndexesToShow.unzip._2 // TODO move to Library...???
+  
+  private val books = ListBuffer[Book]()
 
+  private def columnToShowFilter(col: TableCol) = configuration.isShowInTable(columns(col.index))
 }
 
 class ListBufferAsJava[T](list: ListBuffer[T]) extends java.util.List[T] {

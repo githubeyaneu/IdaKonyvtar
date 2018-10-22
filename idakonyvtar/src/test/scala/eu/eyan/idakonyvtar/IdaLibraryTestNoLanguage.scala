@@ -9,7 +9,6 @@ import org.junit.Ignore
 import org.junit.Test
 
 import IdaLibraryTestNoLanguage.library
-import eu.eyan.idakonyvtar.model.ColumnConfigurations
 import eu.eyan.idakonyvtar.testhelper.IdaLibraryTestHelper
 import eu.eyan.idakonyvtar.testhelper.LibraryFileBuilder
 import eu.eyan.idakonyvtar.text.TextsIda

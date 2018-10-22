@@ -21,7 +21,6 @@ import com.jgoodies.forms.layout.RowSpec
 import eu.eyan.idakonyvtar.controller.input.BookControllerInput
 import eu.eyan.idakonyvtar.model.Book
 import eu.eyan.idakonyvtar.model.BookFieldValueModel
-import eu.eyan.idakonyvtar.model.ColumnConfigurations
 import eu.eyan.idakonyvtar.model.FieldConfiguration
 import eu.eyan.idakonyvtar.oszk.Marc
 import eu.eyan.idakonyvtar.oszk.OszkKereso
@@ -65,10 +64,10 @@ object BookController {
 }
 class BookController(
   private val book:                Book,
-  private val columns:             List[String], //TODO refact
+  private val fields:              List[String], //TODO refact
   private val columnConfiguration: FieldConfiguration,
   private val bookList:            List[Book],
-  private val isbnEnabled:         Boolean             = false,
+  private val isbnEnabled:         Boolean            = false,
   private val loadedFile:          File) {
 
   def getComponent = view
@@ -89,61 +88,59 @@ class BookController(
     .newColumn("f:320px").addFluent(picturePanel)
     .newColumn("f:320px").addFluent(webcamPanel)
 
+  startWebcam
 
-    startWebcam
+  if (isbnEnabled) {
+    fieldsPanel.newRow.span.addSeparatorWithTitle("Isbn")
+    fieldsPanel.newRow
+    fieldsPanel.add(isbnSearchLabel.name(ISBN_LABEL))
+    fieldsPanel.nextColumn.add(isbnText.name(ISBN_TEXT))
 
-    if (isbnEnabled) {
-      fieldsPanel.newRow.span.addSeparatorWithTitle("Isbn")
-      fieldsPanel.newRow
-      fieldsPanel.add(isbnSearchLabel.name(ISBN_LABEL))
-      fieldsPanel.nextColumn.add(isbnText.name(ISBN_TEXT))
+    isbnText onHierarchyChanged isbnText.requestFocusInWindow
+    isbnText onActionPerformed isbnSearch
+  }
 
-      isbnText onHierarchyChanged isbnText.requestFocusInWindow
-      isbnText onActionPerformed isbnSearch
-    }
+  fieldsPanel.newRow.span.addSeparatorWithTitle("Adatok")
 
-    fieldsPanel.newRow.span.addSeparatorWithTitle("Adatok")
+  for { fieldIndex <- 0 until fields.size } {
+    val fieldName = fields(fieldIndex)
+    Log.debug(s"column $fieldName")
+    fieldsPanel.newRow.addLabel(fieldName)
 
-    for { columnIndex <- 0 until columns.size } {
-      val columnName = columns(columnIndex)
-      Log.debug(s"column $columnName")
-      fieldsPanel.newRow.addLabel(columnName)
+    val isMultiEditorField = columnConfiguration.isMulti(fieldName)
+    val isAutocompleteField = columnConfiguration.isAutocomplete(fieldName)
+    val isPictureField = columnConfiguration.isPicture(fieldName)
 
-      val isMultiEditorField = columnConfiguration.isMulti(columnName)
-      val isAutocompleteField = columnConfiguration.isTrue(columnName, ColumnConfigurations.AUTOCOMPLETE)
-      val isPictureField = columnConfiguration.isTrue(columnName, ColumnConfigurations.PICTURE)
+    val editor: Component =
+      if (isPictureField) {
+        //TODO WTF spagetti:
+        picturePanel.newRow.addLabel(fieldName)
+        val imageLabel = picturePanel.newRow.addLabel("").name("look" + fieldName)
 
-      val editor: Component =
-        if (isPictureField) {
-          //TODO WTF spagetti:
-          picturePanel.newRow.addLabel(columnName)
-          val imageLabel = picturePanel.newRow.addLabel("").name("look" + columnName)
+        val imgNameAndBtn = JPanelWithFrameLayout()
+        val textField = imgNameAndBtn.newColumn.addTextField("", TEXTFIELD_DEFAULT_SIZE).name("picturePath")
+        val button = imgNameAndBtn.newColumn.addButton("katt").name("click")
 
-          val imgNameAndBtn = JPanelWithFrameLayout()
-          val textField = imgNameAndBtn.newColumn.addTextField("", TEXTFIELD_DEFAULT_SIZE).name("picturePath")
-          val button = imgNameAndBtn.newColumn.addButton("katt").name("click")
+        def refreshImage = imageLabel.setIcon(new ImageIcon(book.getImage(fieldIndex).get.getScaledInstance(320, 240, Image.SCALE_DEFAULT)))
+        if (book.getImage(fieldIndex).nonEmpty) refreshImage
+        button.onClicked({
+          book.setImage(fieldIndex)(WebCam.getImage)
+          book.setValue(fieldIndex)("")
+          refreshImage
+        })
 
-          def refreshImage = imageLabel.setIcon(new ImageIcon(book.images(columnIndex).getScaledInstance(320, 240, Image.SCALE_DEFAULT)))
-          if (book.images.contains(columnIndex)) refreshImage
-          button.onClicked({
-            book.images.put(columnIndex, WebCam.getImage)
-            book.setValue(columnIndex)("")
-            refreshImage
-          })
+        bindTextField(textField, new BookFieldValueModel(fieldIndex, book))
+        imgNameAndBtn
+      } else if (isAutocompleteField)
+        if (isMultiEditorField) multiFieldBind(new MultiFieldAutocomplete(fieldName, "Autocomplete", "Nincs találat").setAutoCompleteList(BookController.listForAutocomplete(bookList, fieldIndex)), new BookFieldValueModel(fieldIndex, book))
+        else bindTextField(new JTextFieldAutocomplete().setHintText("Autocomplete").setAutocompleteList(BookController.listForAutocomplete(bookList, fieldIndex)), new BookFieldValueModel(fieldIndex, book))
+      else if (isMultiEditorField) multiFieldBind(new MultiFieldJTextField(fieldName), new BookFieldValueModel(fieldIndex, book))
+      else bindTextField(new JTextField(TEXTFIELD_DEFAULT_SIZE), new BookFieldValueModel(fieldIndex, book))
 
-          bindTextField(textField, new BookFieldValueModel(columnIndex, book))
-          imgNameAndBtn
-        } else if (isAutocompleteField)
-          if (isMultiEditorField) multiFieldBind(new MultiFieldAutocomplete(columnName, "Autocomplete", "Nincs találat").setAutoCompleteList(BookController.listForAutocomplete(bookList, columnIndex)), new BookFieldValueModel(columnIndex, book))
-          else bindTextField(new JTextFieldAutocomplete().setHintText("Autocomplete").setAutocompleteList(BookController.listForAutocomplete(bookList, columnIndex)), new BookFieldValueModel(columnIndex, book))
-        else if (isMultiEditorField) multiFieldBind(new MultiFieldJTextField(columnName), new BookFieldValueModel(columnIndex, book))
-        else bindTextField(new JTextField(TEXTFIELD_DEFAULT_SIZE), new BookFieldValueModel(columnIndex, book))
-
-      editor.setName(columnName)
-      fieldsPanel.nextColumn.add(editor)
-      editors += editor
-    }
-
+    editor.setName(fieldName)
+    fieldsPanel.nextColumn.add(editor)
+    editors += editor
+  }
 
   private def bindTextField(tf: JTextField, bookFieldValueModel: BookFieldValueModel) = {
     Bindings.bind(tf, bookFieldValueModel)
@@ -193,15 +190,15 @@ class BookController(
   }
 
   private def prozessIsbnData(marcsFromOszk: List[Marc]) =
-    columns.foreach(column => {
+    fields.foreach(column => {
       try {
         val marcCodesFromColumns = columnConfiguration.getMarcCodes(column)
         val values = for {
           marcFromOszk <- marcsFromOszk
-          marcFromColumn <- marcCodesFromColumns if (isMarcsApply(marcFromOszk, marcFromColumn)) 
+          marcFromColumn <- marcCodesFromColumns if (isMarcsApply(marcFromOszk, marcFromColumn))
         } yield marcFromOszk.value
         Log.info("BookController.prozessIsbnData " + values.mkString("\r\n    "))
-        book.setValue(columns.indexOf(column))(values.mkString(", "))
+        book.setValue(fields.indexOf(column))(values.mkString(", "))
       } catch {
         case e: Exception =>
           e.printStackTrace()

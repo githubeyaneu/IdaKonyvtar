@@ -62,7 +62,7 @@ class IdaLibraryTest extends AbstractUiTest {
       .withColumns("column1", "column2")
       .withRow("árvíztűrő tükörfúrógép", "ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP")
       .withSheet("config")
-      .withColumns("", ColumnConfigurations.SHOW_IN_TABLE.name, "ko2")
+      .withColumns("", "intable", "ko2")
       .withRow("column1", "igen", "")
       .withRow("column2 tükörfúrógép", "nem", "")
       .save

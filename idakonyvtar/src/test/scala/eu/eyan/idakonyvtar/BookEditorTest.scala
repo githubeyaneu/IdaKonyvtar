@@ -11,7 +11,6 @@ import org.junit.Test
 import eu.eyan.idakonyvtar.controller.BookController
 import eu.eyan.idakonyvtar.controller.input.BookControllerInput
 import eu.eyan.idakonyvtar.model.Book
-import eu.eyan.idakonyvtar.model.ColumnConfigurations
 import eu.eyan.idakonyvtar.model.FieldConfiguration
 import eu.eyan.idakonyvtar.testhelper.BookEditorTestHelper
 import eu.eyan.idakonyvtar.util.DialogHelper
@@ -20,6 +19,10 @@ import eu.eyan.testutil.video.VideoRunner
 import javax.swing.SwingUtilities
 import eu.eyan.util.text.Text
 import eu.eyan.idakonyvtar.text.TechnicalTextsIda
+import scala.annotation.varargs
+import eu.eyan.idakonyvtar.util.ExcelHandler.Column
+import eu.eyan.idakonyvtar.util.ExcelHandler.Row
+import eu.eyan.idakonyvtar.util.ExcelHandler.Excel
 
 object BookEditorTest {
 
@@ -28,6 +31,32 @@ object BookEditorTest {
   }
 
 }
+class FieldConfigurationBuilder(columnCount: Int, rowCount: Int) {
+  @varargs def withRow(values: String*): FieldConfigurationBuilder = {
+    for { columnIndex <- 0 until values.length } table.put((Column(columnIndex), Row(actualRow)), values(columnIndex))
+    actualRow = actualRow + 1
+    this
+  }
+
+  private val columns = for (columnIndex <- 0 until columnCount) yield Column(columnIndex)
+  private val rows = for (rowIndex <- 0 until rowCount) yield Row(rowIndex)
+  private val table = scala.collection.mutable.Map[(Column, Row), String]()
+  private var actualRow: Int = 0
+
+  def build() = new FieldConfiguration(new Excel(columns, rows, table.toMap))
+}
+
+class BookBuilder(columnCount: Int) {
+    val book = Book(columnCount)
+
+    def withValue(columnIndex: Int, value: String): BookBuilder = {
+      Log.debug(columnIndex + " " + value)
+      book.setValue(columnIndex)(value)
+      this
+    }
+
+    def build(): Book = book
+  }
 
 class BookEditorTest extends AbstractUiTest {
 
@@ -36,18 +65,18 @@ class BookEditorTest extends AbstractUiTest {
   private var bookController: BookController = _
 
   private val columns: List[String] = List("szimpla", "ac", "mm", "mmac")
-  
-  private val book: Book = new Book.Builder(columns.size).withValue(0, "Érték1").build()
-  
+
+  private val book: Book = new BookBuilder(columns.size).withValue(0, "Érték1").build()
+
   @Before
   def setUp(): Unit = {
     Log.activateInfoLevel
     val columnConfiguration: FieldConfiguration =
-      new FieldConfiguration.Builder(3, columns.size + 1)
+      new FieldConfigurationBuilder(3, columns.size + 1)
         .withRow(
           "",
-          TechnicalTextsIda.CONFIG_NAME_MULTIFIELD,
-          ColumnConfigurations.AUTOCOMPLETE.name)
+          "multi",
+          "autocomplete")
         .withRow(columns(0), "", "")
         .withRow(columns(1), "", "igen")
         .withRow(columns(2), "igen", "")
@@ -55,17 +84,18 @@ class BookEditorTest extends AbstractUiTest {
         .build()
     val bookList: List[Book] = List(
       book,
-      new Book.Builder(columns.size)
+      new BookBuilder(columns.size)
         .withValue(0, "Érték2")
         .withValue(1, "abc")
         .withValue(3, "abc")
         .build(),
-      new Book.Builder(columns.size)
+      new BookBuilder(columns.size)
         .withValue(0, "Érték2")
         .withValue(1, "abd")
         .withValue(3, "abd")
         .build())
-    bookController = new BookController(book,
+    bookController = new BookController(
+      book,
       columns,
       columnConfiguration,
       bookList,

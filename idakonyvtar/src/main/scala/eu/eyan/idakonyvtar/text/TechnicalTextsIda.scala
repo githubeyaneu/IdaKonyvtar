@@ -72,5 +72,10 @@ object TechnicalTextsIda {
   
   val NO_COLUMNS_FOUND = "No columns in library"
   
-  val CONFIG_NAME_MULTIFIELD = "MultiMező"
+  val IGEN = "Igen"
+  val YES = "Yes"
+  val JA = "Ja"
+  
+  val MARC_CODES_SEPARATOR = ","
+  val MARC_CODE_SEPARATOR = "-"
 }

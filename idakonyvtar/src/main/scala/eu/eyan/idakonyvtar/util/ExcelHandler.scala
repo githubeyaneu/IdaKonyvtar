@@ -59,7 +59,7 @@ object ExcelHandler {
     def columnFromFirstRow(contentToSearchInFirstRow: String) = firstRowCells.filter(_.content == Option(contentToSearchInFirstRow)).map(_.column).lift(0)
 
     def getCell(columnRow: (Column, Row)) = Cell(columnRow._1, columnRow._2, cells.get(columnRow))
-        // FIXME refactor to this : cells.get(columnRow).map(value => Cell(columnRow._1, columnRow._2, value))
+    // FIXME refactor to this : cells.get(columnRow).map(value => Cell(columnRow._1, columnRow._2, value))
     // FIXME: refactor to this: case class Cell(column: Column, row: Row, content: String)
 
     private def columnCells(column: Column) = rows.map(row => getCell((column, row)))
@@ -84,16 +84,6 @@ object ExcelHandler {
     try {
       backup(file)
       val libraryWorkbook = Workbook.getWorkbook(file, WORKBOOK_SETTINGS)
-      
-//      val columnConfigSheet = libraryWorkbook.getSheet(1)
-//      val configTable = (
-//        for { col <- 0 until columnConfigSheet.getColumns() }
-//          yield (
-//          for { row <- 0 until columnConfigSheet.getRows() }
-//            yield columnConfigSheet.getCell(col, row).getContents()).toArray).toArray
-//      Log.debug(configTable.map(_.mkString(", ")).mkString("\r\n"))
-
-      sheetToExcel(libraryWorkbook.getSheet(1))
       
       val colConfig = new FieldConfiguration(sheetToExcel(libraryWorkbook.getSheet(1)))
 

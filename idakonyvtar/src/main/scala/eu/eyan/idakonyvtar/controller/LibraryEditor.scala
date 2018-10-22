@@ -9,7 +9,6 @@ import com.jgoodies.binding.list.SelectionInList
 
 import eu.eyan.idakonyvtar.controller.input.BookControllerInput
 import eu.eyan.idakonyvtar.model.Book
-import eu.eyan.idakonyvtar.model.ColumnConfigurations
 import eu.eyan.idakonyvtar.text.TechnicalTextsIda.ERROR_AT_READING_LIBRARY
 import eu.eyan.idakonyvtar.text.TextsIda
 import eu.eyan.idakonyvtar.util.DialogHelper
@@ -142,9 +141,9 @@ class LibraryEditor(val library: Library) extends WithComponent {
     //TODO spagetti and refaactor the columns...
     for {
       columnIndex <- 0 until columns.size
-      if (book.values(columnIndex) != "")
-      if columnConfiguration.isTrue(columns(columnIndex), ColumnConfigurations.PICTURE)
-    } book.images.put(columnIndex, loadImage(book.values(columnIndex)))
+      if (book.getValue(columnIndex) != "")
+      if columnConfiguration.isPicture(columns(columnIndex))
+    } book.setImage(columnIndex)(loadImage(book.getValue(columnIndex)))
 
     val bookController = new BookController(book, columns, columnConfiguration, books.getList.toList, NO_ISBN, file)
 
@@ -177,7 +176,7 @@ class LibraryEditor(val library: Library) extends WithComponent {
     columnIndex <- 0 until library.columns.size
     if library.isPictureField(columnIndex)
     if (book.getValue(columnIndex) == EMPTY_STRING)
-  } book.images.get(columnIndex).map(saveImageIntoNewFile).foreach(book.setValue(columnIndex))
+  } book.getImage(columnIndex).map(saveImageIntoNewFile).foreach(book.setValue(columnIndex))
 
   private def saveImageIntoNewFile(image: RenderedImage) = {
     val imagesDir = (file.getAbsolutePath + IMAGES_DIR_POSTFIX).asDir.mkDirs
