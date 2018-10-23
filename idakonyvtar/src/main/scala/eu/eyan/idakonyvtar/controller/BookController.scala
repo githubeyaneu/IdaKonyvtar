@@ -49,6 +49,7 @@ import javax.swing.JTextField
 import eu.eyan.idakonyvtar.text.TechnicalTextsIda._
 import eu.eyan.util.swing.WithComponent
 import eu.eyan.util.swing.JTextFieldPlus.JTextFieldPlusImplicit
+import eu.eyan.idakonyvtar.model.BookField
 
 object BookController {
   def listForAutocomplete(bookList: Seq[Book], columnIndex: Int) = bookList
@@ -64,7 +65,7 @@ object BookController {
 }
 class BookController(
   private val book:                Book,
-  private val fields:              List[String], //TODO refact
+  private val fields:              List[BookField], 
   private val columnConfiguration: FieldConfiguration,
   private val bookList:            List[Book],
   private val isbnEnabled:         Boolean            = false,
@@ -103,19 +104,19 @@ class BookController(
   fieldsPanel.newRow.span.addSeparatorWithTitle("Adatok")
 
   for { fieldIndex <- 0 until fields.size } {
-    val fieldName = fields(fieldIndex)
-    Log.debug(s"column $fieldName")
-    fieldsPanel.newRow.addLabel(fieldName)
+    val field = fields(fieldIndex)
+    Log.debug(s"column $field")
+    fieldsPanel.newRow.addLabel(field.fieldName)
 
-    val isMultiEditorField = columnConfiguration.isMulti(fieldName)
-    val isAutocompleteField = columnConfiguration.isAutocomplete(fieldName)
-    val isPictureField = columnConfiguration.isPicture(fieldName)
+    val isMultiEditorField = columnConfiguration.isMulti(field)
+    val isAutocompleteField = columnConfiguration.isAutocomplete(field)
+    val isPictureField = columnConfiguration.isPicture(field)
 
     val editor: Component =
       if (isPictureField) {
         //TODO WTF spagetti:
-        picturePanel.newRow.addLabel(fieldName)
-        val imageLabel = picturePanel.newRow.addLabel("").name("look" + fieldName)
+        picturePanel.newRow.addLabel(field.fieldName)
+        val imageLabel = picturePanel.newRow.addLabel("").name("look" + field)
 
         val imgNameAndBtn = JPanelWithFrameLayout()
         val textField = imgNameAndBtn.newColumn.addTextField("", TEXTFIELD_DEFAULT_SIZE).name("picturePath")
@@ -132,12 +133,12 @@ class BookController(
         bindTextField(textField, new BookFieldValueModel(fieldIndex, book))
         imgNameAndBtn
       } else if (isAutocompleteField)
-        if (isMultiEditorField) multiFieldBind(new MultiFieldAutocomplete(fieldName, "Autocomplete", "Nincs találat").setAutoCompleteList(BookController.listForAutocomplete(bookList, fieldIndex)), new BookFieldValueModel(fieldIndex, book))
+        if (isMultiEditorField) multiFieldBind(new MultiFieldAutocomplete(field.fieldName, "Autocomplete", "Nincs találat").setAutoCompleteList(BookController.listForAutocomplete(bookList, fieldIndex)), new BookFieldValueModel(fieldIndex, book))
         else bindTextField(new JTextFieldAutocomplete().setHintText("Autocomplete").setAutocompleteList(BookController.listForAutocomplete(bookList, fieldIndex)), new BookFieldValueModel(fieldIndex, book))
-      else if (isMultiEditorField) multiFieldBind(new MultiFieldJTextField(fieldName), new BookFieldValueModel(fieldIndex, book))
+      else if (isMultiEditorField) multiFieldBind(new MultiFieldJTextField(field.fieldName), new BookFieldValueModel(fieldIndex, book))
       else bindTextField(new JTextField(TEXTFIELD_DEFAULT_SIZE), new BookFieldValueModel(fieldIndex, book))
 
-    editor.setName(fieldName)
+    editor.setName(field.fieldName)
     fieldsPanel.nextColumn.add(editor)
     editors += editor
   }
@@ -190,15 +191,15 @@ class BookController(
   }
 
   private def prozessIsbnData(marcsFromOszk: List[Marc]) =
-    fields.foreach(column => {
+    fields.foreach(field => {
       try {
-        val marcCodesFromColumns = columnConfiguration.getMarcCodes(column)
+        val marcCodesFromColumns = columnConfiguration.getMarcCodes(field.fieldName)
         val values = for {
           marcFromOszk <- marcsFromOszk
           marcFromColumn <- marcCodesFromColumns if (isMarcsApply(marcFromOszk, marcFromColumn))
         } yield marcFromOszk.value
         Log.info("BookController.prozessIsbnData " + values.mkString("\r\n    "))
-        book.setValue(fields.indexOf(column))(values.mkString(", "))
+        book.setValue(fields.indexOf(field))(values.mkString(", "))
       } catch {
         case e: Exception =>
           e.printStackTrace()

@@ -32,8 +32,9 @@ import eu.eyan.util.swing.JTableModelPlus
 import javax.swing.ListModel
 import eu.eyan.util.swing.TableRow
 import eu.eyan.util.swing.TableCol
+import eu.eyan.idakonyvtar.model.BookField
 
-class BookTable(nameOfLibrary: String, columnNames: List[String], books: SelectionInList[_], cellValueGetter: (TableRow, TableCol) => String, emptyText: Observable[String]) extends WithComponent {
+class BookTable(nameOfLibrary: String, columnNames: List[BookField], books: SelectionInList[_], cellValueGetter: (TableRow, TableCol) => String, emptyText: Observable[String]) extends WithComponent {
   def getComponent = scrollPane // FIXME... use another
   def getSelectedIndex = table.convertRowIndexToModel(table.getSelectedRow)
   def onSelectionChanged(action: Int => Unit) = table.onValueChanged(action(table.getSelectedRow))
@@ -46,7 +47,7 @@ class BookTable(nameOfLibrary: String, columnNames: List[String], books: Selecti
   private val scrollPane = new JScrollPane(table)
 
   table.setSelectionModel(new SingleListSelectionAdapter(books.getSelectionIndexHolder))
-  table.setModel(new JTableModelPlus(books.asInstanceOf[ListModel[_]], columnNames, cellValueGetter))
+  table.setModel(new JTableModelPlus(books.asInstanceOf[ListModel[_]], columnNames.map(_.fieldName), cellValueGetter))
   table.setDefaultRenderer(classOf[Object], highlightRenderer)
   table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
 }

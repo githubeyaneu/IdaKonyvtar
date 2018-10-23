@@ -70,7 +70,7 @@ object TechnicalTextsIda {
   val EXCEL_SHEET_NAME_COLUMN_CONFIGURATION = "Configuration"
   val EXCEL_SHEET_NAME_BOOKS = "Books"
   
-  val NO_COLUMNS_FOUND = "No columns in library"
+  val NO_COLUMNS_FOUND = "No columns to show(!) in library"
   
   val IGEN = "Igen"
   val YES = "Yes"

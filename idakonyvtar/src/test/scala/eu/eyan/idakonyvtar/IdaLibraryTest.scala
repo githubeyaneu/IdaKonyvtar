@@ -8,7 +8,6 @@ import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
 
-import eu.eyan.idakonyvtar.model.ColumnConfigurations
 import eu.eyan.idakonyvtar.testhelper.IdaLibraryTestHelper
 import eu.eyan.idakonyvtar.testhelper.LibraryFileBuilder
 import eu.eyan.idakonyvtar.text.TextsIda
@@ -28,6 +27,8 @@ import org.mockito.ArgumentCaptor
 import java.net.URI
 import java.awt.Desktop.Action
 import org.fest.swing.core.BasicRobot
+import eu.eyan.util.scala.Try
+import eu.eyan.idakonyvtar.testhelper.AbstractUiTest
 
 object IdaLibraryTest {
   def main(args: Array[String]) = {
@@ -41,6 +42,7 @@ class IdaLibraryTest extends AbstractUiTest {
 
   @Before
   def setUp = {
+    Try(RegistryPlus.clear(classOf[IdaLibrary].getName))
     RegistryPlus.write(classOf[IdaLibrary].getName, classOf[TextsIda].getName, "English")
     library.start.toFront
     VideoRunner.setComponentToRecord(library.getComponentToRecord)
@@ -52,7 +54,7 @@ class IdaLibraryTest extends AbstractUiTest {
   @Test
   def testStartProgram = {
     library.requireVisible()
-    library.checkTitleWithNumber(4)
+    library.checkTitleWithNumber(2)
   }
 
   @Test //  @SuppressFBWarnings(value = "RV_RETURN_VALUE_IGNORED_BAD_PRACTICE", justification = "test cleanup")
@@ -62,9 +64,9 @@ class IdaLibraryTest extends AbstractUiTest {
       .withColumns("column1", "column2")
       .withRow("árvíztűrő tükörfúrógép", "ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP")
       .withSheet("config")
-      .withColumns("", "intable", "ko2")
-      .withRow("column1", "igen", "")
-      .withRow("column2 tükörfúrógép", "nem", "")
+      .withColumns("", "mm", "ac", "marc", "intable", "rem" , "pict")
+      .withRow("column1","","","", "igen", "")
+      .withRow("column2 tükörfúrógép","","","", "nem", "")
       .save
     try {
       library.load(file)
@@ -91,21 +93,21 @@ class IdaLibraryTest extends AbstractUiTest {
     library.assertTableCell(2, 1, "original title 1")
     library.clickNewButton
     library.editor.requireIsbnPresent
-    library.editor.setNormalText("Cím", "New Title 1")
+    library.editor.setNormalText("Title", "New Title 1")
     library.editor.clickSave
     library.assertTableCell(2, 1, "New Title 1")
     library.assertTableCell(2, 2, "original title 1")
-    library.checkTitleWithNumber(5)
+    library.checkTitleWithNumber(3)
   }
 
   @Test
   def testNewBookSaveNot = {
     library.assertTableCell(2, 1, "original title 1")
     library.clickNewButton
-    library.editor.setNormalText("Cím", "New Title 1")
+    library.editor.setNormalText("Title", "New Title 1")
     library.editor.clickCancel()
     library.assertTableCell(2, 1, "original title 1")
-    library.checkTitleWithNumber(4)
+    library.checkTitleWithNumber(2)
   }
 
   @Test
@@ -118,7 +120,7 @@ class IdaLibraryTest extends AbstractUiTest {
     library.clickApproveYes()
     library.assertTableCell(2, 1, "original title 2")
     library.requireDeleteDisabled()
-    library.checkTitleWithNumber(3)
+    library.checkTitleWithNumber(1)
   }
 
   @Test
@@ -131,12 +133,13 @@ class IdaLibraryTest extends AbstractUiTest {
     library.clickApproveNo()
     library.assertTableCell(2, 1, "original title 1")
     library.requireDeleteEnabled()
-    library.checkTitleWithNumber(4)
+    library.checkTitleWithNumber(2)
   }
 
   @Test
   def testFilter = {
     library.filter("aron")
+    library.assertTableRowCount(1)
     library.assertTableCell(
       1,
       1,
@@ -150,7 +153,7 @@ class IdaLibraryTest extends AbstractUiTest {
         .toString)
     library.assertTableCell(
       2,
-      2,
+      1,
       new StringBuilder("")
         .append(HighlightRenderer.HTML_START_TAG)
         .append("Kh")
@@ -160,8 +163,6 @@ class IdaLibraryTest extends AbstractUiTest {
         .append(" ladikján")
         .append(HighlightRenderer.HTML_END_TAG)
         .toString)
-    library.assertTableCell(1, 2, "Illyés Gyula")
-    library.assertTableRowCount(2)
   }
 
   @Test
@@ -169,20 +170,20 @@ class IdaLibraryTest extends AbstractUiTest {
     library.assertTableCell(2, 1, "original title 1")
     library.doubleClick(1)
     library.editor.requireIsbnNotPresent
-    library.editor.setNormalText("Cím", "New Title 1")
+    library.editor.setNormalText("Title", "New Title 1")
     library.editor.clickSave
     library.assertTableCell(2, 1, "New Title 1")
-    library.checkTitleWithNumber(4)
+    library.checkTitleWithNumber(2)
   }
 
   @Test
   def testBookEditCancel = {
     library.assertTableCell(2, 1, "original title 1")
     library.doubleClick(1)
-    library.editor.setNormalText("Cím", "New Title")
+    library.editor.setNormalText("Title", "New Title")
     library.editor.clickCancel()
     library.assertTableCell(2, 1, "original title 1")
-    library.checkTitleWithNumber(4)
+    library.checkTitleWithNumber(2)
   }
 
   @Test
@@ -190,7 +191,7 @@ class IdaLibraryTest extends AbstractUiTest {
     library.requireVisible()
     library.clickExit
     library.dialog.requireVisible()
-    library.dialog.button(JButtonMatcher.withText("No")).click
+    library.dialog.button(JButtonMatcher.withText("Cancel")).click
     library.requireVisible()
   }
 
@@ -201,7 +202,7 @@ class IdaLibraryTest extends AbstractUiTest {
     library.dialog.requireVisible
     library.dialog.component.getTitle ==> "Confirm"
     library.dialog.optionPane.requireMessage("Are you sure to quit?")
-    library.dialog.button(JButtonMatcher.withText("No")).requireText("No") // :)
+    library.dialog.button(JButtonMatcher.withText("Cancel")).requireText("Cancel") // :)
     library.dialog.button(JButtonMatcher.withText("Yes")).requireText("Yes") // :)
     library.dialog.button(JButtonMatcher.withText("Yes")).click
     library.requireNotExists
@@ -269,12 +270,14 @@ class IdaLibraryTest extends AbstractUiTest {
 
   @Test
   def changeLanguage = {
-    library.requireTitle("IdaLibrary - 4 books")
+    library.requireTitle("IdaLibrary - 2 books")
     library.menuItem("Language", "Deutsch").click
-    library.requireTitle("IdaBibliothek - 4 Bücher")
+    library.requireTitle("IdaBibliothek - 2 Bücher")
     library.cleanUp
     library.start
-    library.frame.target.getTitle ==>  "IdaBibliothek - 4 Bücher"
+    library.frame.target.getTitle ==>  "IdaBibliothek - 2 Bücher"
+    library.menuItem("Sprachen", "English").click
+    library.requireTitle("IdaLibrary - 2 books")
   }
 
   @Test

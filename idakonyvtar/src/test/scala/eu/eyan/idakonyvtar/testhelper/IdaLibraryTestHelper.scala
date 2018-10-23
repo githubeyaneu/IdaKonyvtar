@@ -48,7 +48,7 @@ class IdaLibraryTestHelper extends TestPlus {
       pause(1000)
     }
 
-  def start = { IdaLibrary.main(Array()); this }
+  def start = { IdaLibrary.main(Array("library.xls")); this }
   def start(filenév: String) = { IdaLibrary.main(Array(filenév)); this }
 
   def toFront = frame.target.toFront
@@ -118,14 +118,14 @@ class IdaLibraryTestHelper extends TestPlus {
   def clickApproveYes(): Unit = {
     frame
       .dialog()
-      .button(JButtonMatcher.withText("Igen"))
+      .button(JButtonMatcher.withText("Yes"))
       .click()
   }
 
   def clickApproveNo(): Unit = {
     frame
       .dialog()
-      .button(JButtonMatcher.withText("Nem"))
+      .button(JButtonMatcher.withText("Cancel"))
       .click()
   }
 

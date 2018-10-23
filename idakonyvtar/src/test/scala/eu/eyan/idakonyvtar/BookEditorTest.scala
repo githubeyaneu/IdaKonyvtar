@@ -23,9 +23,10 @@ import scala.annotation.varargs
 import eu.eyan.idakonyvtar.util.ExcelHandler.Column
 import eu.eyan.idakonyvtar.util.ExcelHandler.Row
 import eu.eyan.idakonyvtar.util.ExcelHandler.Excel
+import eu.eyan.idakonyvtar.model.BookField
+import eu.eyan.idakonyvtar.testhelper.AbstractUiTest
 
 object BookEditorTest {
-
   def main(args: Array[String]): Unit = {
     new BookEditorTest().setUp()
   }
@@ -94,9 +95,10 @@ class BookEditorTest extends AbstractUiTest {
         .withValue(1, "abd")
         .withValue(3, "abd")
         .build())
+        val fields = columns.zipWithIndex.map(t=>BookField(Column(t._2),t._1))
     bookController = new BookController(
       book,
-      columns,
+      fields,
       columnConfiguration,
       bookList,
       false,

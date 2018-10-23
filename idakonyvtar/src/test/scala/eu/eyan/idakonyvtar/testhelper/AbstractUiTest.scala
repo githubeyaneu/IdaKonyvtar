@@ -1,9 +1,7 @@
-package eu.eyan.idakonyvtar
+package eu.eyan.idakonyvtar.testhelper
 
 import java.util.concurrent.TimeUnit
-
 import org.fest.swing.core.EmergencyAbortListener
-import org.fest.swing.timing.Pause
 import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.rules.Timeout

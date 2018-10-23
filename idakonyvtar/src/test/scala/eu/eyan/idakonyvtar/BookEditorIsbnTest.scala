@@ -19,6 +19,9 @@ import javax.swing.SwingUtilities
 import eu.eyan.idakonyvtar.text.TextsIda
 import eu.eyan.util.text.Text
 import eu.eyan.idakonyvtar.text.TechnicalTextsIda
+import eu.eyan.idakonyvtar.model.BookField
+import eu.eyan.idakonyvtar.util.ExcelHandler.Column
+import eu.eyan.idakonyvtar.testhelper.AbstractUiTest
 
 
 object BookEditorIsbnTest {
@@ -68,8 +71,9 @@ class BookEditorIsbnTest extends AbstractUiTest {
         .withValue(3, "abd")
         .build()
     )
+    val fields = columns.zipWithIndex.map(t=>BookField(Column(t._2),t._1))
     bookController = new BookController(book,
-      columns,
+      fields,
       columnConfig,
       bookList,
       true,

@@ -10,6 +10,7 @@ import eu.eyan.log.Log
 import java.awt.Image
 import scala.collection.mutable.Map
 import java.awt.image.BufferedImage
+import eu.eyan.idakonyvtar.util.ExcelHandler.Column
 
 object Book {
   def apply(fieldCount: Int): Book = new Book(MutableList.fill[String](fieldCount)(""), Map())
@@ -18,6 +19,7 @@ object Book {
 
 class BookPropertyChangeEvent(source: Object, propertyName: String, oldValue: Object, newValue: Object, val columnIndex: Int) extends PropertyChangeEvent(source, propertyName, oldValue, newValue)
 
+  case class BookField(excelColumn: Column, fieldName: String)
 //TODO: make it immutable! use BookField instead of String or better BookField->String map
 class Book(private val values: MutableList[String], private val images: Map[Int, BufferedImage]) extends Model {
   def setValue(columnIndex: Int)(value: String) = {

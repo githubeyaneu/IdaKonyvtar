@@ -9,13 +9,15 @@ import scala.collection.mutable.ListBuffer
 class Library(
   val file:          File,
   val configuration: FieldConfiguration,
-  val columns:       List[String] // TODO:refact
+  private val columns:       List[BookField] 
   ) {
 
   def booksSize = books.size
   def bookAtIndex(index: Int) = books(index)
   def addBook(book: Book) = books += book
   def booksAsJavaList = new ListBufferAsJava(books)
+  def createEmptyBook = Book(columns.size)
+  @deprecated def getColumns = columns // TODO delete after refactoring. this info goes into Book.
   
   def isPictureField(columnIndex: Int) = configuration.isPicture(columns(columnIndex))//TODO why is it needed?
 

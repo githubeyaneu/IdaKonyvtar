@@ -15,39 +15,38 @@ class LibraryFileBuilder {
 
   private var workbook: WritableWorkbook = null
 
-  private var sorok: MutableList[Array[String]] = MutableList()
+  private var sorok = 0
 
   private var actualSheet: WritableSheet = null
 
   var file: File = new File(System.currentTimeMillis() + ".xls")
 
-  try workbook =
-    Workbook.createWorkbook(file, ExcelHandler.WORKBOOK_SETTINGS)
-  catch {
-    case e: IOException => e.printStackTrace()
+  try workbook = Workbook.createWorkbook(file, ExcelHandler.WORKBOOK_SETTINGS)
+  catch { case e: IOException => e.printStackTrace() }
 
+  def withSheet(sheetName: String): LibraryFileBuilder = {
+    sorok = 0
+    actualSheet = workbook.createSheet(sheetName, workbook.getNumberOfSheets)
+    this
   }
-
+    
   def withColumns(columns: String*): LibraryFileBuilder = {
-    for (i <- 0 until columns.length) {
-      try actualSheet.addCell(new Label(i, 0, columns(i)))
-      catch {
-        case e: Exception => e.printStackTrace()
-
-      }
-    }
+    withRow(columns: _*)
     this
   }
 
   def withRow(row: String*): LibraryFileBuilder = {
-    sorok += row.toArray
+    
     for (i <- 0 until row.length) {
-      try actualSheet.addCell(new Label(i, sorok.size, row(i)))
+      try {
+        actualSheet.addCell(new Label(i, sorok, row(i)))
+      }
       catch {
         case e: Exception => e.printStackTrace()
 
       }
     }
+    sorok += 1
     this
   }
 
@@ -55,16 +54,9 @@ class LibraryFileBuilder {
     try {
       workbook.write()
       workbook.close()
-    } catch {
-      case e: Exception => e.printStackTrace()
-
+    } 
+    catch { case e: Exception => e.printStackTrace() 
     }
     file
   }
-
-  def withSheet(sheetName: String): LibraryFileBuilder = {
-    actualSheet = workbook.createSheet(sheetName, workbook.getNumberOfSheets)
-    this
-  }
-
 }

@@ -36,6 +36,7 @@ import org.fest.swing.core.ComponentFoundCondition
 import org.fest.swing.timing.Pause
 import org.fest.swing.timing.Timeout
 import org.fest.swing.core.Robot
+import eu.eyan.idakonyvtar.testhelper.AbstractUiTest
 
 object IdaLibraryTestNoLanguage {
   private var library: IdaLibraryTestHelper = new IdaLibraryTestHelper()
@@ -51,7 +52,7 @@ class IdaLibraryTestNoLanguage extends AbstractUiTest {
   @Before
   def setUp = {
     Try(RegistryPlus.clear(classOf[IdaLibrary].getName))
-    ThreadPlus.run(IdaLibrary.main(Array()))
+    ThreadPlus.run(IdaLibrary.main(Array("library.xls")))
     VideoRunner.setFullScreenToRecord
   }
 
@@ -66,7 +67,7 @@ class IdaLibraryTestNoLanguage extends AbstractUiTest {
     langDialog.close
     val frame = waitFor(library.frame)
     RegistryPlus.readOption(classOf[IdaLibrary].getName, classOf[TextsIda].getName) ==> None
-    frame.target.getTitle ==> "IdaLibrary - 4 books"
+    frame.target.getTitle ==> "IdaLibrary - 2 books"
   }
 
   @Test
@@ -82,6 +83,6 @@ class IdaLibraryTestNoLanguage extends AbstractUiTest {
     langDialog.button(JButtonMatcher.withText("Magyar")).click
     val frame = waitFor(library.frame)
     RegistryPlus.readOption(classOf[IdaLibrary].getName, classOf[TextsIda].getName).get ==> "Magyar"
-    frame.target.getTitle ==> "IdaKönyvtár - 4 könyv"
+    frame.target.getTitle ==> "IdaKönyvtár - 2 könyv"
   }
 }

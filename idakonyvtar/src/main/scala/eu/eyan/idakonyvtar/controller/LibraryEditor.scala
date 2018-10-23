@@ -60,7 +60,7 @@ class LibraryEditor(val library: Library) extends WithComponent {
 
   private val texts = IdaLibrary.texts
   private val books = new SelectionInList[Book]()
-  private val previousBook = Book(library.columns.size)
+  private val previousBook = library.createEmptyBook
 
   private val numberOfBooks = BehaviorSubject(books.getList.size)
   private val hasBooks = numberOfBooks.distinctUntilChanged.map(_ > 0)
@@ -118,9 +118,9 @@ class LibraryEditor(val library: Library) extends WithComponent {
   private val WITH_ISBN = true
 
   private def createNewBookInDialog = {
-    val book = newPreviousBook(library.columns.size)
+    val book = newPreviousBook
 
-    val bookController = new BookController(book, columns, columnConfiguration, books.getList.toList, WITH_ISBN, file)
+    val bookController = new BookController(book, library.getColumns, columnConfiguration, books.getList.toList, WITH_ISBN, file)
 
     val output = DialogHelper.yesNoEditor(component, bookController.getComponent, texts.NewBookWindowTitle, texts.NewBookSaveButton, texts.NewBookCancelButton)
 
@@ -140,15 +140,15 @@ class LibraryEditor(val library: Library) extends WithComponent {
 
     //TODO spagetti and refaactor the columns...
     for {
-      columnIndex <- 0 until columns.size
+      columnIndex <- 0 until library.getColumns.size
       if (book.getValue(columnIndex) != "")
-      if columnConfiguration.isPicture(columns(columnIndex))
+      if columnConfiguration.isPicture(library.getColumns(columnIndex))
     } book.setImage(columnIndex)(loadImage(book.getValue(columnIndex)))
 
-    val bookController = new BookController(book, columns, columnConfiguration, books.getList.toList, NO_ISBN, file)
+    val bookController = new BookController(book, library.getColumns, columnConfiguration, books.getList.toList, NO_ISBN, file)
 
     val titleFieldName = texts.ConfigTitleFieldName
-    val titleColumnIndex = titleFieldName.map(columns.indexOf)
+    val titleColumnIndex = titleFieldName.map(library.getColumns.map(_.fieldName).indexOf)
     val bookTitle = titleColumnIndex.map(columnIndex => if (-1 < columnIndex) book.getValue(columnIndex) else EMPTY_STRING)
 
     val output = DialogHelper.yesNoEditor(component, bookController.getComponent, texts.EditBookWindowTitle(bookTitle), texts.EditBookSaveButton, texts.EditBookCancelButton)
@@ -162,7 +162,7 @@ class LibraryEditor(val library: Library) extends WithComponent {
   }
 
   private def columnConfiguration = library.configuration
-  private def columns = library.columns.toList //TODO refact
+//  private def columns = library.columns.toList //TODO refact
 
   private def loadImage(imgName: String) = { //TODO: move to LibEditor
     val dir = file.getParentFile
@@ -173,7 +173,7 @@ class LibraryEditor(val library: Library) extends WithComponent {
   }
 
   private def saveImages(book: Book) = for {
-    columnIndex <- 0 until library.columns.size
+    columnIndex <- 0 until library.getColumns.size
     if library.isPictureField(columnIndex)
     if (book.getValue(columnIndex) == EMPTY_STRING)
   } book.getImage(columnIndex).map(saveImageIntoNewFile).foreach(book.setValue(columnIndex))
@@ -185,11 +185,11 @@ class LibraryEditor(val library: Library) extends WithComponent {
     imageFile.getName
   }
 
-  private def savePreviousBook(book: Book) = library.configuration.getRememberingColumns.map(library.columns.indexOf).foreach(columnIndex => previousBook.setValue(columnIndex)(book.getValue(columnIndex)))
+  private def savePreviousBook(book: Book) = library.configuration.getRememberingColumns.map(library.getColumns.map(_.fieldName).indexOf).foreach(columnIndex => previousBook.setValue(columnIndex)(book.getValue(columnIndex)))
 
-  private def newPreviousBook(size: Int): Book = {
-    val newBook = Book(size)
-    library.configuration.getRememberingColumns.map(library.columns.indexOf).foreach(columnIndex => {
+  private def newPreviousBook: Book = {
+    val newBook = library.createEmptyBook
+    library.configuration.getRememberingColumns.map(library.getColumns.map(_.fieldName).indexOf).foreach(columnIndex => {
       newBook.setValue(columnIndex)(previousBook.getValue(columnIndex))
       Log.info("Remembering col " + columnIndex + " val:" + previousBook.getValue(columnIndex))
     })

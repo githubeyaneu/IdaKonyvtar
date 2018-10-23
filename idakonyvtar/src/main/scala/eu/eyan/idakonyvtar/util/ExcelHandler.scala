@@ -25,6 +25,7 @@ import jxl.write.WriteException
 import jxl.write.biff.RowsExceededException
 import eu.eyan.util.io.FilePlus.FilePlusImplicit
 import jxl.Sheet
+import eu.eyan.idakonyvtar.model.BookField
 
 object ExcelHandler {
 
@@ -88,8 +89,21 @@ object ExcelHandler {
       val colConfig = new FieldConfiguration(sheetToExcel(libraryWorkbook.getSheet(1)))
 
       
-      val booksSheet = libraryWorkbook.getSheet(0)
-      val columns = (for { actualColumn <- 0 until booksSheet.getColumns() } yield booksSheet.getCell(actualColumn, 0).getContents()).toList.filter(_.nonEmpty)
+      val booksSheet = libraryWorkbook.getSheet(0) // TODO delete
+      val booksSheet2 = sheetToExcel(libraryWorkbook.getSheet(0)) // TODO delete
+      
+      
+//      val columns = (for { actualColumn <- 0 until booksSheet.getColumns() } yield booksSheet.getCell(actualColumn, 0).getContents()).toList.filter(_.nonEmpty)//TODO delete
+      
+      def createBookField(cell: Cell) = BookField(cell.column, cell.content.get)
+      val columns = booksSheet2.firstRowCells.toList.filter(_.content.nonEmpty).map(createBookField)
+      Log.debug(columns)
+      
+//      def createBook(excelRow:Row) = {
+//        val book = Book(1)//FIXME
+//      }
+//      val books2 = booksSheet2.rows.tail.map(createBook)
+      
       val books = for { actualRow <- 1 until booksSheet.getRows() } yield {
         val book = Book(booksSheet.getColumns())
         for (actualColumn <- 0 until booksSheet.getColumns()) {
@@ -98,9 +112,10 @@ object ExcelHandler {
         }
         book
       }
-
+      
       val library = new Library(file, colConfig, columns)
       for { book <- books } library.addBook(book)
+      
       libraryWorkbook.close
 
       library
@@ -132,8 +147,8 @@ object ExcelHandler {
 
     val workbook = Workbook.createWorkbook(targetFile, WORKBOOK_SETTINGS)
     val booksSheet = workbook.createSheet(EXCEL_SHEET_NAME_BOOKS, 0)
-    for { columnIndex <- 0 until library.columns.size } {
-      booksSheet.addCell(new Label(columnIndex, 0, library.columns(columnIndex)))
+    for { columnIndex <- 0 until library.getColumns.size } {
+      booksSheet.addCell(new Label(columnIndex, 0, library.getColumns(columnIndex).fieldName))
       for (bookIndex <- 0 until library.booksSize) {
         val cellFormat = new WritableCellFormat()
         cellFormat.setWrap(true)

@@ -22,12 +22,19 @@ class FieldConfiguration(val configurationTable: Excel) {
   val COLUMN_PICTURE = Column(6)
 
   // TODO: use Row s instead of strings -> bigger refact
+  // TODO delete them after
   def isMulti(fieldName: String) = isConfigSetForField(fieldName, COLUMN_MULTIFIELD)
   def isAutocomplete(fieldName: String) = isConfigSetForField(fieldName, COLUMN_AUTOCOMPLETE)
   def isShowInTable(fieldName: String) = isConfigSetForField(fieldName, COLUMN_INTABLE)
   def isPicture(fieldName: String) = isConfigSetForField(fieldName, COLUMN_PICTURE)
   def isRemember(fieldName: String) = isConfigSetForField(fieldName, COLUMN_REMEMBER)
   def getRememberingColumns() = for { field <- configurationTable.firstColumnCells if isRemember(field.content.getOrElse("")) } yield field.content.get
+  
+  def isMulti(field: BookField) = isConfigSetForField(field, COLUMN_MULTIFIELD)
+  def isAutocomplete(field: BookField) = isConfigSetForField(field, COLUMN_AUTOCOMPLETE)
+  def isShowInTable(field: BookField) = isConfigSetForField(field, COLUMN_INTABLE)
+  def isPicture(field: BookField) = isConfigSetForField(field, COLUMN_PICTURE)
+  def isRemember(field: BookField) = isConfigSetForField(field, COLUMN_REMEMBER)
 
   @throws(classOf[LibraryException])
   def getMarcCodes(fieldName: String) =
@@ -41,9 +48,15 @@ class FieldConfiguration(val configurationTable: Excel) {
     }
 
   private def isConfigSetForField(fieldName: String, column: Column): Boolean = getValue(fieldName, column).map(isTrue).getOrElse(false)
+  private def isConfigSetForField(field: BookField, column: Column): Boolean = getValue(field, column).map(isTrue).getOrElse(false)
 
   private def getValue(fieldName: String, column: Column) = {
     val rowOpt = configurationTable.rowFromFirstColumn(fieldName)
+    val colRow = rowOpt.map((column, _))
+    colRow.map(configurationTable.getCell).map(_.content).flatten
+  }
+  private def getValue(field: BookField, column: Column) = {
+    val rowOpt = configurationTable.rowFromFirstColumn(field.fieldName)
     val colRow = rowOpt.map((column, _))
     colRow.map(configurationTable.getCell).map(_.content).flatten
   }
