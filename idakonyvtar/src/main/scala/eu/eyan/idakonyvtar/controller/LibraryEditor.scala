@@ -7,7 +7,6 @@ import scala.collection.JavaConversions.asScalaBuffer
 
 import com.jgoodies.binding.list.SelectionInList
 
-import eu.eyan.idakonyvtar.controller.input.BookControllerInput
 import eu.eyan.idakonyvtar.model.Book
 import eu.eyan.idakonyvtar.text.TechnicalTextsIda.ERROR_AT_READING_LIBRARY
 import eu.eyan.idakonyvtar.text.TextsIda
@@ -28,7 +27,6 @@ import javax.swing.JOptionPane
 import rx.lang.scala.subjects.BehaviorSubject
 import com.jgoodies.binding.adapter.AbstractTableAdapter
 import javax.swing.ListModel
-import eu.eyan.idakonyvtar.model.FieldConfiguration
 import eu.eyan.idakonyvtar.model.Library
 import eu.eyan.util.swing.TableCol
 import eu.eyan.util.swing.TableRow
@@ -86,7 +84,7 @@ class LibraryEditor(val library: Library) extends WithComponent {
   books.getList.clear
   books.setList(library.booksAsJavaList)
 
-  private def cellValue(row: TableRow, col: TableCol) = books.getElementAt(row.index).getValue(library.columnIndicesToShow(col.index))
+  private def cellValue(row: TableRow, col: TableCol) = books.getElementAt(row.index).getValue(library.columnFieldsToShow(col.index))
 
   private def dirty = isDirty.onNext(true)
   private def notDirty = isDirty.onNext(false)
@@ -113,14 +111,10 @@ class LibraryEditor(val library: Library) extends WithComponent {
       e => { Log.error(e); DialogHelper.yes(texts.SaveErrorTexts); false })
   }
 
-  //TODO case class...
-  private val NO_ISBN = false
-  private val WITH_ISBN = true
-
   private def createNewBookInDialog = {
     val book = newPreviousBook
 
-    val bookController = new BookController(book, library.getColumns, columnConfiguration, books.getList.toList, WITH_ISBN, file)
+    val bookController = new BookController(book, library.getColumns, books.getList.toList, WITH_ISBN, file)
 
     val output = DialogHelper.yesNoEditor(component, bookController.getComponent, texts.NewBookWindowTitle, texts.NewBookSaveButton, texts.NewBookCancelButton)
 
@@ -136,20 +130,16 @@ class LibraryEditor(val library: Library) extends WithComponent {
   private def editBook = {
     val selectedBookIndex = bookTable.getSelectedIndex
 
-    val book = Book(books.getList.get(selectedBookIndex))
+    val book = Book.copy(books.getList.get(selectedBookIndex))
 
     //TODO spagetti and refaactor the columns...
-    for {
-      columnIndex <- 0 until library.getColumns.size
-      if (book.getValue(columnIndex) != "")
-      if columnConfiguration.isPicture(library.getColumns(columnIndex))
-    } book.setImage(columnIndex)(loadImage(book.getValue(columnIndex)))
+    loadImages(book)
 
-    val bookController = new BookController(book, library.getColumns, columnConfiguration, books.getList.toList, NO_ISBN, file)
+    val bookController = new BookController(book, library.getColumns, books.getList.toList, NO_ISBN, file)
 
     val titleFieldName = texts.ConfigTitleFieldName
-    val titleColumnIndex = titleFieldName.map(library.getColumns.map(_.fieldName).indexOf)
-    val bookTitle = titleColumnIndex.map(columnIndex => if (-1 < columnIndex) book.getValue(columnIndex) else EMPTY_STRING)
+    val titleField = titleFieldName.map(library.fieldToName)
+    val bookTitle = titleField.map(_.map(field => book.getValue(field)).getOrElse(EMPTY_STRING))
 
     val output = DialogHelper.yesNoEditor(component, bookController.getComponent, texts.EditBookWindowTitle(bookTitle), texts.EditBookSaveButton, texts.EditBookCancelButton)
 
@@ -161,22 +151,29 @@ class LibraryEditor(val library: Library) extends WithComponent {
     }
   }
 
-  private def columnConfiguration = library.configuration
-//  private def columns = library.columns.toList //TODO refact
+  private def loadImages(book: Book) = {
+    for {
+      //TODO spagetti: library.getPictureColumns
+      field <- library.getColumns
+      if field.isPicture
+      if (book.getValue(field) != EMPTY_STRING)
+    } book.setImage(field)(loadImage(book.getValue(field)))
+  }
+  
+  private def saveImages(book: Book) = for {
+    //TODO spagetti: library.getPictureColumns
+    field <- library.getColumns
+    if field.isPicture
+    if (book.getValue(field) == EMPTY_STRING)
+  } book.getImage(field).map(saveImageIntoNewFile).foreach(book.setValue(field))
 
-  private def loadImage(imgName: String) = { //TODO: move to LibEditor
+  private def loadImage(imgName: String) = {
     val dir = file.getParentFile
     val imagesDir = (file.getAbsolutePath + ".images").asDir
     val imageFile = (imagesDir.getAbsolutePath + "\\" + imgName).asFile
     val image = ImageIO.read(imageFile)
     image
   }
-
-  private def saveImages(book: Book) = for {
-    columnIndex <- 0 until library.getColumns.size
-    if library.isPictureField(columnIndex)
-    if (book.getValue(columnIndex) == EMPTY_STRING)
-  } book.getImage(columnIndex).map(saveImageIntoNewFile).foreach(book.setValue(columnIndex))
 
   private def saveImageIntoNewFile(image: RenderedImage) = {
     val imagesDir = (file.getAbsolutePath + IMAGES_DIR_POSTFIX).asDir.mkDirs
@@ -185,13 +182,13 @@ class LibraryEditor(val library: Library) extends WithComponent {
     imageFile.getName
   }
 
-  private def savePreviousBook(book: Book) = library.configuration.getRememberingColumns.map(library.getColumns.map(_.fieldName).indexOf).foreach(columnIndex => previousBook.setValue(columnIndex)(book.getValue(columnIndex)))
+  private def savePreviousBook(book: Book) = library.fieldsToRemember.foreach(field => previousBook.setValue(field)(book.getValue(field)))
 
   private def newPreviousBook: Book = {
     val newBook = library.createEmptyBook
-    library.configuration.getRememberingColumns.map(library.getColumns.map(_.fieldName).indexOf).foreach(columnIndex => {
-      newBook.setValue(columnIndex)(previousBook.getValue(columnIndex))
-      Log.info("Remembering col " + columnIndex + " val:" + previousBook.getValue(columnIndex))
+    library.fieldsToRemember.foreach(field => {
+      newBook.setValue(field)(previousBook.getValue(field))
+      Log.info("Remembering col " + field + " val:" + previousBook.getValue(field))
     })
     newBook
   }

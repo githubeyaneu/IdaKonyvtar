@@ -8,18 +8,19 @@ import com.jgoodies.binding.value.ValueModel
 
 import eu.eyan.log.Log
 
-class BookFieldValueModel(fieldIndex: Int, book: Book) extends ValueModel with PropertyChangeListener {
+//TODO delete after
+class BookFieldValueModel(field: BookField, book: Book) extends ValueModel with PropertyChangeListener {
   def addValueChangeListener(listener: PropertyChangeListener) = listeners += listener
 
   def removeValueChangeListener(listener: PropertyChangeListener) = listeners -= listener
 
-  def propertyChange(evt: PropertyChangeEvent) = evt match { case bookEvent: BookPropertyChangeEvent => if (bookEvent.columnIndex == fieldIndex) listeners.foreach(_.propertyChange(evt)) }
+  def propertyChange(evt: PropertyChangeEvent) = evt match { case bookEvent: BookPropertyChangeEvent => if (bookEvent.field == field) listeners.foreach(_.propertyChange(evt)) }
 
-  def getValue() = book.getValue(fieldIndex)
+  def getValue() = book.getValue(field)
 
   def setValue(newValue: Object) = {
     Log.debug(newValue.toString)
-    book.setValue(fieldIndex)(newValue.asInstanceOf[String])
+    book.setValue(field)(newValue.asInstanceOf[String])
   }
 
   private val listeners: Set[PropertyChangeListener] = Set()

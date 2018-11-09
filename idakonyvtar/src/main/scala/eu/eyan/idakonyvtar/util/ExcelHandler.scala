@@ -4,132 +4,71 @@ import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.nio.charset.Charset
-import java.text.SimpleDateFormat
-import java.util.Date
+
+import scala.collection.mutable.ListBuffer
 
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.FilenameUtils
 
+import eu.eyan.idakonyvtar.model._
 import eu.eyan.idakonyvtar.model.Book
-import eu.eyan.idakonyvtar.model.FieldConfiguration
 import eu.eyan.idakonyvtar.model.Library
+import eu.eyan.idakonyvtar.oszk.Marc
 import eu.eyan.idakonyvtar.text.TechnicalTextsIda._
 import eu.eyan.log.Log
 import eu.eyan.util.backup.BackupHelper
+import eu.eyan.util.io.FilePlus.FilePlusImplicit
+import eu.eyan.util.string.StringPlus.StringPlusImplicit
+import jxl.Sheet
 import jxl.Workbook
 import jxl.WorkbookSettings
 import jxl.read.biff.BiffException
 import jxl.write.Label
 import jxl.write.WritableCellFormat
-import jxl.write.WriteException
-import jxl.write.biff.RowsExceededException
-import eu.eyan.util.io.FilePlus.FilePlusImplicit
-import jxl.Sheet
-import eu.eyan.idakonyvtar.model.BookField
+import eu.eyan.idakonyvtar.util.ExcelHandler.FieldConfiguration
+import eu.eyan.idakonyvtar.text.TextsIda
+import eu.eyan.idakonyvtar.IdaLibrary
+import eu.eyan.util.excel.ExcelPlus
+import eu.eyan.util.excel.ExcelColumn
+import eu.eyan.util.excel.ExcelCell
+import eu.eyan.util.excel.ExcelSheet
+import eu.eyan.util.excel.ExcelRow
 
 object ExcelHandler {
-
-  def readExcelFromFile(file: File, sheetName: String) = {
-    Log.info(s"$file exists: ${file.exists}")
-    val workbook = Workbook.getWorkbook(file, WORKBOOK_SETTINGS)
-    val excel = workbookSheetToExcel(workbook, sheetName)
-    workbook.close
-    excel
-  }
-
-  def readExcelFromStream(data: InputStream, sheetName: String) = {
-    Log.info
-    val workbook = Workbook.getWorkbook(data, WORKBOOK_SETTINGS)
-    val excel = workbookSheetToExcel(workbook, sheetName)
-    workbook.close
-    excel
-  }
-
-  def WORKBOOK_SETTINGS = { val ws = new WorkbookSettings(); ws.setEncoding("Cp1252"); ws }
-
-  case class Column(index: Int)
-  case class Row(index: Int)
-  case class Cell(column: Column, row: Row, content: Option[String])
-
-  case class Excel(val columns: IndexedSeq[Column], val rows: IndexedSeq[Row], private val cells: Map[(Column, Row), String]) {
-
-    def firstRowCells = rowCells(Row(0))
-    def firstColumnCells = columnCells(Column(0))
-
-    def rowFromFirstColumn(contentToSearchInFirstColumn: String) = firstColumnCells.filter(_.content == Option(contentToSearchInFirstColumn)).map(_.row).lift(0)
-    def columnFromFirstRow(contentToSearchInFirstRow: String) = firstRowCells.filter(_.content == Option(contentToSearchInFirstRow)).map(_.column).lift(0)
-
-    def getCell(columnRow: (Column, Row)) = Cell(columnRow._1, columnRow._2, cells.get(columnRow))
-    // FIXME refactor to this : cells.get(columnRow).map(value => Cell(columnRow._1, columnRow._2, value))
-    // FIXME: refactor to this: case class Cell(column: Column, row: Row, content: String)
-
-    private def columnCells(column: Column) = rows.map(row => getCell((column, row)))
-    private def rowCells(row: Row) = columns.map(column => getCell((column, row)))
-  }
-
-  private def workbookSheetToExcel(workbook: Workbook, sheetName: String) = {
-    Log.info(s"Sheets: ${workbook.getSheetNames.mkString}")
-    val sheet = getSheet(WORKBOOK_SETTINGS, workbook, sheetName)
-    sheetToExcel(sheet)
-  }
-
-  private def sheetToExcel(sheet: Sheet) = {
-		  val columns = for (columnIndex <- 0 until sheet.getColumns) yield Column(columnIndex)
-		  val rows = for (rowIndex <- 0 until sheet.getRows) yield Row(rowIndex)
-		  val table = for (column <- columns; row <- rows) yield ((column, row), sheet.getCell(column.index, row.index).getContents)
-		  Excel(columns, rows, table.toMap)
-  }
-
+  
   @throws(classOf[LibraryException])
   def readLibrary(file: File): Library = {
     try {
       backup(file)
-      val libraryWorkbook = Workbook.getWorkbook(file, WORKBOOK_SETTINGS)
-      
-      val colConfig = new FieldConfiguration(sheetToExcel(libraryWorkbook.getSheet(1)))
-
-      
-      val booksSheet = libraryWorkbook.getSheet(0) // TODO delete
-      val booksSheet2 = sheetToExcel(libraryWorkbook.getSheet(0)) // TODO delete
-      
-      
-//      val columns = (for { actualColumn <- 0 until booksSheet.getColumns() } yield booksSheet.getCell(actualColumn, 0).getContents()).toList.filter(_.nonEmpty)//TODO delete
-      
-      def createBookField(cell: Cell) = BookField(cell.column, cell.content.get)
-      val columns = booksSheet2.firstRowCells.toList.filter(_.content.nonEmpty).map(createBookField)
-      Log.debug(columns)
-      
-//      def createBook(excelRow:Row) = {
-//        val book = Book(1)//FIXME
-//      }
-//      val books2 = booksSheet2.rows.tail.map(createBook)
-      
-      val books = for { actualRow <- 1 until booksSheet.getRows() } yield {
-        val book = Book(booksSheet.getColumns())
-        for (actualColumn <- 0 until booksSheet.getColumns()) {
-          val contents = booksSheet.getCell(actualColumn, actualRow).getContents()
-          book.setValue(actualColumn)(contents)
-        }
-        book
-      }
-      
-      val library = new Library(file, colConfig, columns)
-      for { book <- books } library.addBook(book)
-      
+      val libraryWorkbook = Workbook.getWorkbook(file, ExcelPlus.WORKBOOK_SETTINGS)
+      val booksExcel = ExcelPlus.sheetToExcel(libraryWorkbook.getSheet(0))
+      val colConfig = new FieldConfiguration(ExcelPlus.sheetToExcel(libraryWorkbook.getSheet(1)))
       libraryWorkbook.close
 
-      library
+      def createBookField(cell: ExcelCell) = {
+        val bookColumn = cell.column
+        val bookFieldName = cell.content.get
+
+        val bookFieldTypes: List[BookFieldType] = colConfig.getFieldTypes(bookFieldName)
+        val marcCodes = colConfig.getMarcCodes(bookFieldName)
+        BookField(bookColumn, bookFieldName, bookFieldTypes, marcCodes)
+      }
+      val columns = booksExcel.firstRowCells.toList.filter(_.content.getOrElse("").trim.nonEmpty).map(createBookField)
+      Log.debug(columns)
+
+      def createBook(excelRow: ExcelRow) = {
+        val bs = columns.map(field => (field, booksExcel.getContentOrEmpty((field.excelColumn, excelRow))))
+        Book(bs)
+      }
+
+      val books = booksExcel.rows.tail.map(createBook)
+
+      new Library(file, columns, books.to[ListBuffer])
     } catch {
       case e: BiffException => throw new LibraryException("Biff Hiba a beolvasásnál " + e.getLocalizedMessage());
       case e: IOException   => throw new LibraryException("IO hiba a beolvasásnál " + e.getLocalizedMessage());
       case t: Throwable     => throw new LibraryException(t.getLocalizedMessage());
     }
-  }
-
-  def getSheet(ws: WorkbookSettings, workbook: Workbook, string: String) = {
-    val sheet = workbook.getSheet(new String(string.getBytes(Charset.forName(ws.getEncoding()))))
-    if (sheet == null) workbook.getSheet(string)
-    else sheet
   }
 
   @throws(classOf[Exception])
@@ -145,31 +84,108 @@ object ExcelHandler {
       else
         throw new LibraryException("A választott cél nem file: " + targetFile)
 
-    val workbook = Workbook.createWorkbook(targetFile, WORKBOOK_SETTINGS)
+    val workbook = Workbook.createWorkbook(targetFile, ExcelPlus.WORKBOOK_SETTINGS)
     val booksSheet = workbook.createSheet(EXCEL_SHEET_NAME_BOOKS, 0)
-    for { columnIndex <- 0 until library.getColumns.size } {
-      booksSheet.addCell(new Label(columnIndex, 0, library.getColumns(columnIndex).fieldName))
+    for { field <- library.getColumns } {
+      booksSheet.addCell(new Label(field.excelColumn.index, 0, field.fieldName))
       for (bookIndex <- 0 until library.booksSize) {
         val cellFormat = new WritableCellFormat()
         cellFormat.setWrap(true)
-        booksSheet.addCell(new Label(columnIndex, bookIndex + 1, library.bookAtIndex(bookIndex).getValue(columnIndex), cellFormat))
+        booksSheet.addCell(new Label(field.excelColumn.index, bookIndex + 1, library.bookAtIndex(bookIndex).getValue(field), cellFormat))
       }
     }
     val columnConfigurationSheet = workbook.createSheet(EXCEL_SHEET_NAME_COLUMN_CONFIGURATION, 1)
-    val table = library.configuration.configurationTable
     
-    for { column <- table.columns; row <- table.rows } {
-      val cell = table.getCell((column, row))
-      cell.content.foreach{ content =>
-        columnConfigurationSheet.addCell(new Label(cell.column.index, cell.row.index, content))
-      }
-    	
+    
+    val texts = IdaLibrary.texts
+    
+    columnConfigurationSheet.addCell(new Label(COLUMN_FIELD_NAME.index,0,""))
+    columnConfigurationSheet.addCell(new Label(COLUMN_MULTIFIELD.index,0,texts.ConfigMultiField.get))
+    columnConfigurationSheet.addCell(new Label(COLUMN_AUTOCOMPLETE.index,0,texts.ConfigAutocomplete.get))
+    columnConfigurationSheet.addCell(new Label(COLUMN_MARC.index,0,texts.ConfigMarcCode.get))
+    columnConfigurationSheet.addCell(new Label(COLUMN_INTABLE.index,0,texts.ConfigInTable.get))
+    columnConfigurationSheet.addCell(new Label(COLUMN_REMEMBER.index,0,texts.ConfigRemember.get))
+    columnConfigurationSheet.addCell(new Label(COLUMN_PICTURE.index,0,texts.ConfigPicture.get))
+    
+    for { field <- library.getColumns; row = field.excelColumn.index+1 } {
+    	columnConfigurationSheet.addCell(new Label(COLUMN_FIELD_NAME.index,row,field.fieldName))
+    	if(field.isMulti) columnConfigurationSheet.addCell(new Label(COLUMN_MULTIFIELD.index,row,texts.ConfigYes.get))
+      if(field.isAutocomplete)     	columnConfigurationSheet.addCell(new Label(COLUMN_AUTOCOMPLETE.index,row,texts.ConfigYes.get))
+    	columnConfigurationSheet.addCell(new Label(COLUMN_MARC.index,row,field.marcCodes.map(_.toExcel).mkString(",")))
+    	if(field.isShowInTable) columnConfigurationSheet.addCell(new Label(COLUMN_INTABLE.index,row,texts.ConfigYes.get))
+    	if(field.isRemember) columnConfigurationSheet.addCell(new Label(COLUMN_REMEMBER.index,row,texts.ConfigYes.get))
+    	if(field.isPicture) columnConfigurationSheet.addCell(new Label(COLUMN_PICTURE.index,row,texts.ConfigYes.get))
     }
 
     workbook.write
     workbook.close
     true
   }
+
+  val COLUMN_FIELD_NAME = ExcelColumn(0)
+		  val COLUMN_MULTIFIELD = ExcelColumn(1)
+		  val COLUMN_AUTOCOMPLETE = ExcelColumn(2)
+		  val COLUMN_MARC = ExcelColumn(3)
+		  val COLUMN_INTABLE = ExcelColumn(4)
+		  val COLUMN_REMEMBER = ExcelColumn(5)
+		  val COLUMN_PICTURE = ExcelColumn(6)
+		  
+  //TODO make private!
+	  class FieldConfiguration(val configurationTable: ExcelSheet) {
+
+    case class BookFieldTypeAndColumn(column: ExcelColumn, bookFieldType: BookFieldType)
+    val FIELD_TYPES = Map[BookFieldType, ExcelColumn](
+      Multifield -> COLUMN_MULTIFIELD, 
+      Autocomplete-> COLUMN_AUTOCOMPLETE, 
+      InTable -> COLUMN_INTABLE, 
+      Remember-> COLUMN_REMEMBER, 
+      Picture-> COLUMN_PICTURE, 
+          )
+
+    def isMulti(field: BookField) = isConfigSetForField(field, COLUMN_MULTIFIELD)
+    def isAutocomplete(field: BookField) = isConfigSetForField(field, COLUMN_AUTOCOMPLETE)
+    def isShowInTable(field: BookField) = isConfigSetForField(field, COLUMN_INTABLE)
+    def isPicture(field: BookField) = isConfigSetForField(field, COLUMN_PICTURE)
+    def isRemember(field: BookField) = isConfigSetForField(field, COLUMN_REMEMBER)
+    def getRememberingFields(fields: List[BookField]) = fields.filter(isRemember)
+
+    def getFieldTypes(fieldName: String) = {
+      val configRow = configurationTable.rowFromFirstColumn(fieldName)
+      if (configRow.nonEmpty) {
+        val configCells = FIELD_TYPES.mapValues(column => configurationTable.getCell((column, configRow.get)))
+        val yesConfigCells = configCells.filter(_._2.content.map(isTrue).getOrElse(false))
+        yesConfigCells.keys.toList
+      } else List()
+    }
+
+    @throws(classOf[LibraryException])
+    def getMarcCodes(fieldName: String) =
+      try {
+        val marcCodes = getValue(fieldName, COLUMN_MARC).getOrElse(EMPTY_STRING).split(MARC_CODES_SEPARATOR)
+        for { marcCode <- marcCodes; codes = marcCode.split(MARC_CODE_SEPARATOR) if codes.length > 2 } yield new Marc(codes(0), codes(1), codes(2), null)
+      } catch {
+        case e: Exception =>
+          Log.error(e)
+          throw new LibraryException("A Marc kódot nem lehet a configurationból beolvasni. fieldName=" + fieldName, e)
+      }
+
+    private def isConfigSetForField(fieldName: String, column: ExcelColumn): Boolean = getValue(fieldName, column).map(isTrue).getOrElse(false)
+    private def isConfigSetForField(field: BookField, column: ExcelColumn): Boolean = getValue(field, column).map(isTrue).getOrElse(false)
+
+    private def getValue(fieldName: String, column: ExcelColumn) = {
+      val rowOpt = configurationTable.rowFromFirstColumn(fieldName)
+      val colRow = rowOpt.map((column, _))
+      colRow.map(configurationTable.getCell).map(_.content).flatten
+    }
+    private def getValue(field: BookField, column: ExcelColumn) = {
+      val rowOpt = configurationTable.rowFromFirstColumn(field.fieldName)
+      val colRow = rowOpt.map((column, _))
+      colRow.map(configurationTable.getCell).map(_.content).flatten
+    }
+
+    private def isTrue(string: String) = string.trim.nonEmpty
+  }
+
 
   @throws(classOf[Exception])
   private def backup(fileToSave: File) = {

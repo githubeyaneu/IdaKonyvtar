@@ -72,10 +72,6 @@ object TechnicalTextsIda {
   
   val NO_COLUMNS_FOUND = "No columns to show(!) in library"
   
-  val IGEN = "Igen"
-  val YES = "Yes"
-  val JA = "Ja"
-  
   val MARC_CODES_SEPARATOR = ","
   val MARC_CODE_SEPARATOR = "-"
 }

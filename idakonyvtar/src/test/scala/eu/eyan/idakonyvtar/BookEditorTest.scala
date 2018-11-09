@@ -9,9 +9,7 @@ import org.junit.Before
 import org.junit.Test
 
 import eu.eyan.idakonyvtar.controller.BookController
-import eu.eyan.idakonyvtar.controller.input.BookControllerInput
 import eu.eyan.idakonyvtar.model.Book
-import eu.eyan.idakonyvtar.model.FieldConfiguration
 import eu.eyan.idakonyvtar.testhelper.BookEditorTestHelper
 import eu.eyan.idakonyvtar.util.DialogHelper
 import eu.eyan.log.Log
@@ -20,11 +18,14 @@ import javax.swing.SwingUtilities
 import eu.eyan.util.text.Text
 import eu.eyan.idakonyvtar.text.TechnicalTextsIda
 import scala.annotation.varargs
-import eu.eyan.idakonyvtar.util.ExcelHandler.Column
-import eu.eyan.idakonyvtar.util.ExcelHandler.Row
-import eu.eyan.idakonyvtar.util.ExcelHandler.Excel
 import eu.eyan.idakonyvtar.model.BookField
 import eu.eyan.idakonyvtar.testhelper.AbstractUiTest
+import eu.eyan.idakonyvtar.controller.NO_ISBN
+import org.apache.velocity.tools.generic.FieldTool.MutableField
+import eu.eyan.idakonyvtar.util.ExcelHandler.FieldConfiguration
+import eu.eyan.util.excel.ExcelSheet
+import eu.eyan.util.excel.ExcelColumn
+import eu.eyan.util.excel.ExcelRow
 
 object BookEditorTest {
   def main(args: Array[String]): Unit = {
@@ -34,25 +35,26 @@ object BookEditorTest {
 }
 class FieldConfigurationBuilder(columnCount: Int, rowCount: Int) {
   @varargs def withRow(values: String*): FieldConfigurationBuilder = {
-    for { columnIndex <- 0 until values.length } table.put((Column(columnIndex), Row(actualRow)), values(columnIndex))
+    for { columnIndex <- 0 until values.length } table.put((ExcelColumn(columnIndex), ExcelRow(actualRow)), values(columnIndex))
     actualRow = actualRow + 1
     this
   }
 
-  private val columns = for (columnIndex <- 0 until columnCount) yield Column(columnIndex)
-  private val rows = for (rowIndex <- 0 until rowCount) yield Row(rowIndex)
-  private val table = scala.collection.mutable.Map[(Column, Row), String]()
+  private val columns = for (columnIndex <- 0 until columnCount) yield ExcelColumn(columnIndex)
+  private val rows = for (rowIndex <- 0 until rowCount) yield ExcelRow(rowIndex)
+  private val table = scala.collection.mutable.Map[(ExcelColumn, ExcelRow), String]()
   private var actualRow: Int = 0
 
-  def build() = new FieldConfiguration(new Excel(columns, rows, table.toMap))
+  def build() = new FieldConfiguration(new ExcelSheet(columns, rows, table.toMap))
 }
 
 class BookBuilder(columnCount: Int) {
-    val book = Book(columnCount)
+    val fields = (0 until columnCount).toSeq.map(c => BookField(ExcelColumn(c),"", List(/*FIXME*/), Array())).toList
+    val book = Book.empty(fields)
 
     def withValue(columnIndex: Int, value: String): BookBuilder = {
       Log.debug(columnIndex + " " + value)
-      book.setValue(columnIndex)(value)
+      book.setValue(fields(columnIndex))(value)
       this
     }
 
@@ -66,6 +68,7 @@ class BookEditorTest extends AbstractUiTest {
   private var bookController: BookController = _
 
   private val columns: List[String] = List("szimpla", "ac", "mm", "mmac")
+  private val fields = columns.zipWithIndex.map(t=>BookField(ExcelColumn(t._2),t._1, List(/*FIXME*/), Array()))
 
   private val book: Book = new BookBuilder(columns.size).withValue(0, "Érték1").build()
 
@@ -95,13 +98,11 @@ class BookEditorTest extends AbstractUiTest {
         .withValue(1, "abd")
         .withValue(3, "abd")
         .build())
-        val fields = columns.zipWithIndex.map(t=>BookField(Column(t._2),t._1))
     bookController = new BookController(
       book,
       fields,
-      columnConfiguration,
       bookList,
-      false,
+      NO_ISBN,
       null)
     SwingUtilities.invokeLater(() =>
       DialogHelper.yesNoEditor(null, bookController.getComponent, new Text("title"), new Text("save"), new Text("cancel")))
@@ -109,9 +110,6 @@ class BookEditorTest extends AbstractUiTest {
       BasicRobot.robotWithCurrentAwtHierarchy())
     VideoRunner.setComponentToRecord(bookEditor.getComponentToRecord)
   }
-  /* FIXME images map*/
-
-  /* FIXME images map*/
 
   @After
   def tearDown(): Unit = {
@@ -122,7 +120,7 @@ class BookEditorTest extends AbstractUiTest {
   def testNormalField(): Unit = {
     bookEditor.setNormalText("szimpla", "szimpla")
     bookEditor.clickSave()
-    assertThat(book.getValue(0)).isEqualTo("szimpla")
+    assertThat(book.getValue(fields(0))).isEqualTo("szimpla")
   }
 
   @Test
@@ -130,7 +128,7 @@ class BookEditorTest extends AbstractUiTest {
     bookEditor.setNormalText("ac", "a")
     bookEditor.keyboard(KeyEvent.VK_ESCAPE)
     bookEditor.clickSave()
-    assertThat(book.getValue(1)).isEqualTo("a")
+    assertThat(book.getValue(fields(1))).isEqualTo("a")
   }
 
   @Test
@@ -139,7 +137,7 @@ class BookEditorTest extends AbstractUiTest {
     bookEditor.keyboard(KeyEvent.VK_DELETE)
     bookEditor.keyboard(KeyEvent.VK_ESCAPE)
     bookEditor.clickSave()
-    assertThat(book.getValue(1)).isEqualTo("a")
+    assertThat(book.getValue(fields(1))).isEqualTo("a")
   }
 
   @Test
@@ -152,7 +150,7 @@ class BookEditorTest extends AbstractUiTest {
     bookEditor.multifieldDelete("mm", 2)
     bookEditor.requireDeleteDisabled("mm", 4)
     bookEditor.clickSave
-    assertThat(book.getValue(2)).isEqualTo("ab + c")
+    assertThat(book.getValue(fields(2))).isEqualTo("ab + c")
   }
 
   @Test
@@ -171,7 +169,7 @@ class BookEditorTest extends AbstractUiTest {
     bookEditor.enterNormalText("mmac4", "a")
     bookEditor.autocomplete("mmac4").pressEscape
     bookEditor.clickSave
-    assertThat(book.getValue(3)).isEqualTo("ab + c + a")
+    assertThat(book.getValue(fields(3))).isEqualTo("ab + c + a")
   }
 
   @Test

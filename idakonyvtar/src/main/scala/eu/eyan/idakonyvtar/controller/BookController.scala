@@ -18,10 +18,8 @@ import com.jgoodies.binding.adapter.Bindings
 import com.jgoodies.forms.layout.FormLayout
 import com.jgoodies.forms.layout.RowSpec
 
-import eu.eyan.idakonyvtar.controller.input.BookControllerInput
 import eu.eyan.idakonyvtar.model.Book
 import eu.eyan.idakonyvtar.model.BookFieldValueModel
-import eu.eyan.idakonyvtar.model.FieldConfiguration
 import eu.eyan.idakonyvtar.oszk.Marc
 import eu.eyan.idakonyvtar.oszk.OszkKereso
 import eu.eyan.idakonyvtar.oszk.OszkKeresoException
@@ -50,10 +48,11 @@ import eu.eyan.idakonyvtar.text.TechnicalTextsIda._
 import eu.eyan.util.swing.WithComponent
 import eu.eyan.util.swing.JTextFieldPlus.JTextFieldPlusImplicit
 import eu.eyan.idakonyvtar.model.BookField
+import eu.eyan.idakonyvtar.util.ExcelHandler.FieldConfiguration
 
 object BookController {
-  def listForAutocomplete(bookList: Seq[Book], columnIndex: Int) = bookList
-    .map(_.getValue(columnIndex)) // get the values of the column
+  def listForAutocomplete(bookList: Seq[Book], field: BookField) = bookList 
+    .map(_.getValue(field)) // get the values of the column
     .filter(_ != null) // only not nulls
     .map(s => if (s.contains(MULTIFIELD_SEPARATOR)) s.split(MULTIFIELS_SEPARATOR_REGEX) else Array(s)) // get all values if multifield
     .flatten // take the whole list
@@ -63,12 +62,17 @@ object BookController {
     //      .sortWith((s1: String, s2: String) => COLLATOR.compare(s1, s2) < 0) //autocomplete does sorting
     .toList
 }
+
+trait IsbnSetting
+case object NO_ISBN extends IsbnSetting 
+case object WITH_ISBN extends IsbnSetting
+  
+  
 class BookController(
   private val book:                Book,
   private val fields:              List[BookField], 
-  private val columnConfiguration: FieldConfiguration,
   private val bookList:            List[Book],
-  private val isbnEnabled:         Boolean            = false,
+  private val isbnEnabled:         IsbnSetting, //TODO make two applies for editing and for newBook
   private val loadedFile:          File) {
 
   def getComponent = view
@@ -91,7 +95,7 @@ class BookController(
 
   startWebcam
 
-  if (isbnEnabled) {
+  if (isbnEnabled == WITH_ISBN) {
     fieldsPanel.newRow.span.addSeparatorWithTitle("Isbn")
     fieldsPanel.newRow
     fieldsPanel.add(isbnSearchLabel.name(ISBN_LABEL))
@@ -108,9 +112,9 @@ class BookController(
     Log.debug(s"column $field")
     fieldsPanel.newRow.addLabel(field.fieldName)
 
-    val isMultiEditorField = columnConfiguration.isMulti(field)
-    val isAutocompleteField = columnConfiguration.isAutocomplete(field)
-    val isPictureField = columnConfiguration.isPicture(field)
+    val isMultiEditorField = field.isMulti
+    val isAutocompleteField = field.isAutocomplete
+    val isPictureField = field.isPicture
 
     val editor: Component =
       if (isPictureField) {
@@ -122,21 +126,21 @@ class BookController(
         val textField = imgNameAndBtn.newColumn.addTextField("", TEXTFIELD_DEFAULT_SIZE).name("picturePath")
         val button = imgNameAndBtn.newColumn.addButton("katt").name("click")
 
-        def refreshImage = imageLabel.setIcon(new ImageIcon(book.getImage(fieldIndex).get.getScaledInstance(320, 240, Image.SCALE_DEFAULT)))
-        if (book.getImage(fieldIndex).nonEmpty) refreshImage
+        def refreshImage = imageLabel.setIcon(new ImageIcon(book.getImage(field).get.getScaledInstance(320, 240, Image.SCALE_DEFAULT)))
+        if (book.getImage(field).nonEmpty) refreshImage
         button.onClicked({
-          book.setImage(fieldIndex)(WebCam.getImage)
-          book.setValue(fieldIndex)("")
+          book.setImage(field)(WebCam.getImage)
+          book.setValue(field)("")
           refreshImage
         })
 
-        bindTextField(textField, new BookFieldValueModel(fieldIndex, book))
+        bindTextField(textField, new BookFieldValueModel(field, book))
         imgNameAndBtn
       } else if (isAutocompleteField)
-        if (isMultiEditorField) multiFieldBind(new MultiFieldAutocomplete(field.fieldName, "Autocomplete", "Nincs találat").setAutoCompleteList(BookController.listForAutocomplete(bookList, fieldIndex)), new BookFieldValueModel(fieldIndex, book))
-        else bindTextField(new JTextFieldAutocomplete().setHintText("Autocomplete").setAutocompleteList(BookController.listForAutocomplete(bookList, fieldIndex)), new BookFieldValueModel(fieldIndex, book))
-      else if (isMultiEditorField) multiFieldBind(new MultiFieldJTextField(field.fieldName), new BookFieldValueModel(fieldIndex, book))
-      else bindTextField(new JTextField(TEXTFIELD_DEFAULT_SIZE), new BookFieldValueModel(fieldIndex, book))
+        if (isMultiEditorField) multiFieldBind(new MultiFieldAutocomplete(field.fieldName, "Autocomplete", "Nincs találat").setAutoCompleteList(BookController.listForAutocomplete(bookList, field)), new BookFieldValueModel(field, book))
+        else bindTextField(new JTextFieldAutocomplete().setHintText("Autocomplete").setAutocompleteList(BookController.listForAutocomplete(bookList, field)), new BookFieldValueModel(field, book))
+      else if (isMultiEditorField) multiFieldBind(new MultiFieldJTextField(field.fieldName), new BookFieldValueModel(field, book))
+      else bindTextField(new JTextField(TEXTFIELD_DEFAULT_SIZE), new BookFieldValueModel(field, book))
 
     editor.setName(field.fieldName)
     fieldsPanel.nextColumn.add(editor)
@@ -193,13 +197,13 @@ class BookController(
   private def prozessIsbnData(marcsFromOszk: List[Marc]) =
     fields.foreach(field => {
       try {
-        val marcCodesFromColumns = columnConfiguration.getMarcCodes(field.fieldName)
+        val marcCodesFromColumns = field.marcCodes
         val values = for {
           marcFromOszk <- marcsFromOszk
           marcFromColumn <- marcCodesFromColumns if (isMarcsApply(marcFromOszk, marcFromColumn))
         } yield marcFromOszk.value
         Log.info("BookController.prozessIsbnData " + values.mkString("\r\n    "))
-        book.setValue(fields.indexOf(field))(values.mkString(", "))
+        book.setValue(field)(values.mkString(", "))
       } catch {
         case e: Exception =>
           e.printStackTrace()

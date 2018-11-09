@@ -5,29 +5,30 @@ import java.io.File
 import eu.eyan.util.swing.TableCol
 import scala.collection.mutable.MutableList
 import scala.collection.mutable.ListBuffer
+import eu.eyan.idakonyvtar.util.ExcelHandler.FieldConfiguration
 
 class Library(
-  val file:          File,
-  val configuration: FieldConfiguration,
-  private val columns:       List[BookField] 
-  ) {
+  val file:            File,
+  private val columns: List[BookField],
+  private val books:   ListBuffer[Book]   = ListBuffer[Book]()) {
 
+  def addBook(book: Book) = books += book
   def booksSize = books.size
   def bookAtIndex(index: Int) = books(index)
-  def addBook(book: Book) = books += book
   def booksAsJavaList = new ListBufferAsJava(books)
-  def createEmptyBook = Book(columns.size)
-  @deprecated def getColumns = columns // TODO delete after refactoring. this info goes into Book.
-  
-  def isPictureField(columnIndex: Int) = configuration.isPicture(columns(columnIndex))//TODO why is it needed?
 
-  val columnNamesAndIndexesToShow = columns.zipWithIndex.filter(x => columnToShowFilter(TableCol(x._2)))
+  def createEmptyBook = Book.empty(columns)
+  def fieldsToRemember = columns.filter(_.isRemember)
+  def fieldToName(fieldName: String) = columns.filter(_.fieldName == fieldName).lift(0)
+  def getColumns = columns // needed for saving the config
+
+  val columnNamesAndIndexesToShow = columns.zipWithIndex.filter(_._1.isShowInTable)
   val columnNamesToShow = columnNamesAndIndexesToShow.unzip._1
   val columnIndicesToShow = columnNamesAndIndexesToShow.unzip._2 // TODO move to Library...???
   
-  private val books = ListBuffer[Book]()
-
-  private def columnToShowFilter(col: TableCol) = configuration.isShowInTable(columns(col.index))
+  
+  val columnNamesAndFieldsToShow = columns.zipWithIndex.filter(_._1.isShowInTable)
+  val columnFieldsToShow = columnNamesAndFieldsToShow.unzip._1 // TODO move to Library...???
 }
 
 class ListBufferAsJava[T](list: ListBuffer[T]) extends java.util.List[T] {

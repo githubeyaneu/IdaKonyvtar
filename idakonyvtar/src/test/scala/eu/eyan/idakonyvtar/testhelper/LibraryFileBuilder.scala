@@ -10,6 +10,7 @@ import jxl.Workbook
 import jxl.write.Label
 import jxl.write.WritableSheet
 import jxl.write.WritableWorkbook
+import eu.eyan.util.excel.ExcelPlus
 
 class LibraryFileBuilder {
 
@@ -21,7 +22,7 @@ class LibraryFileBuilder {
 
   var file: File = new File(System.currentTimeMillis() + ".xls")
 
-  try workbook = Workbook.createWorkbook(file, ExcelHandler.WORKBOOK_SETTINGS)
+  try workbook = Workbook.createWorkbook(file, ExcelPlus.WORKBOOK_SETTINGS)
   catch { case e: IOException => e.printStackTrace() }
 
   def withSheet(sheetName: String): LibraryFileBuilder = {

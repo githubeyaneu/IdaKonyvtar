@@ -17,6 +17,7 @@ import eu.eyan.util.string.StringPlus.StringPlusImplicit
 class OszkKeresoException(message: String, cause: Throwable) extends Exception(message, cause)
 class Marc(val marc1: String, val marc2: String, val marc3: String, val value: String) {
   override def toString() = "Marc [marc1=" + marc1 + ", marc2=" + marc2 + ", marc3=" + marc3 + ", value=" + value + "]"
+  def toExcel = marc1 + "-" + marc2 + "-" + marc3
 }
 
 object OszkKereso {
@@ -33,10 +34,10 @@ object OszkKereso {
 
     // Login2
     HttpPlus.sendPost(
-        "http://nektar1.oszk.hu/LVbin/LibriVision/lv_search_form.html?SESSION_ID="
-          + session_id
-          + "&lv_action=LV_Search_Form&HTML_SEARCH_TYPE=SIMPLE&DB_ID=2",
-        "")
+      "http://nektar1.oszk.hu/LVbin/LibriVision/lv_search_form.html?SESSION_ID="
+        + session_id
+        + "&lv_action=LV_Search_Form&HTML_SEARCH_TYPE=SIMPLE&DB_ID=2",
+      "")
 
     // Keresés aztán Marc rövid formátum keresése
     val marcLink = findTextInUrl(
@@ -61,18 +62,19 @@ object OszkKereso {
   }
 
   @throws(classOf[IOException])
-  def findTextInUrl(host: String,
+  def findTextInUrl(
+    host:          String,
     postParameter: String,
-    lineGrep: String,
-    regex_prefix: String,
-    regex: String,
-    regexPost: String): String = {
+    lineGrep:      String,
+    regex_prefix:  String,
+    regex:         String,
+    regexPost:     String): String = {
 
     val postUrl = host.asUrlPost(postParameter).mkString
-		Log.info("postUrl: "+ postUrl)
-//    val line = Unix4j.fromString(postUrl).grep(lineGrep).toStringResult()
+    Log.info("postUrl: " + postUrl)
+    //    val line = Unix4j.fromString(postUrl).grep(lineGrep).toStringResult()
     val line = postUrl.lines.filter(_.contains(lineGrep)).toList(0)
-    Log.info("Line: "+ line)
+    Log.info("Line: " + line)
     val firstMatch = (regex_prefix + regex + regexPost).r.findFirstIn(line).get
 
     firstMatch.substring(regex_prefix.length(), firstMatch.length() - regexPost.length()).replaceAll("&amp;", "&")
@@ -97,8 +99,7 @@ object OszkKereso {
         if (marc1 != lastMarc1 && marc1 != "") {
           lastMarc1 = marc1
           lastMarc2 = marc2
-        }
-        else if (marc2 != lastMarc2 && marc2 != "") {
+        } else if (marc2 != lastMarc2 && marc2 != "") {
           lastMarc2 = marc2
         }
         lastMarc3 = marc3
@@ -110,8 +111,7 @@ object OszkKereso {
 
       marcs.foreach(m => Log.debug(m.toString()))
       marcs
-    }
-    catch {
+    } catch {
       case e: Throwable => {
         e.printStackTrace();
         throw new OszkKeresoException("Sikertelen.", e)

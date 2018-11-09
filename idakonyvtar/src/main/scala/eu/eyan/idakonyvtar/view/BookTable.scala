@@ -10,7 +10,6 @@ import com.jgoodies.binding.adapter.SingleListSelectionAdapter
 import com.jgoodies.binding.list.SelectionInList
 
 import eu.eyan.idakonyvtar.IdaLibrary
-import eu.eyan.idakonyvtar.model.FieldConfiguration
 import eu.eyan.log.Log
 import eu.eyan.util.swing.HighlightRenderer
 import eu.eyan.util.swing.JComponentPlus.JComponentImplicit
@@ -34,8 +33,14 @@ import eu.eyan.util.swing.TableRow
 import eu.eyan.util.swing.TableCol
 import eu.eyan.idakonyvtar.model.BookField
 
-class BookTable(nameOfLibrary: String, columnNames: List[BookField], books: SelectionInList[_], cellValueGetter: (TableRow, TableCol) => String, emptyText: Observable[String]) extends WithComponent {
-  def getComponent = scrollPane // FIXME... use another
+class BookTable(
+    private val nameOfLibrary: String, 
+    private val columnNames: List[BookField], 
+    private val books: SelectionInList[_], 
+    private val cellValueGetter: (TableRow, TableCol) => String, 
+    private val emptyText: Observable[String]) {
+  
+  def getComponent = scrollPane // TODO... use another
   def getSelectedIndex = table.convertRowIndexToModel(table.getSelectedRow)
   def onSelectionChanged(action: Int => Unit) = table.onValueChanged(action(table.getSelectedRow))
   def onLineDoubleClicked(action: => Unit) = table.onDoubleClick(action)

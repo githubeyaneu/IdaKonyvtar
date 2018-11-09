@@ -118,7 +118,7 @@ class IdaLibraryTest extends AbstractUiTest {
     library.requireDeleteEnabled()
     library.clickDeleteButton()
     library.clickApproveYes()
-    library.assertTableCell(2, 1, "original title 2")
+    library.assertTableCell(2, 1, "Kháron ladikján")
     library.requireDeleteDisabled()
     library.checkTitleWithNumber(1)
   }

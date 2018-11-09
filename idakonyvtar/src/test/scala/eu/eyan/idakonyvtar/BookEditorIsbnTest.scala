@@ -9,9 +9,7 @@ import org.junit.Before
 import org.junit.Test
 
 import eu.eyan.idakonyvtar.controller.BookController
-import eu.eyan.idakonyvtar.controller.input.BookControllerInput
 import eu.eyan.idakonyvtar.model.Book
-import eu.eyan.idakonyvtar.model.FieldConfiguration
 import eu.eyan.idakonyvtar.testhelper.BookEditorTestHelper
 import eu.eyan.idakonyvtar.util.DialogHelper
 import eu.eyan.testutil.video.VideoRunner
@@ -20,8 +18,10 @@ import eu.eyan.idakonyvtar.text.TextsIda
 import eu.eyan.util.text.Text
 import eu.eyan.idakonyvtar.text.TechnicalTextsIda
 import eu.eyan.idakonyvtar.model.BookField
-import eu.eyan.idakonyvtar.util.ExcelHandler.Column
 import eu.eyan.idakonyvtar.testhelper.AbstractUiTest
+import eu.eyan.idakonyvtar.controller.WITH_ISBN
+import eu.eyan.idakonyvtar.util.ExcelHandler.FieldConfiguration
+import eu.eyan.util.excel.ExcelColumn
 
 
 object BookEditorIsbnTest {
@@ -71,12 +71,11 @@ class BookEditorIsbnTest extends AbstractUiTest {
         .withValue(3, "abd")
         .build()
     )
-    val fields = columns.zipWithIndex.map(t=>BookField(Column(t._2),t._1))
+    val fields = columns.zipWithIndex.map(t=>BookField(ExcelColumn(t._2),t._1, List(/*FIXME*/), Array()))
     bookController = new BookController(book,
       fields,
-      columnConfig,
       bookList,
-      true,
+      WITH_ISBN,
       null)
     
     SwingUtilities.invokeLater(() =>
@@ -85,9 +84,7 @@ class BookEditorIsbnTest extends AbstractUiTest {
       BasicRobot.robotWithCurrentAwtHierarchy())
     VideoRunner.setComponentToRecord(bookEditor.getComponentToRecord)
   }
-  /* FIXME images map*/
-
-  /* FIXME images map*/
+  /* TODO images map*/
 
   @After
   def tearDown(): Unit = {

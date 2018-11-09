@@ -39,7 +39,7 @@ import eu.eyan.util.rx.lang.scala.ObservablePlus.ObservableImplicitInt
 import eu.eyan.util.rx.lang.scala.ObservablePlus
 import rx.lang.scala.Observable
 
-class IdaLibraryFrame(fileToOpen: Option[File]) {
+class IdaLibraryFrame(private val fileToOpen: Option[File]) {
   private val texts = IdaLibrary.texts
   private val filterText = BehaviorSubject(EMPTY_STRING)
   private val multiEditor = new IdaLibraryMultiEditor()
@@ -72,7 +72,7 @@ class IdaLibraryFrame(fileToOpen: Option[File]) {
     .menuItem(texts.MenuFile, texts.MenuFileSaveAs, multiEditor.saveActiveLibraryAs(multiEditor.loadLibrary), isAnyLibraryOpen)
     .menuItemSeparator(texts.MenuFile)
     .menuItemEvent(texts.MenuFile, texts.MenuFileExit, JFramePlus.close)
-    .menuItems(texts.MenuLanguages, texts.languages, texts.onLanguageSelected: String => Unit)
+    .menuItems(texts.MenuLanguages, texts.getLanguages, texts.onLanguageSelected: String => Unit)
     .menuItemEvent(texts.MenuDebug, texts.MenuDebugLogWindow, LogWindow.show)
     .menuItem(texts.MenuDebug, texts.MenuDebugCopyLogs, ClipboardPlus.copyToClipboard(getAllLogs))
     .menuItem(texts.MenuDebug, texts.MenuDebugClearRegistry, RegistryPlus.clear(classOf[IdaLibrary].getName))
@@ -96,7 +96,7 @@ class IdaLibraryFrame(fileToOpen: Option[File]) {
 
   private def writeEmail = Desktop.getDesktop.mail(new URI(WRITE_EMAIL + URLEncoder.encode(getAllLogs, UTF8).replace(PLUS_AS_REGEX, SPACE_URL_ENCODED)))
 
-  private def checkAndselectLanguage = if (texts.initialLanguage.isEmpty) selectLanguageByDialog(texts.languages).foreach(texts.onLanguageSelected)
+  private def checkAndselectLanguage = if (texts.hasNoInitialLanguage) selectLanguageByDialog(texts.getLanguages).foreach(texts.onLanguageSelected)
 
   private def confirmEditorAndExit(multiEditor: IdaLibraryMultiEditor)(frame: JFrame) = multiEditor.confirmExit(frame) && DialogHelper.yesNo(frame, texts.ExitWindowTexts)
 

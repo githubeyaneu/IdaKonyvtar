@@ -21,19 +21,22 @@ import eu.eyan.util.text.TextsDialogYes
 import eu.eyan.util.text.TextsDialogYesNo
 import eu.eyan.util.text.TextsDialogFileChooser
 import eu.eyan.util.text.TextsButton
-import eu.eyan.idakonyvtar.util.ExcelHandler.Row
+import eu.eyan.util.excel.ExcelPlus
 
 class TextsIda extends Texts {
-  lazy val languageInRegistry = IdaLibrary.registryValue(classOf[TextsIda].getName)
-  def initialLanguage = languageInRegistry.read
+  def getLanguages = languages
+
+  private lazy val languageInRegistry = IdaLibrary.registryValue(classOf[TextsIda].getName)
+  private lazy val translationsXls = "translations.xls".toResourceFile.get
+  private lazy val translationsXlsInputStream = ClassLoader.getSystemResourceAsStream("translations.xls")
+  private lazy val translationsTable = ExcelPlus.readExcelFromStream(translationsXlsInputStream, "translations")
+  private lazy val languages = translationsTable.firstRowCells.drop(2).filter(_.content.nonEmpty).map(_.content.get).filter(_.nonEmpty).toArray
+
   language.subscribe(_.foreach(languageInRegistry.save))
 
-  lazy val translationsXls = "translations.xls".toResourceFile.get
-  val translationsXlsInputStream = ClassLoader.getSystemResourceAsStream("translations.xls")
-  lazy val translationsTable = ExcelHandler.readExcelFromStream(translationsXlsInputStream, "translations")
-  lazy val languages = translationsTable.firstRowCells.drop(2).filter(_.content.nonEmpty).map(_.content.get).filter(_.nonEmpty).toArray
+  protected def initialLanguage = languageInRegistry.read
 
-  def getTextTranslation(technicalName: String, language: Option[String]) = {
+  protected def getTextTranslation(technicalName: String, language: Option[String]) = {
     Log.debug(s"TechnicalName=$technicalName, language=$language")
 
     val translationColumnIndex = translationsTable.columnFromFirstRow(language.getOrElse("English"))
@@ -49,15 +52,17 @@ class TextsIda extends Texts {
     translation
   }
 
-  protected object IdaText {
+  private object IdaText {
     def apply(technicalName: String, args: Observable[Any]*) = new IdaText(technicalName, args: _*)
   }
 
   protected class IdaText(private val technicalName: String, private val args: Observable[Any]*) extends Text(noTranslation(technicalName), args: _*) {
     def optionGetOrElse(orElse: String)(option: Option[String]) = option.getOrElse(orElse)
-    val translateText = translate(technicalName)(_)
-    val translated = language map translateText
-    val validTranslationObs = translated map optionGetOrElse(noTranslation(technicalName))
+
+    private val translateText = translate(technicalName)(_)
+    private val translated = language map translateText
+    private val validTranslationObs = translated map optionGetOrElse(noTranslation(technicalName))
+
     validTranslationObs subscribe templateObservable
   }
 
@@ -99,7 +104,7 @@ class TextsIda extends Texts {
   case object SaveErrorWindowTitle extends IdaText("SaveErrorWindowTitle")
   case object SaveErrorWindowButton extends IdaText("SaveErrorWindowButton")
   case object SaveErrorTexts extends TextsDialogYes(SaveErrorWindowText, SaveErrorWindowTitle, SaveErrorWindowButton)
-  
+
   case object LoadErrorWindowText extends IdaText("LoadErrorWindowText")
   case object LoadErrorWindowTitle extends IdaText("LoadErrorWindowTitle")
   case object LoadErrorWindowButton extends IdaText("LoadErrorWindowButton")
@@ -185,7 +190,7 @@ class TextsIda extends Texts {
   case object DeleteBookWindowYes extends IdaText("DeleteBookWindowYes")
   case object DeleteBookWindowNo extends IdaText("DeleteBookWindowNo")
   case object DeleteBookWindowTexts extends TextsDialogYesNo(DeleteBookWindowQuestion, DeleteBookWindowTitle, DeleteBookWindowYes, DeleteBookWindowNo)
-  
+
   case object ToolbarFilterLabel extends IdaText("ToolbarFilterLabel")
   case object EmptyLibrary extends IdaText("EmptyLibrary")
   case object NoResultAfterFilter extends IdaText("NoResultAfterFilter")
@@ -208,8 +213,17 @@ class TextsIda extends Texts {
   case object AutocompleteFieldDeleteButton extends IdaText("AutocompleteFieldDeleteButton")
   case object WebcamTakeImageButton extends IdaText("WebcamTakeImageButton")
   case object ShowImageWindowTitle extends IdaText("ShowImageWindowTitle")
-  case object EditBookWindowTitle  { def apply(bookTitle: Observable[String]) = IdaText("EditBookWindowTitle", bookTitle) }
+  case object EditBookWindowTitle { def apply(bookTitle: Observable[String]) = IdaText("EditBookWindowTitle", bookTitle) }
   case object EditBookSaveButton extends IdaText("EditBookSaveButton")
   case object EditBookCancelButton extends IdaText("EditBookCancelButton")
   case object ConfigTitleFieldName extends IdaText("ConfigTitleFieldName")
+
+  case object ConfigMultiField extends IdaText("ConfigMultiField")
+  case object ConfigAutocomplete extends IdaText("ConfigAutocomplete")
+  case object ConfigMarcCode extends IdaText("ConfigMarcCode")
+  case object ConfigInTable extends IdaText("ConfigInTable")
+  case object ConfigRemember extends IdaText("ConfigRemember")
+  case object ConfigPicture extends IdaText("ConfigPicture")
+  case object ConfigYes extends IdaText("ConfigYes")
+
 }
