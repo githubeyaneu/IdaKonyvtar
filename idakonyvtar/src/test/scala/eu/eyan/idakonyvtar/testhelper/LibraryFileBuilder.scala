@@ -5,7 +5,7 @@ import java.io.IOException
 
 import scala.collection.mutable.MutableList
 
-import eu.eyan.idakonyvtar.util.ExcelHandler
+import eu.eyan.idakonyvtar.util.LibraryExcelHandler
 import jxl.Workbook
 import jxl.write.Label
 import jxl.write.WritableSheet

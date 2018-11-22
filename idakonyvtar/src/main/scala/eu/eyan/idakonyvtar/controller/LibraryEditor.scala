@@ -11,7 +11,7 @@ import eu.eyan.idakonyvtar.model.Book
 import eu.eyan.idakonyvtar.text.TechnicalTextsIda.ERROR_AT_READING_LIBRARY
 import eu.eyan.idakonyvtar.text.TextsIda
 import eu.eyan.idakonyvtar.util.DialogHelper
-import eu.eyan.idakonyvtar.util.ExcelHandler
+import eu.eyan.idakonyvtar.util.LibraryExcelHandler
 import eu.eyan.idakonyvtar.util.LibraryException
 import eu.eyan.idakonyvtar.view.BookTable
 import eu.eyan.log.Log
@@ -100,25 +100,27 @@ class LibraryEditor(val library: Library) extends WithComponent {
 
   private def checkAndSaveLibrary = {
     Log.info("Save " + file)
-    TryCatch({ ExcelHandler.saveLibrary(file, library); notDirty }, (e: Throwable) => { Log.error(e); DialogHelper.yes(texts.SaveErrorTexts) })
+    TryCatch({ LibraryExcelHandler.saveLibrary(file, library); notDirty }, (e: Throwable) => { Log.error(e); DialogHelper.yes(texts.SaveErrorTexts) })
   }
 
   private def checkAndSaveAsLibrary(newFile: File) = {
     Log.info("SaveAs " + file)
     def confirmOverwrite = DialogHelper.yesNo(null, texts.SaveAsOverwriteConfirmText(newFile), texts.SaveAsOverwriteConfirmWindowTitle, texts.SaveAsOverwriteYes, texts.SaveAsOverwriteNo)
     TryCatchThrowable(
-      ((newFile.notExists || confirmOverwrite) && ExcelHandler.saveLibrary(newFile, library)),
+      ((newFile.notExists || confirmOverwrite) && LibraryExcelHandler.saveLibrary(newFile, library)),
       e => { Log.error(e); DialogHelper.yes(texts.SaveErrorTexts); false })
   }
 
   private def createNewBookInDialog = {
     val book = newPreviousBook
 
-    val bookController = new BookController(book, library.getColumns, books.getList.toList, WITH_ISBN, file)
+    val bookController = BookEditor.editWithIsbn(book, library.getColumns, books.getList.toList, file)
 
     val output = DialogHelper.yesNoEditor(component, bookController.getComponent, texts.NewBookWindowTitle, texts.NewBookSaveButton, texts.NewBookCancelButton)
+    
 
     if (output) {
+    	val result = bookController.getResult 
       saveImages(book)
       books.getList.add(0, book)
       savePreviousBook(book)
@@ -135,7 +137,7 @@ class LibraryEditor(val library: Library) extends WithComponent {
     //TODO spagetti and refaactor the columns...
     loadImages(book)
 
-    val bookController = new BookController(book, library.getColumns, books.getList.toList, NO_ISBN, file)
+    val bookController = BookEditor.editBookWithoutIsbn(book, library.getColumns, books.getList.toList, file)
 
     val titleFieldName = texts.ConfigTitleFieldName
     val titleField = titleFieldName.map(library.fieldToName)

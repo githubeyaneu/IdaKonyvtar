@@ -13,21 +13,20 @@ class MultiFieldAutocomplete(columnName: String, hintText: String, noItemsFoundT
 
   Log.debug(columnName)
 
-  protected def addFieldEditListener(editor: JTextFieldAutocomplete, listener: FieldEditListener[JTextFieldAutocomplete]): Unit = {
-    def addIfNotEmpty = if (editor.getText.nonEmpty) listener.fieldEdited(editor)
-  	editor.onKeyReleased(addIfNotEmpty)
-  	editor.autocomplete.autocompleteList.onDoubleClick(addIfNotEmpty)
+  protected def createEditor(fieldEdited: JTextFieldAutocomplete => Unit): JTextFieldAutocomplete = {
+    val editor = new JTextFieldAutocomplete().setAutocompleteList(autocompleteList).setHintText(hintText).setNoItemsFoundText(noItemsFoundText)
+    def addIfNotEmpty = if (editor.getText.nonEmpty) fieldEdited(editor)
+    editor.onKeyReleased(addIfNotEmpty)
+    editor.autocomplete.autocompleteList.onDoubleClick(addIfNotEmpty)
+    editor
   }
 
-  protected def createEditor(): JTextFieldAutocomplete =
-    new JTextFieldAutocomplete().setAutocompleteList(autocompleteList).setHintText(hintText).setNoItemsFoundText(noItemsFoundText)
+  protected def getValue(editor: JTextFieldAutocomplete) = if (editor.getText.isEmpty) None else Some(editor.getText)
 
-  protected def getValue(editor: JTextFieldAutocomplete): String = if (editor.getText.equals("")) null else editor.getText
-
-  protected def setValueInEditor(editor: JTextFieldAutocomplete, value: String): Unit = {
+  protected def setValueInEditor(editor: JTextFieldAutocomplete)(value: String): Unit = {
     editor.setText(value)
     Log.debug(editor.getName + " " + value)
   }
 
-  def setAutoCompleteList(autocompleteList: List[String]) = {this.autocompleteList = autocompleteList; this}
+  def setAutoCompleteList(autocompleteList: List[String]) = { this.autocompleteList = autocompleteList; this }
 }

@@ -36,6 +36,7 @@ object Book {
 
   def empty(fields: List[BookField]): Book = Book(fields.map((_, EMPTY_STRING)))
 
+  // TODO no need after makin immutable
   def copy(book: Book): Book = book.copy
 }
 
@@ -44,7 +45,7 @@ class Book private (
   private val fields: Map[BookField, String]        = Map(),
   private val images: Map[BookField, BufferedImage] = Map()) extends Model {
 
-  def setValue(field: BookField)(value: String) = {
+  def setValue(field: BookField)(value: String) = { //FIXME make it immutable
     val oldValue: String = getValue(field)
     fields.put(field, value)
     Log.trace("fire " + value)

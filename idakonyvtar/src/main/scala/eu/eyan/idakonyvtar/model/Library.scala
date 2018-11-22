@@ -5,7 +5,7 @@ import java.io.File
 import eu.eyan.util.swing.TableCol
 import scala.collection.mutable.MutableList
 import scala.collection.mutable.ListBuffer
-import eu.eyan.idakonyvtar.util.ExcelHandler.FieldConfiguration
+import eu.eyan.idakonyvtar.util.LibraryExcelHandler.FieldConfiguration
 
 class Library(
   val file:            File,

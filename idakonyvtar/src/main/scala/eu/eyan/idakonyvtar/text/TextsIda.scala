@@ -4,7 +4,7 @@ import rx.lang.scala.Observable
 import rx.lang.scala.subjects.BehaviorSubject
 import eu.eyan.util.scala.Try
 import eu.eyan.util.string.StringPlus.StringPlusImplicit
-import eu.eyan.idakonyvtar.util.ExcelHandler
+import eu.eyan.idakonyvtar.util.LibraryExcelHandler
 import eu.eyan.log.Log
 import eu.eyan.util.text.Text
 import eu.eyan.util.registry.RegistryPlus

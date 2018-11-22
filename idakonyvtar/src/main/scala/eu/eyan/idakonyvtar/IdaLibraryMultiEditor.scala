@@ -22,7 +22,7 @@ import eu.eyan.util.text.Text
 import eu.eyan.util.io.FilePlus.FilePlusImplicit
 import eu.eyan.util.string.StringPlus.StringPlusImplicit
 import eu.eyan.util.scala.Try
-import eu.eyan.idakonyvtar.util.ExcelHandler
+import eu.eyan.idakonyvtar.util.LibraryExcelHandler
 import eu.eyan.util.rx.lang.scala.ObservablePlus.ObservableImplicit
 import eu.eyan.idakonyvtar.text.TechnicalTextsIda._
 
@@ -94,7 +94,7 @@ class IdaLibraryMultiEditor extends WithComponent {
     if (findControllerToFile(file).nonEmpty) activateTab(findControllerToFile(file).get)
     else {
       Log.info("Loading library: " + file)
-      val library = Try(ExcelHandler.readLibrary(file))
+      val library = Try(LibraryExcelHandler.readLibrary(file))
 
       if (library.isSuccess && library.get.columnNamesAndIndexesToShow.size > 0) {
         val libraryController = new LibraryEditor(library.get)
