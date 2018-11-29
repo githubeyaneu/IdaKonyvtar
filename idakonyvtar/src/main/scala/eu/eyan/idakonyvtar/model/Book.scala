@@ -1,17 +1,13 @@
 package eu.eyan.idakonyvtar.model;
 
+import java.awt.image.BufferedImage
 import java.beans.PropertyChangeEvent
 
-import scala.collection.mutable.MutableList
-
 import com.jgoodies.binding.beans.Model
-import eu.eyan.log.Log
-import eu.eyan.log.Log
-import java.awt.Image
-import scala.collection.mutable.Map
-import java.awt.image.BufferedImage
-import eu.eyan.idakonyvtar.text.TechnicalTextsIda._
+
 import eu.eyan.idakonyvtar.oszk.Marc
+import eu.eyan.idakonyvtar.text.TechnicalTextsIda.EMPTY_STRING
+import eu.eyan.log.Log
 import eu.eyan.util.excel.ExcelColumn
 
 trait BookFieldType
@@ -32,7 +28,7 @@ case class BookField (excelColumn: ExcelColumn, fieldName: String, private val f
 class BookPropertyChangeEvent(source: Object, propertyName: String, oldValue: Object, newValue: Object, val field: BookField) extends PropertyChangeEvent(source, propertyName, oldValue, newValue)
 
 object Book {
-  def apply(fields: List[(BookField, String)]): Book = new Book(Map(fields: _*))
+  def apply(fields: List[(BookField, String)]): Book = new Book(scala.collection.mutable.Map(fields: _*)) //TODO delete mutable
 
   def empty(fields: List[BookField]): Book = Book(fields.map((_, EMPTY_STRING)))
 
@@ -42,8 +38,8 @@ object Book {
 
 // TODO: make it immutable. remove the binding framework
 class Book private (
-  private val fields: Map[BookField, String]        = Map(),
-  private val images: Map[BookField, BufferedImage] = Map()) extends Model {
+  private val fields: scala.collection.mutable.Map[BookField, String]        = scala.collection.mutable.Map(),
+  private val images: scala.collection.mutable.Map[BookField, BufferedImage] = scala.collection.mutable.Map()) extends Model {
 
   def setValue(field: BookField)(value: String) = { //FIXME make it immutable
     val oldValue: String = getValue(field)
@@ -56,6 +52,7 @@ class Book private (
 
   def setImage(field: BookField)(image: BufferedImage) = images.put(field, image)
   def getImage(field: BookField) = images.get(field)
+  def getValues: Map[BookField, String] = fields.toMap
 
   override def toString(): String = fields.mkString(" - ")
 

@@ -41,6 +41,7 @@ import eu.eyan.util.scala.TryCatch
 import eu.eyan.util.scala.TryCatchThrowable
 import java.awt.image.BufferedImage
 import java.awt.image.RenderedImage
+import eu.eyan.idakonyvtar.model.BookField
 
 class LibraryEditor(val library: Library) extends WithComponent {
   override def toString = s"LibraryController[file=${library.file}, nrOfBooks=${numberOfBooks.get}, isBookSelected=${isBookSelected.get}]"
@@ -117,10 +118,9 @@ class LibraryEditor(val library: Library) extends WithComponent {
     val bookController = BookEditor.editWithIsbn(book, library.getColumns, books.getList.toList, file)
 
     val output = DialogHelper.yesNoEditor(component, bookController.getComponent, texts.NewBookWindowTitle, texts.NewBookSaveButton, texts.NewBookCancelButton)
-    
 
     if (output) {
-    	val result = bookController.getResult 
+      val result = bookController.getResult
       saveImages(book)
       books.getList.add(0, book)
       savePreviousBook(book)
@@ -154,6 +154,7 @@ class LibraryEditor(val library: Library) extends WithComponent {
   }
 
   private def loadImages(book: Book) = {
+	  def isFieldPictureToLoad(pair: (BookField, String)) = pair match { case (field, value) => field.isPicture && value != EMPTY_STRING }
     for {
       //TODO spagetti: library.getPictureColumns
       field <- library.getColumns
@@ -161,13 +162,15 @@ class LibraryEditor(val library: Library) extends WithComponent {
       if (book.getValue(field) != EMPTY_STRING)
     } book.setImage(field)(loadImage(book.getValue(field)))
   }
-  
-  private def saveImages(book: Book) = for {
-    //TODO spagetti: library.getPictureColumns
-    field <- library.getColumns
-    if field.isPicture
-    if (book.getValue(field) == EMPTY_STRING)
-  } book.getImage(field).map(saveImageIntoNewFile).foreach(book.setValue(field))
+
+  private def saveImages(book: Book): Book = {
+	  def saveImage(pair: (BookField, String)) = pair match { case (field, value) => (field, book.getImage(field).map(saveImageIntoNewFile).get) }
+	  def isFieldPictureToSave(pair: (BookField, String)) = pair match { case (field, value) => field.isPicture && value == EMPTY_STRING && book.getImage(field).nonEmpty}
+    val imageFieldsToSave = book.getValues filter isFieldPictureToSave
+    val newImageNames = imageFieldsToSave map saveImage
+    val updatedFields = book.getValues ++ newImageNames
+    Book(updatedFields.toList)
+  }
 
   private def loadImage(imgName: String) = {
     val dir = file.getParentFile
@@ -184,12 +187,12 @@ class LibraryEditor(val library: Library) extends WithComponent {
     imageFile.getName
   }
 
-  private def savePreviousBook(book: Book) = library.fieldsToRemember.foreach(field => previousBook.setValue(field)(book.getValue(field)))
+  private def savePreviousBook(book: Book) = library.fieldsToRemember.foreach(field => previousBook.setValue(field)(book.getValue(field))) // FIXME dont use setValue
 
   private def newPreviousBook: Book = {
     val newBook = library.createEmptyBook
     library.fieldsToRemember.foreach(field => {
-      newBook.setValue(field)(previousBook.getValue(field))
+      newBook.setValue(field)(previousBook.getValue(field)) // FIXME dont use setValue
       Log.info("Remembering col " + field + " val:" + previousBook.getValue(field))
     })
     newBook

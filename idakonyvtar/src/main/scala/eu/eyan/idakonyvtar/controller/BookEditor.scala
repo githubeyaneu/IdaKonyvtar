@@ -33,6 +33,8 @@ import javax.swing.ImageIcon
 import javax.swing.JLabel
 import javax.swing.JOptionPane
 import javax.swing.JTextField
+import eu.eyan.util.swing.JComponentPlus.JComponentImplicit
+import javax.swing.JComponent
 
 object BookEditor {
   def listForAutocomplete(bookList: Seq[Book], field: BookField) = bookList
@@ -57,7 +59,7 @@ object BookEditor {
     fields:     List[BookField],
     bookList:   List[Book],
     loadedFile: File) = new BookEditor(book, fields, bookList, NO_ISBN, loadedFile)
-  
+
   private def getMultiFieldValues(value: String) = value.split(MULTIFIELS_SEPARATOR_REGEX).filter(!_.isEmpty())
   private def encodeMultiFieldValues(values: TraversableOnce[String]) = values.mkString(MULTIFIELD_SEPARATOR)
 }
@@ -77,7 +79,6 @@ class BookEditor private (
   def getResult = createResult
 
   private val TEXTFIELD_DEFAULT_SIZE = 20
-  private val editors: MutableList[Component] = MutableList() // FIXME: delete afterwards
   private val isbnSearchLabel = new JLabel()
   private val isbnText = new JTextField()
   private val webcamPanel = new JPanelWithFrameLayout
@@ -106,8 +107,11 @@ class BookEditor private (
 
   fieldsPanel.newRow.span.addSeparatorWithTitle("Adatok")
 
-  case class BookFieldEditor(val component: Component, valueGetter: () => String) {
+  case class BookFieldEditor(val field: BookField, val component: JComponent, valueGetter: () => String, valueSetter: String => Unit) {
     def getValue: String = valueGetter()
+    def setValue(value: String) = valueSetter(value)
+    def enable = component.enabled
+    def disable = component.disabled
   }
 
   val fieldEditors = for { fieldIndex <- 0 until fields.size } yield {
@@ -139,84 +143,79 @@ class BookEditor private (
         })
 
         textField.setText(value)
-        BookFieldEditor(imgNameAndBtn, textField.getText)
+        BookFieldEditor(field, imgNameAndBtn, textField.getText, textField.setText)
       } else {
         if (isAutocompleteField) {
           if (isMultiEditorField) {
             val multiAutocomplete = new MultiFieldAutocomplete(field.fieldName, "Autocomplete", "Nincs találat").setAutoCompleteList(BookEditor.listForAutocomplete(bookList, field))
             multiAutocomplete.setValues(BookEditor.getMultiFieldValues(value))
-            BookFieldEditor(multiAutocomplete, () => BookEditor.encodeMultiFieldValues(multiAutocomplete.getValues))
+            BookFieldEditor(field, multiAutocomplete, () => BookEditor.encodeMultiFieldValues(multiAutocomplete.getValues), value => multiAutocomplete.setValues(Array(value)))
           } else {
             val autocompleteEditor = new JTextFieldAutocomplete().setHintText("Autocomplete").setAutocompleteList(BookEditor.listForAutocomplete(bookList, field))
             autocompleteEditor.setText(value)
-            BookFieldEditor(autocompleteEditor, () => autocompleteEditor.getText)
+            BookFieldEditor(field, autocompleteEditor, autocompleteEditor.getText, autocompleteEditor.setText)
           }
         } else {
           if (isMultiEditorField) {
             val multiEditor = new MultiFieldJTextField(field.fieldName)
             multiEditor.setValues(BookEditor.getMultiFieldValues(value))
-            BookFieldEditor(multiEditor, () => BookEditor.encodeMultiFieldValues(multiEditor.getValues))
+            BookFieldEditor(field, multiEditor, () => BookEditor.encodeMultiFieldValues(multiEditor.getValues), value => multiEditor.setValues(Array(value)))
           } else {
             val textField = new JTextField(TEXTFIELD_DEFAULT_SIZE)
             textField.setText(value)
-            BookFieldEditor(textField, () => textField.getText)
+            BookFieldEditor(field, textField, textField.getText, textField.setText)
           }
         }
       }
 
     editor.component.setName(field.fieldName)
     fieldsPanel.nextColumn.add(editor.component)
-    editors += editor.component
-    field -> editor
+    //    editors += editor.component
+    editor
   }
 
   private def createResult = {
-    def getEditorResult(fieldAndEditor: (BookField, BookFieldEditor)): (BookField, String) = {
-      val field = fieldAndEditor._1
-      val editor = fieldAndEditor._2
-      field -> editor.getValue
-    }
+    def getEditorResult(fieldAndEditor: BookFieldEditor): (BookField, String) = fieldAndEditor.field -> fieldAndEditor.getValue
     val fieldsAndValues = fieldEditors.toList map getEditorResult
     Book(fieldsAndValues)
   }
 
   private def isbnSearch() = {
-    isbnText.selectAll()
-    isbnSearchLabel.setText("Keresés")
-    isbnSearchLabel.setIcon(new ImageIcon(Resources.getResource("icons/search.gif")))
-    editors.foreach(_.setEnabled(false))
+    isbnText.selectAll
+    isbnSearchLabel.setText("Keresés") // TODO
+    isbnSearchLabel.setIcon(new ImageIcon(Resources.getResource("icons/search.gif"))) //TODO
+    fieldEditors.foreach(_.disable)
 
     SwingPlus.invokeLater {
-      {
-        try {
-          val marcsToIsbn = OszkKereso.getMarcsToIsbn(isbnText.getText().replaceAll("ö", "0"))
-          prozessIsbnData(marcsToIsbn)
-        } catch {
-          case e: OszkKeresoException =>
-            Log.error(e)
-            isbnSearchLabel.setText("Nincs találat")
-            isbnSearchLabel.setIcon(new ImageIcon(Resources.getResource("icons/error.gif")))
-        } finally {
-          editors.foreach(_.setEnabled(true))
-        }
+      try {
+        val marcsToIsbn = OszkKereso.getMarcsToIsbn(isbnText.getText.replaceAll("ö", "0"))
+        prozessIsbnData(marcsToIsbn)
+      } catch {
+        case e: OszkKeresoException =>
+          Log.error(e)
+          isbnSearchLabel.setText("Nincs találat") // TODO
+          isbnSearchLabel.setIcon(new ImageIcon(Resources.getResource("icons/error.gif"))) // TODO
+      } finally {
+        fieldEditors.foreach(_.enable)
       }
     }
   }
 
   private def prozessIsbnData(marcsFromOszk: List[Marc]) =
-    fields.foreach(field => {
+    fieldEditors.foreach(fieldEditor => {
       try {
-        val marcCodesFromColumns = field.marcCodes
+        val fieldMarcCodes = fieldEditor.field.marcCodes
         val values = for {
           marcFromOszk <- marcsFromOszk
-          marcFromColumn <- marcCodesFromColumns if (isMarcsApply(marcFromOszk, marcFromColumn))
+          fieldMarcCode <- fieldMarcCodes
+          if (isMarcsApply(marcFromOszk, fieldMarcCode))
         } yield marcFromOszk.value
         Log.info("BookController.prozessIsbnData " + values.mkString("\r\n    "))
-        book.setValue(field)(values.mkString(", "))
+        fieldEditor.setValue(values.mkString(", "))
       } catch {
         case e: Exception =>
           e.printStackTrace()
-          JOptionPane.showMessageDialog(null, e.getLocalizedMessage())
+          JOptionPane.showMessageDialog(null, e.getLocalizedMessage()) // TODO
       }
     })
 
