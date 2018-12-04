@@ -42,19 +42,19 @@ class BookEditorIsbnTest extends AbstractUiTest {
     val columns: List[String] =
       List("szimpla", "ac", "mm", "mmac", "cim")
     val book: Book =
-      new BookBuilder(columns.size).withValue(0, "Érték1").build()
+      new BookBuilder(columns.size).withValue(0, "Érték1").build
     val bookList: List[Book] = List(
       book,
       new BookBuilder(columns.size)
         .withValue(0, "Érték2")
         .withValue(1, "abc")
         .withValue(3, "abc")
-        .build(),
+        .build,
       new BookBuilder(columns.size)
         .withValue(0, "Érték2")
         .withValue(1, "abd")
         .withValue(3, "abd")
-        .build())
+        .build)
 
     val fields = List(
       BookField(ExcelColumn(0), "szimpla", List(), Array()),

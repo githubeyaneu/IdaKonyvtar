@@ -22,6 +22,7 @@ import eu.eyan.testutil.video.VideoRunner
 import eu.eyan.util.excel.ExcelColumn
 import eu.eyan.util.text.Text
 import javax.swing.SwingUtilities
+import scala.collection.mutable.Map
 
 object BookEditorTest {
   def main(args: Array[String]): Unit = {
@@ -33,14 +34,15 @@ object BookEditorTest {
 class BookBuilder(columnCount: Int) {
   val fields = (0 until columnCount).toSeq.map(c => BookField(ExcelColumn(c), "", List(), Array())).toList
   val book = Book.empty(fields)
+  val fieldsAndValues = Map[BookField, String]()
 
   def withValue(columnIndex: Int, value: String): BookBuilder = {
     Log.debug(columnIndex + " " + value)
-    book.setValue(fields(columnIndex))(value)
+    fieldsAndValues.put(fields(columnIndex), value)
     this
   }
 
-  def build(): Book = book
+  def build: Book = Book( (book.getValues ++ fieldsAndValues).toList)
 }
 
 class BookEditorTest extends AbstractUiTest {
@@ -56,7 +58,7 @@ class BookEditorTest extends AbstractUiTest {
     BookField(ExcelColumn(3), "mmac", List(Multifield, Autocomplete), Array()),
     BookField(ExcelColumn(4), "cim", List(), Array(new Marc("245", "10", "a", ""))))
 
-  private val inputBook: Book = new BookBuilder(5).withValue(0, "Érték1").build()
+  private val inputBook: Book = new BookBuilder(5).withValue(0, "Érték1").build
 
   private def outputBook = bookController.getResult
 
@@ -69,12 +71,12 @@ class BookEditorTest extends AbstractUiTest {
         .withValue(0, "Érték2")
         .withValue(1, "abc")
         .withValue(3, "abc")
-        .build(),
+        .build,
       new BookBuilder(5)
         .withValue(0, "Érték2")
         .withValue(1, "abd")
         .withValue(3, "abd")
-        .build())
+        .build)
     bookController = BookEditor.editBookWithoutIsbn(inputBook, fields, bookList, null)
     SwingUtilities.invokeLater(() =>
       DialogHelper.yesNoEditor(null, bookController.getComponent, new Text("title"), new Text("save"), new Text("cancel")))

@@ -59,7 +59,7 @@ class LibraryEditor(val library: Library) extends WithComponent {
 
   private val texts = IdaLibrary.texts
   private val books = new SelectionInList[Book]()
-  private val previousBook = library.createEmptyBook
+  private var previousBook = library.createEmptyBook
 
   private val numberOfBooks = BehaviorSubject(books.getList.size)
   private val hasBooks = numberOfBooks.distinctUntilChanged.map(_ > 0)
@@ -113,17 +113,15 @@ class LibraryEditor(val library: Library) extends WithComponent {
   }
 
   private def createNewBookInDialog = {
-    val book = newPreviousBook
-
-    val bookController = BookEditor.editWithIsbn(book, library.getColumns, books.getList.toList, file)
+    val bookController = BookEditor.editWithIsbn(previousBook, library.getColumns, books.getList.toList, file)
 
     val output = DialogHelper.yesNoEditor(component, bookController.getComponent, texts.NewBookWindowTitle, texts.NewBookSaveButton, texts.NewBookCancelButton)
 
     if (output) {
-      val result = bookController.getResult
-      saveImages(book)
-      books.getList.add(0, book)
-      savePreviousBook(book)
+      val newBook = bookController.getResult
+      saveImages(newBook)
+      books.getList.add(0, newBook)
+      savePreviousBook(newBook)
       books.fireIntervalAdded(0, 0)
       dirty
     }
@@ -132,35 +130,32 @@ class LibraryEditor(val library: Library) extends WithComponent {
   private def editBook = {
     val selectedBookIndex = bookTable.getSelectedIndex
 
-    val book = Book.copy(books.getList.get(selectedBookIndex))
+    val originalBook = books.getList.get(selectedBookIndex)
 
     //TODO spagetti and refaactor the columns...
-    loadImages(book)
+    val pictures = loadPictures(originalBook)
+    val originalBookWithPictures = originalBook.withPictures(pictures)
 
-    val bookController = BookEditor.editBookWithoutIsbn(book, library.getColumns, books.getList.toList, file)
+    val bookController = BookEditor.editBookWithoutIsbn(originalBookWithPictures, library.getColumns, books.getList.toList, file)
 
     val titleFieldName = texts.ConfigTitleFieldName
     val titleField = titleFieldName.map(library.fieldToName)
-    val bookTitle = titleField.map(_.map(field => book.getValue(field)).getOrElse(EMPTY_STRING))
+    val bookTitle = titleField.map(_.map(field => originalBookWithPictures.getValue(field)).getOrElse(EMPTY_STRING))
 
     val output = DialogHelper.yesNoEditor(component, bookController.getComponent, texts.EditBookWindowTitle(bookTitle), texts.EditBookSaveButton, texts.EditBookCancelButton)
 
     if (output) {
-      saveImages(book)
-      books.getList.set(selectedBookIndex, book)
+      val editedBook = bookController.getResult
+      saveImages(editedBook)
+      books.getList.set(selectedBookIndex, editedBook)
       books.fireSelectedContentsChanged
       dirty
     }
   }
 
-  private def loadImages(book: Book) = {
+  private def loadPictures(book: Book) = {
 	  def isFieldPictureToLoad(pair: (BookField, String)) = pair match { case (field, value) => field.isPicture && value != EMPTY_STRING }
-    for {
-      //TODO spagetti: library.getPictureColumns
-      field <- library.getColumns
-      if field.isPicture
-      if (book.getValue(field) != EMPTY_STRING)
-    } book.setImage(field)(loadImage(book.getValue(field)))
+	  book.getValues.filter(isFieldPictureToLoad).mapValues(loadImage)
   }
 
   private def saveImages(book: Book): Book = {
@@ -187,14 +182,10 @@ class LibraryEditor(val library: Library) extends WithComponent {
     imageFile.getName
   }
 
-  private def savePreviousBook(book: Book) = library.fieldsToRemember.foreach(field => previousBook.setValue(field)(book.getValue(field))) // FIXME dont use setValue
-
-  private def newPreviousBook: Book = {
-    val newBook = library.createEmptyBook
-    library.fieldsToRemember.foreach(field => {
-      newBook.setValue(field)(previousBook.getValue(field)) // FIXME dont use setValue
-      Log.info("Remembering col " + field + " val:" + previousBook.getValue(field))
-    })
-    newBook
+  private def savePreviousBook(book: Book) = {
+    def isFieldToRemember(pair: (BookField, String)) = pair match { case (field, value) => field.isRemember}
+    val fieldsToRemember = book.getValues filter isFieldToRemember
+    val updatedFields = previousBook.getValues ++ fieldsToRemember
+    previousBook = Book(updatedFields.toList)
   }
 }

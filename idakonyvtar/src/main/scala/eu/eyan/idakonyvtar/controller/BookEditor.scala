@@ -35,6 +35,7 @@ import javax.swing.JOptionPane
 import javax.swing.JTextField
 import eu.eyan.util.swing.JComponentPlus.JComponentImplicit
 import javax.swing.JComponent
+import java.awt.image.BufferedImage
 
 object BookEditor {
   def listForAutocomplete(bookList: Seq[Book], field: BookField) = bookList
@@ -107,8 +108,9 @@ class BookEditor private (
 
   fieldsPanel.newRow.span.addSeparatorWithTitle("Adatok")
 
-  case class BookFieldEditor(val field: BookField, val component: JComponent, valueGetter: () => String, valueSetter: String => Unit) {
-    def getValue: String = valueGetter()
+  case class BookFieldEditor(val field: BookField, val component: JComponent, valueGetter: () => String, valueSetter: String => Unit, imageGetter: () => BufferedImage = () => null) {
+    def getValue = valueGetter()
+		def getImage = imageGetter()
     def setValue(value: String) = valueSetter(value)
     def enable = component.enabled
     def disable = component.disabled
@@ -134,16 +136,20 @@ class BookEditor private (
         val textField = imgNameAndBtn.newColumn.addTextField("", TEXTFIELD_DEFAULT_SIZE).name("picturePath")
         val button = imgNameAndBtn.newColumn.addButton("katt").name("click")
 
-        def refreshImage = imageLabel.setIcon(new ImageIcon(book.getImage(field).get.getScaledInstance(320, 240, Image.SCALE_DEFAULT)))
-        if (book.getImage(field).nonEmpty) refreshImage
+        var picture: BufferedImage = null
+        def setImage(image: BufferedImage) = {
+          picture = image
+          imageLabel.setIcon(new ImageIcon(image.getScaledInstance(320, 240, Image.SCALE_DEFAULT)))
+        }
+        book.getImage(field).foreach(setImage)
         button.onClicked({
-          book.setImage(field)(WebCam.getImage)
-          textField.setText("") //book.setValue(field)("")
-          refreshImage
+          textField.setText("");
+          val image = WebCam.getImage
+          setImage(image)
         })
 
         textField.setText(value)
-        BookFieldEditor(field, imgNameAndBtn, textField.getText, textField.setText)
+        BookFieldEditor(field, imgNameAndBtn, textField.getText, textField.setText, () => picture)
       } else {
         if (isAutocompleteField) {
           if (isMultiEditorField) {
@@ -170,14 +176,15 @@ class BookEditor private (
 
     editor.component.setName(field.fieldName)
     fieldsPanel.nextColumn.add(editor.component)
-    //    editors += editor.component
     editor
   }
 
   private def createResult = {
     def getEditorResult(fieldAndEditor: BookFieldEditor): (BookField, String) = fieldAndEditor.field -> fieldAndEditor.getValue
+		def getEditorImage(fieldAndEditor: BookFieldEditor): (BookField, BufferedImage) = fieldAndEditor.field -> fieldAndEditor.getImage
     val fieldsAndValues = fieldEditors.toList map getEditorResult
-    Book(fieldsAndValues)
+    val fieldsAndPictures = fieldEditors.toList map getEditorImage
+    Book(fieldsAndValues).withPictures(fieldsAndPictures.toMap.filter(_._2!=null))
   }
 
   private def isbnSearch() = {

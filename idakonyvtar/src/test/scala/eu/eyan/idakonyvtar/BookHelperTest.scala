@@ -16,7 +16,7 @@ import eu.eyan.util.excel.ExcelColumn
 @RunWith(classOf[ScalaEclipseJunitRunner])
 class BookHelperTest {
   val TWO = 2
-  val bookA = new BookBuilder(TWO).withValue(0, "A0").withValue(1, "A1").build()
+  val bookA = new BookBuilder(TWO).withValue(0, "A0").withValue(1, "A1").build
 
   @Test
   def speedColumnList = {
