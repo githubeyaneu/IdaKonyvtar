@@ -63,7 +63,7 @@ class TextsIda extends Texts {
     private val translated = language map translateText
     private val validTranslationObs = translated map optionGetOrElse(noTranslation(technicalName))
 
-    validTranslationObs subscribe templateObservable
+    validTranslationObs subscribe setTemplate _
   }
 
   case object IdaLibraryTitleSingular extends IdaText("IdaLibraryTitleSingular")

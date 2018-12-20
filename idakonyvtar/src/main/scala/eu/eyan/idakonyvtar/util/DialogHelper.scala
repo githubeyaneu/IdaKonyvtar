@@ -85,7 +85,7 @@ object DialogHelper {
 
   def yesNo(parent: Component, texts: TextsDialogYesNo): Boolean = yesNo(parent, texts.text, texts.title, texts.yes, texts.no)
   def yesNo(parent: Component, question: Text, dialogTitle: Text, yes: Text, no: Text) =
-    Text.combineAndExecute("question" -> question, "title" -> dialogTitle, "yes" -> yes, "no" -> no)(texts =>
+    Text.combineMoreTextsWithNamesAndExecute("question" -> question, "title" -> dialogTitle, "yes" -> yes, "no" -> no)(texts =>
       JOptionPane.showOptionDialog(
         parent,
         texts("question"),
@@ -103,7 +103,7 @@ object DialogHelper {
 
   def yesNoCancel(parent: Component, texts: TextsDialogYesNoCancel): DialogResult = yesNoCancel(parent, texts.text, texts.title, texts.yes, texts.no, texts.cancel)
   def yesNoCancel(parent: Component, text: Text, title: Text, yes: Text, no: Text, cancel: Text): DialogResult =
-    Text.combineAndExecute("question" -> text, "title" -> title, "yes" -> yes, "no" -> no, "cancel" -> cancel)(texts => {
+    Text.combineMoreTextsWithNamesAndExecute("question" -> text, "title" -> title, "yes" -> yes, "no" -> no, "cancel" -> cancel)(texts => {
       val result = JOptionPane.showOptionDialog(
         parent,
         texts("question"),
