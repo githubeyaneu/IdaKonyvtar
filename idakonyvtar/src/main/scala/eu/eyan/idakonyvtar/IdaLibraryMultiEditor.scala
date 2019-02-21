@@ -80,7 +80,7 @@ class IdaLibraryMultiEditor extends WithComponent {
 
   private def saveLibrary(library: LibraryEditor) = library saveLibrary
 
-  private def loadLibraries(fileList: Array[String]): Unit = fileList.map(_.asFile).filter(_.exists).foreach(loadLibraryFromFile)
+  private def loadLibraries(fileList: List[String]): Unit = fileList.map(_.asFile).filter(_.exists).foreach(loadLibraryFromFile)
 
   private def loadFileAndRememberDir(selectedFile: File) = {
     Log.info("selected file: " + selectedFile)
