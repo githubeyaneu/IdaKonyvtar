@@ -20,8 +20,6 @@ import eu.eyan.idakonyvtar.text.TechnicalTextsIda.ISBN_TEXT
 import eu.eyan.idakonyvtar.text.TechnicalTextsIda.MULTIFIELD_SEPARATOR
 import eu.eyan.idakonyvtar.text.TechnicalTextsIda.MULTIFIELS_SEPARATOR_REGEX
 import eu.eyan.idakonyvtar.util.WebCam
-import eu.eyan.idakonyvtar.view.MultiFieldAutocomplete
-import eu.eyan.idakonyvtar.view.MultiFieldJTextField
 import eu.eyan.log.Log
 import eu.eyan.util.swing.JButtonPlus.JButtonImplicit
 import eu.eyan.util.swing.JLabelPlus.JLabelImplicit
@@ -36,12 +34,14 @@ import javax.swing.JTextField
 import eu.eyan.util.swing.JComponentPlus.JComponentImplicit
 import javax.swing.JComponent
 import java.awt.image.BufferedImage
+import eu.eyan.util.swing.MultiFieldAutocomplete
+import eu.eyan.util.swing.MultiFieldJTextField
 
 object BookEditor {
   def listForAutocomplete(bookList: Seq[Book], field: BookField) = bookList
     .map(_.getValue(field)) // get the values of the column
     .filter(_ != null) // only not nulls
-    .map(s => if (s.contains(MULTIFIELD_SEPARATOR)) getMultiFieldValues(s) else Array(s)) // get all values if multifield
+    .map(s => if (s.contains(MULTIFIELD_SEPARATOR)) getMultiFieldValues(s) else List(s)) // get all values if multifield
     .flatten // take the whole list
     .++:(List("")) // empty is always the default option
     .map(_.trim)
@@ -61,7 +61,7 @@ object BookEditor {
     bookList:   List[Book],
     loadedFile: File) = new BookEditor(book, fields, bookList, NO_ISBN, loadedFile)
 
-  private def getMultiFieldValues(value: String) = value.split(MULTIFIELS_SEPARATOR_REGEX).filter(!_.isEmpty())
+  private def getMultiFieldValues(value: String) = value.split(MULTIFIELS_SEPARATOR_REGEX).filter(!_.isEmpty()).toList
   private def encodeMultiFieldValues(values: TraversableOnce[String]) = values.mkString(MULTIFIELD_SEPARATOR)
 }
 
@@ -155,7 +155,7 @@ class BookEditor private (
           if (isMultiEditorField) {
             val multiAutocomplete = new MultiFieldAutocomplete(field.fieldName, "Autocomplete", "Nincs találat").setAutoCompleteList(BookEditor.listForAutocomplete(bookList, field))
             multiAutocomplete.setValues(BookEditor.getMultiFieldValues(value))
-            BookFieldEditor(field, multiAutocomplete, () => BookEditor.encodeMultiFieldValues(multiAutocomplete.getValues), value => multiAutocomplete.setValues(Array(value)))
+            BookFieldEditor(field, multiAutocomplete, () => BookEditor.encodeMultiFieldValues(multiAutocomplete.getValues), value => multiAutocomplete.setValues(List(value)))
           } else {
             val autocompleteEditor = new JTextFieldAutocomplete().setHintText("Autocomplete").setAutocompleteList(BookEditor.listForAutocomplete(bookList, field))
             autocompleteEditor.setText(value)
@@ -165,7 +165,7 @@ class BookEditor private (
           if (isMultiEditorField) {
             val multiEditor = new MultiFieldJTextField(field.fieldName)
             multiEditor.setValues(BookEditor.getMultiFieldValues(value))
-            BookFieldEditor(field, multiEditor, () => BookEditor.encodeMultiFieldValues(multiEditor.getValues), value => multiEditor.setValues(Array(value)))
+            BookFieldEditor(field, multiEditor, () => BookEditor.encodeMultiFieldValues(multiEditor.getValues), value => multiEditor.setValues(List(value)))
           } else {
             val textField = new JTextField(TEXTFIELD_DEFAULT_SIZE)
             textField.setText(value)
