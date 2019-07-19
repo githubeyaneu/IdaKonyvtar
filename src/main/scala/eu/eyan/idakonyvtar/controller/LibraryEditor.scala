@@ -1,47 +1,27 @@
 package eu.eyan.idakonyvtar.controller
 
-import java.awt.Component
+import java.awt.image.RenderedImage
 import java.io.File
 
-import scala.collection.JavaConversions.asScalaBuffer
-
 import com.jgoodies.binding.list.SelectionInList
-
-import eu.eyan.idakonyvtar.model.Book
-import eu.eyan.idakonyvtar.text.TechnicalTextsIda.ERROR_AT_READING_LIBRARY
-import eu.eyan.idakonyvtar.text.TextsIda
-import eu.eyan.idakonyvtar.util.DialogHelper
-import eu.eyan.idakonyvtar.util.LibraryExcelHandler
-import eu.eyan.idakonyvtar.util.LibraryException
+import eu.eyan.idakonyvtar.IdaLibrary
+import eu.eyan.idakonyvtar.model.{Book, BookField, Library}
+import eu.eyan.idakonyvtar.text.TechnicalTextsIda._
+import eu.eyan.idakonyvtar.util.{DialogHelper, LibraryExcelHandler}
 import eu.eyan.idakonyvtar.view.BookTable
 import eu.eyan.log.Log
 import eu.eyan.util.io.FilePlus.FilePlusImplicit
 import eu.eyan.util.jgoodies.SelectionInListPlus.SelectionInListImplicit
-import eu.eyan.util.rx.lang.scala.subjects.BehaviorSubjectPlus.BehaviorSubjectImplicit
-import eu.eyan.util.scala.Try
-import eu.eyan.util.string.StringPlus.StringPlusImplicit
-import eu.eyan.util.swing.JPanelWithFrameLayout
-import eu.eyan.util.swing.WithComponent
-import javax.imageio.ImageIO
-import javax.swing.JOptionPane
-import rx.lang.scala.subjects.BehaviorSubject
-import com.jgoodies.binding.adapter.AbstractTableAdapter
-import javax.swing.ListModel
-import eu.eyan.idakonyvtar.model.Library
-import eu.eyan.util.swing.TableCol
-import eu.eyan.util.swing.TableRow
-import rx.lang.scala.Observable
-import eu.eyan.util.rx.lang.scala.ObservablePlus
-import eu.eyan.util.text.Texts
-import eu.eyan.util.text.Text
-import eu.eyan.idakonyvtar.IdaLibrary
-import eu.eyan.idakonyvtar.text.TechnicalTextsIda._
 import eu.eyan.util.rx.lang.scala.ObservablePlus.ObservableImplicitBoolean
-import eu.eyan.util.scala.TryCatch
-import eu.eyan.util.scala.TryCatchThrowable
-import java.awt.image.BufferedImage
-import java.awt.image.RenderedImage
-import eu.eyan.idakonyvtar.model.BookField
+import eu.eyan.util.rx.lang.scala.subjects.BehaviorSubjectPlus.BehaviorSubjectImplicit
+import eu.eyan.util.scala.{TryCatch, TryCatchThrowable}
+import eu.eyan.util.string.StringPlus.StringPlusImplicit
+import eu.eyan.util.swing.{JPanelWithFrameLayout, TableCol, TableRow, WithComponent}
+import javax.imageio.ImageIO
+import rx.lang.scala.subjects.BehaviorSubject
+
+import scala.collection.JavaConverters._
+
 
 class LibraryEditor(val library: Library) extends WithComponent {
   override def toString = s"LibraryController[file=${library.file}, nrOfBooks=${numberOfBooks.get}, isBookSelected=${isBookSelected.get}]"
@@ -108,12 +88,12 @@ class LibraryEditor(val library: Library) extends WithComponent {
     Log.info("SaveAs " + file)
     def confirmOverwrite = DialogHelper.yesNo(null, texts.SaveAsOverwriteConfirmText(newFile), texts.SaveAsOverwriteConfirmWindowTitle, texts.SaveAsOverwriteYes, texts.SaveAsOverwriteNo)
     TryCatchThrowable(
-      ((newFile.notExists || confirmOverwrite) && LibraryExcelHandler.saveLibrary(newFile, library)),
+      (newFile.notExists || confirmOverwrite) && LibraryExcelHandler.saveLibrary(newFile, library),
       e => { Log.error(e); DialogHelper.yes(texts.SaveErrorTexts); false })
   }
 
   private def createNewBookInDialog = {
-    val bookController = BookEditor.editWithIsbn(previousBook, library.getColumns, books.getList.toList, file)
+    val bookController = BookEditor.editWithIsbn(previousBook, library.getColumns, books.getList.asScala.toList, file)
 
     val output = DialogHelper.yesNoEditor(component, bookController.getComponent, texts.NewBookWindowTitle, texts.NewBookSaveButton, texts.NewBookCancelButton)
 
@@ -136,7 +116,7 @@ class LibraryEditor(val library: Library) extends WithComponent {
     val pictures = loadPictures(originalBook)
     val originalBookWithPictures = originalBook.withPictures(pictures)
 
-    val bookController = BookEditor.editBookWithoutIsbn(originalBookWithPictures, library.getColumns, books.getList.toList, file)
+    val bookController = BookEditor.editBookWithoutIsbn(originalBookWithPictures, library.getColumns, books.getList.asScala.toList, file)
 
     val titleFieldName = texts.ConfigTitleFieldName
     val titleField = titleFieldName.map(library.fieldToName)
@@ -159,7 +139,7 @@ class LibraryEditor(val library: Library) extends WithComponent {
   }
 
   private def saveImages(book: Book): Book = {
-	  def saveImage(pair: (BookField, String)) = pair match { case (field, value) => (field, book.getImage(field).map(saveImageIntoNewFile).get) }
+	  def saveImage(pair: (BookField, String)) = pair match { case (field, _) => (field, book.getImage(field).map(saveImageIntoNewFile).get) }
 	  def isFieldPictureToSave(pair: (BookField, String)) = pair match { case (field, value) => field.isPicture && value == EMPTY_STRING && book.getImage(field).nonEmpty}
     val imageFieldsToSave = book.getValues filter isFieldPictureToSave
     val newImageNames = imageFieldsToSave map saveImage
@@ -168,7 +148,6 @@ class LibraryEditor(val library: Library) extends WithComponent {
   }
 
   private def loadImage(imgName: String) = {
-    val dir = file.getParentFile
     val imagesDir = (file.getAbsolutePath + ".images").asDir
     val imageFile = (imagesDir.getAbsolutePath + "\\" + imgName).asFile
     val image = ImageIO.read(imageFile)
@@ -183,7 +162,7 @@ class LibraryEditor(val library: Library) extends WithComponent {
   }
 
   private def savePreviousBook(book: Book) = {
-    def isFieldToRemember(pair: (BookField, String)) = pair match { case (field, value) => field.isRemember}
+    def isFieldToRemember(pair: (BookField, String)) = pair match { case (field, _) => field.isRemember}
     val fieldsToRemember = book.getValues filter isFieldToRemember
     val updatedFields = previousBook.getValues ++ fieldsToRemember
     previousBook = Book(updatedFields.toList)

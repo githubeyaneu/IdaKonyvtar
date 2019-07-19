@@ -1,37 +1,13 @@
-package eu.eyan.idakonyvtar.view;
-
-import java.awt.Color
-import java.awt.Graphics
-import java.awt.Graphics2D
-
-import org.jdesktop.swingx.JXTable
+package eu.eyan.idakonyvtar.view
 
 import com.jgoodies.binding.adapter.SingleListSelectionAdapter
 import com.jgoodies.binding.list.SelectionInList
-
 import eu.eyan.idakonyvtar.IdaLibrary
-import eu.eyan.log.Log
-import eu.eyan.util.swing.HighlightRenderer
-import eu.eyan.util.swing.JComponentPlus.JComponentImplicit
-import eu.eyan.util.swing.JTablePlus.JTableImplicit
-import eu.eyan.util.swing.SpecialCharacterRowFilter
-import eu.eyan.util.swing.WithComponent
-import javax.swing.JScrollPane
-import javax.swing.ListSelectionModel
-import javax.swing.table.TableModel
-import com.jgoodies.binding.adapter.AbstractTableAdapter
-import eu.eyan.idakonyvtar.model.Book
-import eu.eyan.util.registry.RegistryValue
-import rx.lang.scala.Observable
-import rx.lang.scala.subjects.BehaviorSubject
-import eu.eyan.util.rx.lang.scala.ObservablePlus.ObservableImplicit
-import eu.eyan.util.awt.Graphics2DPlus.Graphics2DImplicit
-import eu.eyan.util.swing.JXTableWithEmptyText
-import eu.eyan.util.swing.JTableModelPlus
-import javax.swing.ListModel
-import eu.eyan.util.swing.TableRow
-import eu.eyan.util.swing.TableCol
 import eu.eyan.idakonyvtar.model.BookField
+import eu.eyan.util.swing.JTablePlus.JTableImplicit
+import eu.eyan.util.swing._
+import javax.swing.{JScrollPane, ListModel, ListSelectionModel}
+import rx.lang.scala.Observable
 
 class BookTable(
     private val nameOfLibrary: String, 

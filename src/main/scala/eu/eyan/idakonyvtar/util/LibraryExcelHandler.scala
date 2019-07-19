@@ -1,38 +1,21 @@
-package eu.eyan.idakonyvtar.util;
+package eu.eyan.idakonyvtar.util
 
-import java.io.File
-import java.io.IOException
-import java.io.InputStream
-import java.nio.charset.Charset
+import java.io.{File, IOException}
 
-import scala.collection.mutable.ListBuffer
-
-import org.apache.commons.io.FileUtils
-import org.apache.commons.io.FilenameUtils
-
-import eu.eyan.idakonyvtar.model._
-import eu.eyan.idakonyvtar.model.Book
-import eu.eyan.idakonyvtar.model.Library
+import eu.eyan.idakonyvtar.IdaLibrary
+import eu.eyan.idakonyvtar.model.{Book, Library, _}
 import eu.eyan.idakonyvtar.oszk.Marc
 import eu.eyan.idakonyvtar.text.TechnicalTextsIda._
 import eu.eyan.log.Log
 import eu.eyan.util.backup.BackupHelper
+import eu.eyan.util.excel._
 import eu.eyan.util.io.FilePlus.FilePlusImplicit
-import eu.eyan.util.string.StringPlus.StringPlusImplicit
-import jxl.Sheet
 import jxl.Workbook
-import jxl.WorkbookSettings
 import jxl.read.biff.BiffException
-import jxl.write.Label
-import jxl.write.WritableCellFormat
-import eu.eyan.idakonyvtar.util.LibraryExcelHandler.FieldConfiguration
-import eu.eyan.idakonyvtar.text.TextsIda
-import eu.eyan.idakonyvtar.IdaLibrary
-import eu.eyan.util.excel.ExcelPlus
-import eu.eyan.util.excel.ExcelColumn
-import eu.eyan.util.excel.ExcelCell
-import eu.eyan.util.excel.ExcelSheet
-import eu.eyan.util.excel.ExcelRow
+import jxl.write.{Label, WritableCellFormat}
+import org.apache.commons.io.{FileUtils, FilenameUtils}
+
+import scala.collection.mutable.ListBuffer
 
 object LibraryExcelHandler {
   
@@ -59,9 +42,9 @@ object LibraryExcelHandler {
 
       new Library(file, bookFields, books.to[ListBuffer])
     } catch {
-      case e: BiffException => throw new LibraryException("Biff Hiba a beolvasásnál " + e.getLocalizedMessage());
-      case e: IOException   => throw new LibraryException("IO hiba a beolvasásnál " + e.getLocalizedMessage());
-      case t: Throwable     => throw new LibraryException(t.getLocalizedMessage());
+      case e: BiffException => throw new LibraryException("Biff Hiba a beolvasásnál " + e.getLocalizedMessage);
+      case e: IOException   => throw new LibraryException("IO hiba a beolvasásnál " + e.getLocalizedMessage);
+      case t: Throwable     => throw new LibraryException(t.getLocalizedMessage);
     }
   }
 
@@ -76,9 +59,9 @@ object LibraryExcelHandler {
 
   def saveLibrary(targetFile: File, library: Library): Boolean = {
     if (targetFile.exists())
-      if (targetFile.isFile())
+      if (targetFile.isFile)
         try {
-          backup(targetFile);
+          backup(targetFile)
           FileUtils.forceDelete(targetFile)
         } catch {
           case e: IOException => e.printStackTrace()
@@ -138,7 +121,7 @@ object LibraryExcelHandler {
 			  val configRow = configurationTable.rowFromFirstColumn(fieldName)
 					  if (configRow.nonEmpty) {
 						  val configCells = FIELD_TYPES.mapValues(column => configurationTable.getCell((column, configRow.get)))
-								  val yesConfigCells = configCells.filter(_._2.content.map(isTrue).getOrElse(false))
+								  val yesConfigCells = configCells.filter(_._2.content.exists(isTrue))
 								  yesConfigCells.keys.toList
 					  } else List()
 	  }
@@ -168,7 +151,7 @@ object LibraryExcelHandler {
     private def getValue(fieldName: String, column: ExcelColumn) = {
       val rowOpt = configurationTable.rowFromFirstColumn(fieldName)
       val colRow = rowOpt.map((column, _))
-      colRow.map(configurationTable.getCell).map(_.content).flatten
+      colRow.map(configurationTable.getCell).flatMap(_.content)
     }
     
     private def isTrue(string: String) = string.trim.nonEmpty

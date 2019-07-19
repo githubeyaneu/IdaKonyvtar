@@ -1,8 +1,7 @@
-package eu.eyan.idakonyvtar.controller;
+package eu.eyan.idakonyvtar.controller
 
-import javax.swing.JMenuBar;
-import javax.swing.JToolBar;
+import javax.swing.JToolBar
 
 trait IControllerWithMenu[INPUT, OUTPUT] extends IController[INPUT, OUTPUT] {
-  def getToolBar(): JToolBar
+  def getToolBar: JToolBar
 }

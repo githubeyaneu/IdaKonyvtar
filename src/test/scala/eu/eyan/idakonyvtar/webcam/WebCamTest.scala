@@ -1,16 +1,10 @@
 package eu.eyan.idakonyvtar.webcam
 
-import org.junit.runner.RunWith
-import org.junit.Test
-import eu.eyan.testutil.ScalaEclipseJunitRunner
-import com.github.sarxos.webcam.Webcam
-import javax.imageio.ImageIO
-import java.io.File
-import java.awt.Dimension
-import com.github.sarxos.webcam.WebcamResolution
-import com.github.sarxos.webcam.WebcamPanel
+import com.github.sarxos.webcam.{Webcam, WebcamPanel, WebcamResolution}
+import eu.eyan.testutil.{ScalaEclipseJunitRunner, TestPlus}
 import javax.swing.JFrame
-import eu.eyan.testutil.TestPlus
+import org.junit.Test
+import org.junit.runner.RunWith
 
 @RunWith(classOf[ScalaEclipseJunitRunner])
 class WebCamTest extends TestPlus{
@@ -22,7 +16,7 @@ class WebCamTest extends TestPlus{
     waitFor(webcam.isOpen ==> false, 1000)
     webcam.setViewSize(webcam.getViewSizes.last)
     webcam.open
-    val image = webcam.getImage
+//    val image = webcam.getImage
     //ImageIO.write(image, "JPG", new File("""C:\Users\anfr895\Desktop\test.JPG"""));
     webcam.close
   }
@@ -34,7 +28,7 @@ class WebCamTest extends TestPlus{
 object WebCamTest extends App {
 
   val webcam = Webcam.getDefault
-  webcam.setViewSize(WebcamResolution.VGA.getSize())
+  webcam.setViewSize(WebcamResolution.VGA.getSize)
 
   val panel = new WebcamPanel(webcam)
   panel.setFPSDisplayed(true)

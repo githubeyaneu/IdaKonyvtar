@@ -1,34 +1,24 @@
 package eu.eyan.idakonyvtar
 
-import eu.eyan.util.swing.WithComponent
-import eu.eyan.util.swing.JTabbedPanePlus
-import eu.eyan.idakonyvtar.controller.LibraryEditor
-import java.awt.Frame
-import javax.swing.JFrame
-import eu.eyan.util.rx.lang.scala.subjects.BehaviorSubjectPlus.BehaviorSubjectImplicit
-import eu.eyan.idakonyvtar.util.DialogHelper
-import eu.eyan.idakonyvtar.text.TextsIda
-import eu.eyan.idakonyvtar.util.DialogHelper.YES
-import eu.eyan.idakonyvtar.util.DialogHelper.NO
-import java.awt.Component
 import java.awt.event.ActionEvent
-import eu.eyan.idakonyvtar.controller.LibraryEditor
-import eu.eyan.idakonyvtar.controller.LibraryEditor
-import rx.lang.scala.Observable
-import eu.eyan.idakonyvtar.text.TechnicalTextsIda._
 import java.io.File
-import eu.eyan.log.Log
-import eu.eyan.util.text.Text
-import eu.eyan.util.io.FilePlus.FilePlusImplicit
-import eu.eyan.util.string.StringPlus.StringPlusImplicit
-import eu.eyan.util.scala.Try
-import eu.eyan.idakonyvtar.util.LibraryExcelHandler
-import eu.eyan.util.rx.lang.scala.ObservablePlus.ObservableImplicit
+
+import eu.eyan.idakonyvtar.controller.LibraryEditor
 import eu.eyan.idakonyvtar.text.TechnicalTextsIda._
+import eu.eyan.idakonyvtar.util.DialogHelper.{NO, YES}
+import eu.eyan.idakonyvtar.util.{DialogHelper, LibraryExcelHandler}
+import eu.eyan.log.Log
+import eu.eyan.util.io.FilePlus.FilePlusImplicit
+import eu.eyan.util.rx.lang.scala.ObservablePlus.ObservableImplicit
+import eu.eyan.util.scala.Try
+import eu.eyan.util.string.StringPlus.StringPlusImplicit
+import eu.eyan.util.swing.{JTabbedPanePlus, WithComponent}
+import eu.eyan.util.text.Text
+import javax.swing.JFrame
 
 class IdaLibraryMultiEditor extends WithComponent {
   def getComponent = tabbedPane
-  def confirmExit(frame: JFrame) = askToSaveIfDirty(frame, tabbedPane.items.toList)
+  def confirmExit(frame: JFrame) = askToSaveIfDirty(frame, tabbedPane.items)
   def deleteBookInActiveLibrary(evt: ActionEvent) = getActiveTab foreach deleteBook
   def createNewBookInActiveLibrary = getActiveTab foreach createNewBook
   def saveActiveLibraryAs(fileOnSuccess: File => Unit) = getActiveTab foreach chooseFileToSaveAsLibrary(fileOnSuccess)
@@ -96,7 +86,7 @@ class IdaLibraryMultiEditor extends WithComponent {
       Log.info("Loading library: " + file)
       val library = Try(LibraryExcelHandler.readLibrary(file))
 
-      if (library.isSuccess && library.get.columnNamesAndIndexesToShow.size > 0) {
+      if (library.isSuccess && library.get.columnNamesAndIndexesToShow.nonEmpty) {
         val libraryController = new LibraryEditor(library.get)
         val dirtyText = libraryController.isDirtyObservable.map(dirtyToText)
         tabbedPane.addTab(libraryController, new Text(libraryController.file.withoutExtension.getName + PARAM, dirtyText), libraryController.file.toString, closeLibrary _)

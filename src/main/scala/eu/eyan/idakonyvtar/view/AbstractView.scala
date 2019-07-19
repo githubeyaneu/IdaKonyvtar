@@ -1,8 +1,8 @@
-package eu.eyan.idakonyvtar.view;
+package eu.eyan.idakonyvtar.view
 
 import java.awt.Component
-import com.jgoodies.forms.layout.FormLayout
-import com.jgoodies.forms.layout.RowSpec
+
+import com.jgoodies.forms.layout.{FormLayout, RowSpec}
 
 object AbstractView {
   def addRow(layout: FormLayout, spec: String): Int = {
@@ -12,7 +12,7 @@ object AbstractView {
 }
 
 abstract class AbstractView extends IView {
-  var view: Component = null
+  var view: Component = _
 
   override def getComponent: Component = {
     if (this.view == null) this.view = createViewComponent

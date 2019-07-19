@@ -1,34 +1,23 @@
 package eu.eyan.idakonyvtar
 
+import java.awt.Desktop
+import java.awt.Desktop.Action
+import java.awt.peer.DesktopPeer
 import java.io.File
+import java.net.URI
 
-import org.fest.swing.core.matcher.JButtonMatcher
-import org.junit.After
-import org.junit.Before
-import org.junit.Ignore
-import org.junit.Test
-
-import eu.eyan.idakonyvtar.testhelper.IdaLibraryTestHelper
-import eu.eyan.idakonyvtar.testhelper.LibraryFileBuilder
+import eu.eyan.idakonyvtar.testhelper.{AbstractUiTest, IdaLibraryTestHelper, LibraryFileBuilder}
 import eu.eyan.idakonyvtar.text.TextsIda
-import eu.eyan.idakonyvtar.util.LibraryExcelHandler
+import eu.eyan.log.{Log, LogWindow}
 import eu.eyan.testutil.ExcelAssert
 import eu.eyan.testutil.video.VideoRunner
-import eu.eyan.util.swing.HighlightRenderer
-import org.fest.swing.fixture.FrameFixture
-import eu.eyan.log.LogWindow
 import eu.eyan.util.awt.clipboard.ClipboardPlus
-import eu.eyan.log.Log
 import eu.eyan.util.registry.RegistryPlus
-import java.awt.Desktop
-import java.awt.peer.DesktopPeer
-import org.mockito.Mockito
-import org.mockito.ArgumentCaptor
-import java.net.URI
-import java.awt.Desktop.Action
-import org.fest.swing.core.BasicRobot
 import eu.eyan.util.scala.Try
-import eu.eyan.idakonyvtar.testhelper.AbstractUiTest
+import eu.eyan.util.swing.HighlightRenderer
+import org.fest.swing.core.matcher.JButtonMatcher
+import org.fest.swing.fixture.FrameFixture
+import org.junit.{After, Before, Test}
 
 object IdaLibraryTest {
   def main(args: Array[String]) = {
@@ -38,7 +27,7 @@ object IdaLibraryTest {
 }
 
 class IdaLibraryTest extends AbstractUiTest {
-  private var library = new IdaLibraryTestHelper
+  private val library = new IdaLibraryTestHelper
 
   @Before
   def setUp = {

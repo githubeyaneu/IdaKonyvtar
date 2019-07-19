@@ -2,27 +2,21 @@ package eu.eyan.idakonyvtar
 
 import java.awt.event.KeyEvent
 
-import org.fest.assertions.Assertions.assertThat
-import org.fest.swing.core.BasicRobot
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
-
 import eu.eyan.idakonyvtar.controller.BookEditor
-import eu.eyan.idakonyvtar.model.Autocomplete
-import eu.eyan.idakonyvtar.model.Book
-import eu.eyan.idakonyvtar.model.BookField
-import eu.eyan.idakonyvtar.model.Multifield
+import eu.eyan.idakonyvtar.model.{Autocomplete, Book, BookField, Multifield}
 import eu.eyan.idakonyvtar.oszk.Marc
-import eu.eyan.idakonyvtar.testhelper.AbstractUiTest
-import eu.eyan.idakonyvtar.testhelper.BookEditorTestHelper
+import eu.eyan.idakonyvtar.testhelper.{AbstractUiTest, BookEditorTestHelper}
 import eu.eyan.idakonyvtar.util.DialogHelper
 import eu.eyan.log.Log
 import eu.eyan.testutil.video.VideoRunner
 import eu.eyan.util.excel.ExcelColumn
 import eu.eyan.util.text.Text
 import javax.swing.SwingUtilities
-import scala.collection.mutable.Map
+import org.fest.assertions.Assertions.assertThat
+import org.fest.swing.core.BasicRobot
+import org.junit.{After, Before, Test}
+
+import scala.collection.mutable
 
 object BookEditorTest {
   def main(args: Array[String]): Unit = {
@@ -32,9 +26,9 @@ object BookEditorTest {
 }
 
 class BookBuilder(columnCount: Int) {
-  val fields = (0 until columnCount).toSeq.map(c => BookField(ExcelColumn(c), "", List(), Array())).toList
+  val fields = (0 until columnCount).map(c => BookField(ExcelColumn(c), "", List(), Array())).toList
   val book = Book.empty(fields)
-  val fieldsAndValues = Map[BookField, String]()
+  val fieldsAndValues = mutable.Map[BookField, String]()
 
   def withValue(columnIndex: Int, value: String): BookBuilder = {
     Log.debug(columnIndex + " " + value)
@@ -94,7 +88,7 @@ class BookEditorTest extends AbstractUiTest {
   def testNormalField(): Unit = {
     bookEditor.setNormalText("szimpla", "szimpla")
     bookEditor.clickSave()
-    assertThat(outputBook.getValue(fields(0))).isEqualTo("szimpla")
+    assertThat(outputBook.getValue(fields.head)).isEqualTo("szimpla")
   }
 
   @Test

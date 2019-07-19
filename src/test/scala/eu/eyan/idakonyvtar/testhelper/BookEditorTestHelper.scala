@@ -1,34 +1,17 @@
 package eu.eyan.idakonyvtar.testhelper
 
-import org.fest.swing.finder.WindowFinder.findDialog
-
 import java.awt.Component
-
 import java.awt.event.KeyEvent
 
-import javax.swing.JDialog
-
-import javax.swing.SwingUtilities
-
-import org.fest.assertions.Fail
-
-import org.fest.swing.core.GenericTypeMatcher
-
-import org.fest.swing.core.Robot
-
-import org.fest.swing.fixture.ContainerFixture
-
-import org.fest.swing.fixture.DialogFixture
-
-import eu.eyan.idakonyvtar.util.DialogHelper
-
-
+import eu.eyan.idakonyvtar.testhelper.BookEditorTestHelper._
 import eu.eyan.testutil.swing.fixture.AutocompleteFixture
-
-import BookEditorTestHelper._
+import javax.swing.{JDialog, SwingUtilities}
+import org.fest.assertions.Fail
+import org.fest.swing.core.{GenericTypeMatcher, Robot}
+import org.fest.swing.finder.WindowFinder.findDialog
+import org.fest.swing.fixture.{ContainerFixture, DialogFixture}
 
 //remove if not needed
-import scala.collection.JavaConversions._
 
 object BookEditorTestHelper {
 
@@ -42,7 +25,7 @@ object BookEditorTestHelper {
 
 class BookEditorTestHelper(robot: Robot) {
 
-  private var dialog: DialogFixture =
+  private val dialog: DialogFixture =
     findDialog(VISIBLE_DIALOG_FINDER).withTimeout(1000).using(robot)
 
   dialog.target.toFront()
@@ -56,8 +39,7 @@ class BookEditorTestHelper(robot: Robot) {
                                        textBoxName: String): Unit = {
     try container.label(textBoxName)
     catch {
-      case e: Exception => return
-
+      case _: Exception => return
     }
     Fail.fail()
   }
@@ -66,8 +48,7 @@ class BookEditorTestHelper(robot: Robot) {
                                      labelName: String): Unit = {
     try container.label(labelName).requireVisible()
     catch {
-      case e: Exception => return
-
+      case _: Exception => return
     }
     Fail.fail()
   }
@@ -124,7 +105,7 @@ class BookEditorTestHelper(robot: Robot) {
     dialog.textBox(textBoxName).requireText(text)
   }
 
-  def getComponentToRecord(): Component = SwingUtilities.getRoot(dialog.target)
+  def getComponentToRecord: Component = SwingUtilities.getRoot(dialog.target)
 
   def autocomplete(name: String): AutocompleteFixture =
     new AutocompleteFixture(dialog, name)

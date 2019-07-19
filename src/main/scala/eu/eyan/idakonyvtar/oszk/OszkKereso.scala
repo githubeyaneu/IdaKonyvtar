@@ -1,10 +1,6 @@
-package eu.eyan.idakonyvtar.oszk;
+package eu.eyan.idakonyvtar.oszk
 
 import java.io.IOException
-
-import org.unix4j.Unix4j
-
-import com.google.common.collect.Lists
 
 import eu.eyan.log.Log
 import eu.eyan.util.http.HttpPlus
@@ -16,7 +12,7 @@ import eu.eyan.util.string.StringPlus.StringPlusImplicit
 
 class OszkKeresoException(message: String, cause: Throwable) extends Exception(message, cause)
 class Marc(val marc1: String, val marc2: String, val marc3: String, val value: String) {
-  override def toString() = "Marc [marc1=" + marc1 + ", marc2=" + marc2 + ", marc3=" + marc3 + ", value=" + value + "]"
+  override def toString = "Marc [marc1=" + marc1 + ", marc2=" + marc2 + ", marc3=" + marc3 + ", value=" + value + "]"
   def toExcel = marc1 + "-" + marc2 + "-" + marc3
 }
 
@@ -30,7 +26,7 @@ object OszkKereso {
       "http://nektar1.oszk.hu/LVbin/LibriVision/lv_login.html",
       "USER_LOGIN=Nektar_LV_user&USER_PASSWORD=Nektar&LanguageCode=hu&CountryCode=hu&HtmlSetCode=default&lv_action=LV_Login&image3.x=17&image3.y=9",
       "SESSIO", "SESSION_ID=", "([0-9]*_[0-9]*)", "&")
-    Log.debug("Session Id:" + session_id);
+    Log.debug("Session Id:" + session_id)
 
     // Login2
     HttpPlus.sendPost(
@@ -50,12 +46,12 @@ object OszkKereso {
       "href=\"",
       ".*",
       "\">MARC form")
-    Log.debug("marcLink:" + marcLink);
+    Log.debug("marcLink:" + marcLink)
 
     // Marc rövid, marc hosszú keresése
     val fullMarcLink = findTextInUrl(
       "http://nektar1.oszk.hu/LVbin/LibriVision/" + marcLink, "", "Teljes megjelen", "href=\"", ".*", "\">Teljes")
-    Log.debug("fullMarcLink:" + fullMarcLink);
+    Log.debug("fullMarcLink:" + fullMarcLink)
 
     // Marc hosszú
     s"http://nektar1.oszk.hu/LVbin/LibriVision/$fullMarcLink".asUrlPost("").mkString
@@ -73,7 +69,7 @@ object OszkKereso {
     val postUrl = host.asUrlPost(postParameter).mkString
     Log.info("postUrl: " + postUrl)
     //    val line = Unix4j.fromString(postUrl).grep(lineGrep).toStringResult()
-    val line = postUrl.lines.filter(_.contains(lineGrep)).toList(0)
+    val line = postUrl.lines.filter(_.contains(lineGrep)).toList.head
     Log.info("Line: " + line)
     val firstMatch = (regex_prefix + regex + regexPost).r.findFirstIn(line).get
 
@@ -83,7 +79,7 @@ object OszkKereso {
   @throws(classOf[OszkKeresoException])
   def getMarcsToIsbn(isbn: String): List[Marc] = {
     try {
-      var source = isbnKeresOszkban(isbn).replaceAll("[\r\n]", "")
+      val source = isbnKeresOszkban(isbn).replaceAll("[\r\n]", "")
       val marcTable = "<table class=\"record\">.*?</table>".r.findFirstIn(source).get
 
       var lastMarc1 = ""
@@ -112,10 +108,9 @@ object OszkKereso {
       marcs.foreach(m => Log.debug(m.toString()))
       marcs
     } catch {
-      case e: Throwable => {
-        e.printStackTrace();
+      case e: Throwable =>
+        e.printStackTrace()
         throw new OszkKeresoException("Sikertelen.", e)
-      }
     }
   }
 }

@@ -1,11 +1,6 @@
 package eu.eyan.idakonyvtar.webcam
 
-import java.lang.Thread.UncaughtExceptionHandler
-
-import com.github.sarxos.webcam.WebcamPanel
-import com.github.sarxos.webcam.WebcamPicker
-import com.github.sarxos.webcam.WebcamResolution
-
+import com.github.sarxos.webcam.{WebcamPanel, WebcamPicker, WebcamResolution}
 import eu.eyan.log.Log
 import eu.eyan.util.swing.JFramePlus.JFramePlusImplicit
 import javax.swing.JFrame
@@ -34,9 +29,7 @@ object WebcamViewerExample extends App {
       }
       t.setName("example-starter")
       t.setDaemon(true)
-      t.setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
-        def uncaughtException(x: Thread, x2: Throwable) = Log.error(s"webcam thread error $x", x2)
-      })
+      t.setUncaughtExceptionHandler((x: Thread, x2: Throwable) => Log.error(s"webcam thread error $x", x2))
       t.start()
       Option( WebCamStartResult(panel, t))
     }

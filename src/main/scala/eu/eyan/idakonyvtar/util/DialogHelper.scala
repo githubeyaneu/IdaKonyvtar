@@ -1,53 +1,16 @@
-package eu.eyan.idakonyvtar.util;
+package eu.eyan.idakonyvtar.util
 
-import java.awt.BorderLayout
 import java.awt.Component
-import java.awt.Frame
-import java.awt.Toolkit
-import java.awt.Window
-import java.awt.event.ActionEvent
-import java.awt.event.ActionListener
-import java.awt.event.WindowAdapter
-import java.awt.event.WindowEvent
-import org.jdesktop.swingx.JXFrame
-import com.jgoodies.forms.builder.PanelBuilder
-import com.jgoodies.forms.factories.CC
-import com.jgoodies.forms.layout.FormLayout
-import eu.eyan.idakonyvtar.controller.IController
-import eu.eyan.idakonyvtar.controller.IControllerWithMenu
-import eu.eyan.idakonyvtar.controller.IDialogController
-import javax.swing.JButton
-import javax.swing.JFrame
-import javax.swing.JMenuBar
-import javax.swing.JOptionPane
-import javax.swing.JScrollPane
-import javax.swing.JToolBar
-import javax.swing.SwingUtilities
-import eu.eyan.util.swing.OkCancelDialog
-import eu.eyan.util.swing.OkCancelDialog
-import eu.eyan.util.swing.JPanelWithFrameLayout
-import javax.swing.JPanel
-import eu.eyan.util.awt.ComponentPlus.ComponentPlusImplicit
-import eu.eyan.util.swing.JDialogPlus.JdialogPlusImplicit
-import eu.eyan.util.text.Text
-import eu.eyan.util.swing.JButtonPlus.JButtonImplicit
-import eu.eyan.util.swing.Alert
-import javax.swing.UIManager
-import javax.swing.JFileChooser
-import eu.eyan.util.swing.JFileChooserPlus.JFileChooserImplicit
 import java.io.File
-import eu.eyan.util.text.TextsDialogYes
-import eu.eyan.util.text.TextsDialogYesNo
-import eu.eyan.util.text.TextsDialogFileChooser
-import eu.eyan.util.text.TextsDialogYesNoCancel
-import eu.eyan.util.swing.JDialogPlus.JdialogPlusImplicit
-import java.awt.GraphicsEnvironment
-import eu.eyan.util.swing.JPanelPlus.JPanelImplicit
-import eu.eyan.util.awt.ContainerPlus.ContainerPlusImplicit
-import eu.eyan.util.swing.JComponentPlus.JComponentImplicit
+
 import eu.eyan.idakonyvtar.text.TechnicalTextsIda._
-import eu.eyan.util.swing.WithComponent
-import javax.swing.JDialog
+import eu.eyan.util.awt.ComponentPlus.ComponentPlusImplicit
+import eu.eyan.util.swing.JButtonPlus.JButtonImplicit
+import eu.eyan.util.swing.JDialogPlus.JdialogPlusImplicit
+import eu.eyan.util.swing.JFileChooserPlus.JFileChooserImplicit
+import eu.eyan.util.swing.{Alert, JPanelWithFrameLayout}
+import eu.eyan.util.text._
+import javax.swing.{JDialog, JFileChooser, JOptionPane, UIManager}
 
 object DialogHelper {
 

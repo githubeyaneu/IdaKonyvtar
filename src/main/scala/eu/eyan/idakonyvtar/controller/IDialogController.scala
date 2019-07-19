@@ -1,6 +1,6 @@
-package eu.eyan.idakonyvtar.controller;
+package eu.eyan.idakonyvtar.controller
 
-import java.awt.Window;
+import java.awt.Window
 
 trait IDialogController[INPUT, OUTPUT] extends IController[INPUT, OUTPUT] {//TODO delete
   def onOk():Unit

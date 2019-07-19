@@ -1,6 +1,6 @@
-package eu.eyan.idakonyvtar.view;
+package eu.eyan.idakonyvtar.view
 
-import java.awt.Component;
+import java.awt.Component
 
 trait IView {
   def getComponent: Component

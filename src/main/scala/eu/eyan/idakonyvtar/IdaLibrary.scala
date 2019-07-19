@@ -1,10 +1,9 @@
 package eu.eyan.idakonyvtar
 
+import eu.eyan.idakonyvtar.text.TextsIda
 import eu.eyan.log.Log
 import eu.eyan.util.registry.RegistryGroup
 import eu.eyan.util.string.StringPlus.StringPlusImplicit
-import eu.eyan.idakonyvtar.text.TechnicalTextsIda._
-import eu.eyan.idakonyvtar.text.TextsIda
 
 // TODO - bookediting in scrollpane - multi editor - add many new lines - scrollpane gets not bigger 
 // TODO - bookediting in scrollpane - multi editor - add many new lines - autocomplete popup does not goes with component when scrolling 
@@ -50,7 +49,7 @@ class IdaLibrary
 
 object IdaLibrary {
   def main(args: Array[String]): Unit = {
-    val fileToOpen = args.lift(0).map(_.asFileOrResource).flatten
+    val fileToOpen = args.headOption.flatMap(_.asFileOrResource)
 
     Log.activateDebugLevel
     Log.info("Resource -> File: " + fileToOpen)

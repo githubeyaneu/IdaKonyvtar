@@ -32,8 +32,8 @@ class BookHelperTest {
       .map { x => Book(List((BookField(ExcelColumn(0), "", List(), Array()), x(0) + TechnicalTextsIda.MULTIFIELD_SEPARATOR + x(1)))) }
       .toList
 
-    def allBooks(r: Int) = (books(r).++(books2(r))).toList
-    def shuffledBooks(r: Int) = Random.shuffle(allBooks(r)).toList
+    def allBooks(r: Int) = books(r).++(books2(r))
+    def shuffledBooks(r: Int) = Random.shuffle(allBooks(r))
     var sum = 0L
     for { i <- 1 to 10 } {
       val b = shuffledBooks(i)

@@ -1,24 +1,18 @@
 package eu.eyan.idakonyvtar.testhelper
 
-import java.io.File
-import java.io.IOException
+import java.io.{File, IOException}
 
-import scala.collection.mutable.MutableList
-
-import eu.eyan.idakonyvtar.util.LibraryExcelHandler
-import jxl.Workbook
-import jxl.write.Label
-import jxl.write.WritableSheet
-import jxl.write.WritableWorkbook
 import eu.eyan.util.excel.ExcelPlus
+import jxl.Workbook
+import jxl.write.{Label, WritableSheet, WritableWorkbook}
 
 class LibraryFileBuilder {
 
-  private var workbook: WritableWorkbook = null
+  private var workbook: WritableWorkbook = _
 
   private var sorok = 0
 
-  private var actualSheet: WritableSheet = null
+  private var actualSheet: WritableSheet = _
 
   var file: File = new File(System.currentTimeMillis() + ".xls")
 

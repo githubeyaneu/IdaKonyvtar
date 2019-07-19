@@ -1,33 +1,18 @@
 package eu.eyan.idakonyvtar.text
 
+import java.io.File
+
+import eu.eyan.idakonyvtar.IdaLibrary
+import eu.eyan.log.Log
+import eu.eyan.util.excel.ExcelPlus
+import eu.eyan.util.text._
 import rx.lang.scala.Observable
 import rx.lang.scala.subjects.BehaviorSubject
-import eu.eyan.util.scala.Try
-import eu.eyan.util.string.StringPlus.StringPlusImplicit
-import eu.eyan.idakonyvtar.util.LibraryExcelHandler
-import eu.eyan.log.Log
-import eu.eyan.util.text.Text
-import eu.eyan.util.registry.RegistryPlus
-import eu.eyan.idakonyvtar.IdaLibrary
-import javax.swing.JFrame
-import eu.eyan.util.awt.ComponentPlus.ComponentPlusImplicit
-import eu.eyan.util.swing.Alert
-import javax.swing.JComboBox
-import eu.eyan.util.text.Texts
-import eu.eyan.util.registry.RegistryGroup
-import java.io.File
-import eu.eyan.util.text.TextsDialogYesNoCancel
-import eu.eyan.util.text.TextsDialogYes
-import eu.eyan.util.text.TextsDialogYesNo
-import eu.eyan.util.text.TextsDialogFileChooser
-import eu.eyan.util.text.TextsButton
-import eu.eyan.util.excel.ExcelPlus
 
 class TextsIda extends Texts {
   def getLanguages = languages
 
   private lazy val languageInRegistry = IdaLibrary.registryValue(classOf[TextsIda].getName)
-  private lazy val translationsXls = "translations.xls".toResourceFile.get
   private lazy val translationsXlsInputStream = ClassLoader.getSystemResourceAsStream("translations.xls")
   private lazy val translationsTable = ExcelPlus.readExcelFromStream(translationsXlsInputStream, "translations")
   private lazy val languages = translationsTable.firstRowCells.drop(2).filter(_.content.nonEmpty).map(_.content.get).filter(_.nonEmpty).toArray
@@ -46,7 +31,7 @@ class TextsIda extends Texts {
     Log.debug("technicalName row " + rowIndex)
 
     val colAndRow = for (a <- translationColumnIndex; b <- rowIndex) yield (a, b)
-    val translation = colAndRow.map(translationsTable.getCell).map(_.content).flatten
+    val translation = colAndRow.map(translationsTable.getCell).flatMap(_.content)
     Log.debug("translation " + translation)
 
     translation

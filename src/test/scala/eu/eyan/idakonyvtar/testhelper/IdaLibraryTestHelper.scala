@@ -1,32 +1,20 @@
 package eu.eyan.idakonyvtar.testhelper
 
-import java.awt.Component
-import java.awt.Point
+import java.awt.{Dialog, Point}
 import java.io.File
 
-import org.fest.assertions.Assertions.assertThat
-import org.fest.swing.core.MouseButton
-import org.fest.swing.core.matcher.JButtonMatcher
-import org.fest.swing.fixture.DialogFixture
-import org.fest.swing.fixture.FrameFixture
-
 import eu.eyan.idakonyvtar.IdaLibrary
-import eu.eyan.idakonyvtar.text.TextsIda
 import eu.eyan.testutil.TestPlus
-import org.fest.swing.fixture.JMenuItemFixture
-import eu.eyan.log.Log
-import org.fest.swing.core.Robot
-import org.fest.swing.core.BasicRobot
+import org.fest.assertions.Assertions.assertThat
+import org.fest.swing.core._
+import org.fest.swing.core.matcher.JButtonMatcher
 import org.fest.swing.exception.ComponentLookupException
-import org.fest.swing.core.TypeMatcher
-import java.awt.Dialog
-import org.fest.swing.core.ComponentFoundCondition
-import org.fest.swing.timing.Pause
-import org.fest.swing.timing.Timeout
+import org.fest.swing.fixture.{DialogFixture, FrameFixture, JMenuItemFixture}
+import org.fest.swing.timing.{Pause, Timeout}
 
 class IdaLibraryTestHelper extends TestPlus {
 
-  var robot: Robot = null
+  var robot: Robot = _
 
   def dialog = {
     if (robot == null) robot = BasicRobot.robotWithCurrentAwtHierarchy
@@ -51,6 +39,7 @@ class IdaLibraryTestHelper extends TestPlus {
   def start = { IdaLibrary.main(Array("library.xls")); this }
   def start(filenév: String) = { IdaLibrary.main(Array(filenév)); this }
 
+  //noinspection AccessorLikeMethodIsUnit
   def toFront = frame.target.toFront
 
   def requireVisible(): Unit = {

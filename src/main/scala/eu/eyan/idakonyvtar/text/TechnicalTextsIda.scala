@@ -65,7 +65,7 @@ object TechnicalTextsIda {
   private val DATE_TIME_FORMATTER = new SimpleDateFormat(DATE_TIME_FORMAT)
   private def NOW = new Date()
   def NOW_DATE_TIME = DATE_TIME_FORMATTER.format(NOW)
-  def BACKUP_FILE_TEMPLATE(dir:String, sourceFileName:String) = s"${dir}$FILE_SEPARATOR${sourceFileName}_backup_v${VERSION}_${NOW_DATE_TIME}.zip"
+  def BACKUP_FILE_TEMPLATE(dir:String, sourceFileName:String) = s"$dir$FILE_SEPARATOR${sourceFileName}_backup_v${VERSION}_$NOW_DATE_TIME.zip"
   
   val EXCEL_SHEET_NAME_COLUMN_CONFIGURATION = "Configuration"
   val EXCEL_SHEET_NAME_BOOKS = "Books"

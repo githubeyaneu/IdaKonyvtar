@@ -1,48 +1,27 @@
-package eu.eyan.idakonyvtar.controller;
+package eu.eyan.idakonyvtar.controller
 
-import java.awt.Component
 import java.awt.Image
-import java.awt.Window
+import java.awt.image.BufferedImage
 import java.io.File
 
-import scala.collection.mutable.MutableList
-
-import com.google.common.collect.Lists.newArrayList
 import com.google.common.io.Resources
-
-import eu.eyan.idakonyvtar.model.Book
-import eu.eyan.idakonyvtar.model.BookField
-import eu.eyan.idakonyvtar.oszk.Marc
-import eu.eyan.idakonyvtar.oszk.OszkKereso
-import eu.eyan.idakonyvtar.oszk.OszkKeresoException
-import eu.eyan.idakonyvtar.text.TechnicalTextsIda.ISBN_LABEL
-import eu.eyan.idakonyvtar.text.TechnicalTextsIda.ISBN_TEXT
-import eu.eyan.idakonyvtar.text.TechnicalTextsIda.MULTIFIELD_SEPARATOR
-import eu.eyan.idakonyvtar.text.TechnicalTextsIda.MULTIFIELS_SEPARATOR_REGEX
+import eu.eyan.idakonyvtar.model.{Book, BookField}
+import eu.eyan.idakonyvtar.oszk.{Marc, OszkKereso, OszkKeresoException}
+import eu.eyan.idakonyvtar.text.TechnicalTextsIda.{ISBN_LABEL, ISBN_TEXT, MULTIFIELD_SEPARATOR, MULTIFIELS_SEPARATOR_REGEX}
 import eu.eyan.idakonyvtar.util.WebCam
 import eu.eyan.log.Log
 import eu.eyan.util.swing.JButtonPlus.JButtonImplicit
-import eu.eyan.util.swing.JLabelPlus.JLabelImplicit
-import eu.eyan.util.swing.JPanelWithFrameLayout
-import eu.eyan.util.swing.JTextFieldAutocomplete
-import eu.eyan.util.swing.JTextFieldPlus.JTextFieldPlusImplicit
-import eu.eyan.util.swing.SwingPlus
-import javax.swing.ImageIcon
-import javax.swing.JLabel
-import javax.swing.JOptionPane
-import javax.swing.JTextField
 import eu.eyan.util.swing.JComponentPlus.JComponentImplicit
-import javax.swing.JComponent
-import java.awt.image.BufferedImage
-import eu.eyan.util.swing.MultiFieldAutocomplete
-import eu.eyan.util.swing.MultiFieldJTextField
+import eu.eyan.util.swing.JLabelPlus.JLabelImplicit
+import eu.eyan.util.swing.JTextFieldPlus.JTextFieldPlusImplicit
+import eu.eyan.util.swing._
+import javax.swing._
 
 object BookEditor {
   def listForAutocomplete(bookList: Seq[Book], field: BookField) = bookList
     .map(_.getValue(field)) // get the values of the column
     .filter(_ != null) // only not nulls
-    .map(s => if (s.contains(MULTIFIELD_SEPARATOR)) getMultiFieldValues(s) else List(s)) // get all values if multifield
-    .flatten // take the whole list
+    .flatMap(s => if (s.contains(MULTIFIELD_SEPARATOR)) getMultiFieldValues(s) else List(s)) // get all values if multifield // take the whole list
     .++:(List("")) // empty is always the default option
     .map(_.trim)
     // .distinct //do distinct in ac
@@ -61,7 +40,7 @@ object BookEditor {
     bookList:   List[Book],
     loadedFile: File) = new BookEditor(book, fields, bookList, NO_ISBN, loadedFile)
 
-  private def getMultiFieldValues(value: String) = value.split(MULTIFIELS_SEPARATOR_REGEX).filter(!_.isEmpty()).toList
+  private def getMultiFieldValues(value: String) = value.split(MULTIFIELS_SEPARATOR_REGEX).filter(!_.isEmpty).toList
   private def encodeMultiFieldValues(values: TraversableOnce[String]) = values.mkString(MULTIFIELD_SEPARATOR)
 }
 
@@ -83,7 +62,6 @@ class BookEditor private (
   private val isbnSearchLabel = new JLabel()
   private val isbnText = new JTextField()
   private val webcamPanel = new JPanelWithFrameLayout
-  private val resizeListeners: java.util.List[Window] = newArrayList()
 
   val fieldsPanel = new JPanelWithFrameLayout().withSeparators.newColumn.newColumn("pref:grow")
 
@@ -108,7 +86,7 @@ class BookEditor private (
 
   fieldsPanel.newRow.span.addSeparatorWithTitle("Adatok")
 
-  case class BookFieldEditor(val field: BookField, val component: JComponent, valueGetter: () => String, valueSetter: String => Unit, imageGetter: () => BufferedImage = () => null) {
+  case class BookFieldEditor(field: BookField, component: JComponent, valueGetter: () => String, valueSetter: String => Unit, imageGetter: () => BufferedImage = () => null) {
     def getValue = valueGetter()
 		def getImage = imageGetter()
     def setValue(value: String) = valueSetter(value)
@@ -116,7 +94,7 @@ class BookEditor private (
     def disable = component.disabled
   }
 
-  val fieldEditors = for { fieldIndex <- 0 until fields.size } yield {
+  val fieldEditors = for { fieldIndex <- fields.indices } yield {
     val field = fields(fieldIndex)
     val value = book.getValue(field)
     Log.debug(s"column $field")
@@ -143,7 +121,7 @@ class BookEditor private (
         }
         book.getImage(field).foreach(setImage)
         button.onClicked({
-          textField.setText("");
+          textField.setText("")
           val image = WebCam.getImage
           setImage(image)
         })
@@ -215,14 +193,14 @@ class BookEditor private (
         val values = for {
           marcFromOszk <- marcsFromOszk
           fieldMarcCode <- fieldMarcCodes
-          if (isMarcsApply(marcFromOszk, fieldMarcCode))
+          if isMarcsApply(marcFromOszk, fieldMarcCode)
         } yield marcFromOszk.value
         Log.info("BookController.prozessIsbnData " + values.mkString("\r\n    "))
         fieldEditor.setValue(values.mkString(", "))
       } catch {
         case e: Exception =>
           e.printStackTrace()
-          JOptionPane.showMessageDialog(null, e.getLocalizedMessage()) // TODO
+          JOptionPane.showMessageDialog(null, e.getLocalizedMessage) // TODO
       }
     })
 

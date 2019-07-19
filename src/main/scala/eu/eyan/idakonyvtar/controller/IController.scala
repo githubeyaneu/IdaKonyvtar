@@ -1,19 +1,19 @@
-package eu.eyan.idakonyvtar.controller;
+package eu.eyan.idakonyvtar.controller
 
-import java.awt.Component;
+import java.awt.Component
 
 trait IController[INPUT, OUTPUT] {
 
-  def getView(): Component
+  def getView: Component
 
   @deprecated("change to observable")
-  def getTitle(): String
+  def getTitle: String
 
   def initData(input: INPUT): Unit
 
   def initBindings(): Unit
 
-  def getOutput(): OUTPUT
+  def getOutput: OUTPUT
 
-  def getComponentForFocus(): Component
+  def getComponentForFocus: Component
 }
