@@ -2,8 +2,9 @@ package eu.eyan.idakonyvtar
 
 import eu.eyan.idakonyvtar.text.TextsIda
 import eu.eyan.log.Log
-import eu.eyan.util.registry.RegistryGroup
+import eu.eyan.util.registry.{RegistryGroup, RegistryValue}
 import eu.eyan.util.string.StringPlus.StringPlusImplicit
+import eu.eyan.idakonyvtar.text.TextsIda
 
 // TODO - bookediting in scrollpane - multi editor - add many new lines - scrollpane gets not bigger 
 // TODO - bookediting in scrollpane - multi editor - add many new lines - autocomplete popup does not goes with component when scrolling 
@@ -57,9 +58,9 @@ object IdaLibrary {
     new IdaLibraryFrame(fileToOpen)
   }
   
-  def registryValue(parameterName: String) = registryGroup.registryValue(parameterName)
+  def registryValue(parameterName: String): RegistryValue = registryGroup.registryValue(parameterName)
   
-  def texts = textsIda
+  def texts: TextsIda = textsIda
 
   private val registryGroup = RegistryGroup(classOf[IdaLibrary].getName)
   // must come after

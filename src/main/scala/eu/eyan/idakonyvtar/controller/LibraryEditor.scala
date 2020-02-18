@@ -20,8 +20,7 @@ import eu.eyan.util.swing.{JPanelWithFrameLayout, TableCol, TableRow, WithCompon
 import javax.imageio.ImageIO
 import rx.lang.scala.subjects.BehaviorSubject
 
-import scala.collection.JavaConverters._
-
+import scala.collection.JavaConversions.asScalaBuffer
 
 class LibraryEditor(val library: Library) extends WithComponent {
   override def toString = s"LibraryController[file=${library.file}, nrOfBooks=${numberOfBooks.get}, isBookSelected=${isBookSelected.get}]"

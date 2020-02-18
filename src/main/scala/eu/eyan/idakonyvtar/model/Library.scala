@@ -64,9 +64,9 @@ class ListBufferAsJava[T](list: ListBuffer[T]) extends java.util.List[T] {
   //noinspection NotImplementedCode
   def subList(x$1: Int, x$2: Int): java.util.List[T] = ???
   //noinspection NotImplementedCode
-  def toArray[X](x$1: Array[X with Object]): Array[X with Object] = ???
+  def toArray[X](a: Array[X]): Array[X] = ???
   //noinspection NotImplementedCode
   def toArray: Array[Object] = ???
   //noinspection NotImplementedCode
-  def toArray[X](a: Array[X]) = ???
+  def toArray[X](a: Array[X with Object]): Array[X with Object] = ???
 }

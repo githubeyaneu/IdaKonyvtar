@@ -32,8 +32,8 @@ object OszkKereso {
     HttpPlus.sendPost(
       "http://nektar1.oszk.hu/LVbin/LibriVision/lv_search_form.html?SESSION_ID="
         + session_id
-        + "&lv_action=LV_Search_Form&HTML_SEARCH_TYPE=SIMPLE&DB_ID=2",
-      "")
+        + "&lv_action=LV_Search_Form&HTML_SEARCH_TYPE=SIMPLE&DB_ID=2"
+    )
 
     // Keresés aztán Marc rövid formátum keresése
     val marcLink = findTextInUrl(
@@ -54,7 +54,7 @@ object OszkKereso {
     Log.debug("fullMarcLink:" + fullMarcLink)
 
     // Marc hosszú
-    s"http://nektar1.oszk.hu/LVbin/LibriVision/$fullMarcLink".asUrlPost("").mkString
+    s"http://nektar1.oszk.hu/LVbin/LibriVision/$fullMarcLink".asUrlPost().mkString
   }
 
   @throws(classOf[IOException])
@@ -109,7 +109,7 @@ object OszkKereso {
       marcs
     } catch {
       case e: Throwable =>
-        e.printStackTrace()
+        e.printStackTrace
         throw new OszkKeresoException("Sikertelen.", e)
     }
   }

@@ -21,7 +21,8 @@ object BookEditor {
   def listForAutocomplete(bookList: Seq[Book], field: BookField) = bookList
     .map(_.getValue(field)) // get the values of the column
     .filter(_ != null) // only not nulls
-    .flatMap(s => if (s.contains(MULTIFIELD_SEPARATOR)) getMultiFieldValues(s) else List(s)) // get all values if multifield // take the whole list
+    .flatMap(s => if (s.contains(MULTIFIELD_SEPARATOR)) getMultiFieldValues(s) else List(s)) // get all values if multifield
+    // take the whole list
     .++:(List("")) // empty is always the default option
     .map(_.trim)
     // .distinct //do distinct in ac
