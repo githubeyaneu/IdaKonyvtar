@@ -132,7 +132,7 @@ class BookEditor private (
       } else {
         if (isAutocompleteField) {
           if (isMultiEditorField) {
-            val multiAutocomplete = new MultiFieldAutocomplete(field.fieldName, "Autocomplete", "Nincs találat").setAutoCompleteList(BookEditor.listForAutocomplete(bookList, field))
+            val multiAutocomplete = new MultiFieldAutocomplete(field.fieldName, "Autocomplete", "Nincs találat", BookEditor.listForAutocomplete(bookList, field))
             multiAutocomplete.setValues(BookEditor.getMultiFieldValues(value))
             BookFieldEditor(field, multiAutocomplete, () => BookEditor.encodeMultiFieldValues(multiAutocomplete.getValues), value => multiAutocomplete.setValues(List(value)))
           } else {

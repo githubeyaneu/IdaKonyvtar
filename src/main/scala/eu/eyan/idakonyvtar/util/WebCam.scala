@@ -6,7 +6,7 @@ import com.github.sarxos.webcam.{Webcam, WebcamPanel}
 import eu.eyan.log.Log
 import javax.swing.JComboBox
 
-import scala.collection.JavaConversions._
+import collection.JavaConverters._
 
 case class WebCamStartResult(panel: WebcamPanel, thread: Thread, picker: JComboBox[Webcam])
 

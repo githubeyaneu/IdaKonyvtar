@@ -67,8 +67,7 @@ class BookEditorIsbnTest extends AbstractUiTest {
 
     SwingUtilities.invokeLater(() =>
       DialogHelper.yesNoEditor(null, bookController.getComponent, new Text("title"), new Text("save"), new Text("cancel")))
-    bookEditor = new BookEditorTestHelper(
-      BasicRobot.robotWithCurrentAwtHierarchy())
+    bookEditor = new BookEditorTestHelper(BasicRobot.robotWithCurrentAwtHierarchy())
     VideoRunner.setComponentToRecord(bookEditor.getComponentToRecord)
   }
   /* TODO images map*/
