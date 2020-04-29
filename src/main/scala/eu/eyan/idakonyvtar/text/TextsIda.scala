@@ -51,9 +51,11 @@ class TextsIda extends Texts {
     validTranslationObs subscribe setTemplate _
   }
 
-  case object IdaLibraryTitleSingular extends IdaText("IdaLibraryTitleSingular")
-  case object IdaLibraryTitlePlural { def apply(nrOfBooks: Observable[Int]) = IdaText("IdaLibraryTitlePlural", nrOfBooks) }
-  case object IdaLibraryTitleEmpty extends IdaText("IdaLibraryTitleEmpty")
+  case object IdaLibraryTitleNoLibraryOpen extends IdaText("IdaLibraryTitleNoLibraryOpen")
+  case object IdaLibraryTitleSingular { def apply(selectedLibrary: Observable[String]) = IdaText("IdaLibraryTitleSingular", selectedLibrary) } 
+  case object IdaLibraryTitlePlural { def apply(selectedLibrary: Observable[String], nrOfBooks: Observable[Int]) = IdaText("IdaLibraryTitlePlural", selectedLibrary, nrOfBooks) }
+  case object IdaLibraryTitleEmpty { def apply(selectedLibrary: Observable[String]) = IdaText("IdaLibraryTitleEmpty", selectedLibrary) }
+  
   case object IdaLibraryTitleIcon extends IdaText("IdaLibraryTitleIcon")
   case object MenuFile extends IdaText("MenuFile")
   case object MenuFileLoad extends IdaText("MenuFileLoad")

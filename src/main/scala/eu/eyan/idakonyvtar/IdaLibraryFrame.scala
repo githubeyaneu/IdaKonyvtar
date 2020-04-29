@@ -18,6 +18,7 @@ import eu.eyan.util.swing.JTextFieldPlus.JTextFieldPlusImplicit
 import eu.eyan.util.swing.JToolBarPlus.JToolBarImplicit
 import javax.swing.{JFrame, JToolBar}
 import rx.lang.scala.subjects.BehaviorSubject
+import eu.eyan.util.rx.lang.scala.ObservablePlus.ObservableImplicitBoolean
 
 class IdaLibraryFrame(private val fileToOpen: Option[File]) {
   private val texts = IdaLibrary.texts
@@ -26,6 +27,7 @@ class IdaLibraryFrame(private val fileToOpen: Option[File]) {
   private val numberOfBooks = multiEditor.getActiveEditor.map(getLibraryNrOfBooksOr0).switch
   private val isBookSelected = multiEditor.getActiveEditor.map(getLibraryIsBookSelectedOrNo).switch
   private val isAnyLibraryOpen = multiEditor.getActiveEditor.map(libraryNonEmpty)
+  private val selectedLibraryName = multiEditor.getActiveEditor.map(editorOpt => editorOpt.map(editor=>editor.file.getName).getOrElse(""))
 
   checkAndselectLanguage
 
@@ -41,9 +43,15 @@ class IdaLibraryFrame(private val fileToOpen: Option[File]) {
   jToolBar.addLabel(texts.ToolbarFilterLabel)
   jToolBar.addTextField(5, EMPTY_STRING, FILTER).widthSet(200).onTextChanged(filterText).onHierarchyChangedEvent(_.getComponent.requestFocusInWindow)
 
+  val titleSelectedLibrary = numberOfBooks.emptySingularPlural(
+      texts.IdaLibraryTitleEmpty(selectedLibraryName), 
+      texts.IdaLibraryTitleSingular(selectedLibraryName), 
+      texts.IdaLibraryTitlePlural(selectedLibraryName, numberOfBooks))
+  val title = isAnyLibraryOpen.ifElse(titleSelectedLibrary, texts.IdaLibraryTitleNoLibraryOpen)
+  
   new JFrame()
     .name(classOf[IdaLibrary].getName)
-    .title(numberOfBooks.emptySingularPlural(texts.IdaLibraryTitleEmpty, texts.IdaLibraryTitleSingular, texts.IdaLibraryTitlePlural(numberOfBooks)))
+    .title(title)
     .iconFromChar('I')
     .addFluent(jToolBar, BorderLayout.NORTH)
     .addFluent(multiEditor.getComponent, BorderLayout.CENTER)
